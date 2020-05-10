@@ -1,0 +1,50 @@
+### login
+POST http://localhost:8082/sieg/public/autenticar HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "username": "rpineda",
+    "password": "@mapache@"
+}
+
+### check auth
+GET http://localhost:8082/sieg/public/session-data HTTP/1.1
+
+### logout
+GET http://localhost:8082/sieg/public/logout HTTP/1.1
+
+### rol
+POST http://localhost:8082/sieg/public/rol HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id": 10
+}
+
+### consultar identificacion para solicitud de grado
+GET http://localhost:8082/sieg/public/programas-por-identificacion/1083032282 HTTP/1.1
+
+### solicitar grado
+POST http://localhost:8082/sieg/public/solicitar-grado HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "identificacion": "1083032282",
+    "programa": "INGENIERÍA INDUSTRIAL",
+    "fecha_id": 10206
+}
+
+### solicitudes grado pendientes
+GET http://localhost:8082/sieg/public/solicitud-grado/pendientes HTTP/1.1
+
+### activar estudiante
+POST http://localhost:8082/sieg/public/dirprograma/activar-estudiante HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "solicitud_id": 1
+}
