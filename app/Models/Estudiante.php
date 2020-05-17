@@ -12,4 +12,9 @@ class Estudiante extends Model
     {
         return $this->belongsToMany('App\Models\PazSalvo', 'est_pazsalvo', 'idEstudiante', 'idPazsalvo');
     }
+
+    public function estudio()
+    {
+        return $this->belongsTo('App\Models\DependenciaModalidad', 'idPrograma');
+    }
 }

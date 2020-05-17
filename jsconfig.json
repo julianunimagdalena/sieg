@@ -1,5 +1,14 @@
 {
     "compilerOptions": {
-        "checkJs": true
-    }
+        "checkJs": true,
+        "allowUmdGlobalAccess": true,
+        "lib": [
+            "es2015",
+            "dom"
+        ]
+    },
+    "exclude": [
+        "node_modules",
+        "**/node_modules/*"
+    ]
 }

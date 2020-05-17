@@ -1,0 +1,35 @@
+### duraciones laborales
+get http://167.172.127.114/sieg/public/recursos/duraciones-laborales
+
+### idiomas
+get http://167.172.127.114/sieg/public/recursos/idiomas
+
+### niveles de cargo
+get http://167.172.127.114/sieg/public/recursos/niveles-cargo
+
+### niveles de idioma
+get http://167.172.127.114/sieg/public/recursos/niveles-idioma
+
+### paises
+get http://167.172.127.114/sieg/public/recursos/paises
+
+### departamentos
+get http://167.172.127.114/sieg/public/recursos/departamentos?pais=44
+
+### municipios
+get http://167.172.127.114/sieg/public/recursos/municipios?departamento=268
+
+### salarios
+get http://167.172.127.114/sieg/public/recursos/salarios
+
+### tipos de vinculacion
+get http://167.172.127.114/sieg/public/recursos/tipos-vinculacion
+
+### generos
+get http://167.172.127.114/sieg/public/recursos/generos
+
+### tipos de documento
+get http://167.172.127.114/sieg/public/recursos/tipos-documento
+
+### estados civiles
+get http://167.172.127.114/sieg/public/recursos/estados-civiles

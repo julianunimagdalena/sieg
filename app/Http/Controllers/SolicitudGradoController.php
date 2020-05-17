@@ -32,7 +32,7 @@ class SolicitudGradoController extends Controller
         $programas = [];
         $ws = new WSAdmisiones();
         $data = $ws->getInformacionGraduadoByDocumentoIdentidad($identificacion);
-        return [$data];
+
         foreach ($data as $d) {
             if ($d->situacionAcademica === 'REGULAR')
                 array_push($programas, $d->nombreDelPrograma);

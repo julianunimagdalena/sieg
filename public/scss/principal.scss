@@ -1,0 +1,51 @@
+$blue: #004a87;
+$orange: #d17900;
+$theme-colors: (
+    "primary": $blue
+);
+
+@import "../template-scss/sb-admin-2.scss";
+
+svg {
+    @extend i;
+    cursor: pointer;
+}
+
+.router-link-active svg {
+    color: #fff !important;
+}
+
+#sidebarToggle2 {
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 2.5rem;
+    height: 2.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    margin-right: 0.1rem;
+    font-family: "Font Awesome 5 Free";
+    color: #fff;
+    outline: none;
+}
+
+.topbar {
+    background-color: #ad34;
+    border-bottom: 3px solid $orange;
+}
+
+#sidebarToggleTop {
+    color: $white;
+}
+
+#sidebarToggleTop:hover {
+    color: $blue !important;
+}
+
+body {
+    color: #000;
+}
+
+.titulo {
+    text-transform: uppercase;
+    font-weight: 800;
+}

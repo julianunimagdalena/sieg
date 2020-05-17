@@ -1,0 +1,15 @@
+### datos
+get http://167.172.127.114/sieg/public/estudiante/datos
+Accept: application/json
+
+### datos academicos
+get http://167.172.127.114/sieg/public/estudiante/datos-academicos
+Accept: application/json
+
+### datos hoja
+get http://167.172.127.114/sieg/public/estudiante/datos-hoja
+Accept: application/json
+
+### datos laborales
+get http://167.172.127.114/sieg/public/estudiante/datos-laborales
+Accept: application/json

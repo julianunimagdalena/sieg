@@ -61,7 +61,8 @@ class WSAdmisiones
 
     public function getInformacionGraduadoByDocumentoIdentidad(string $identificacion, $tipoDoc = 'C.C.')
     {
-        $url = $this->baseURL . '/infgrdoc/' . $tipoDoc . '/' . $identificacion . '/' . $this->generateToken($identificacion);
+        $url = $this->baseURL . '/infgrdoc/' . $identificacion . '/' . $this->generateToken($identificacion);
+        // $url = $this->baseURL . '/infgrdoc/' . $tipoDoc . '/' . $identificacion . '/' . $this->generateToken($identificacion);
         return $this->fetch($url);
     }
 

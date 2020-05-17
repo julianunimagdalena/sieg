@@ -76,6 +76,7 @@ class CustomLoginController extends Controller
         Auth::logout();
         session(['ur' => null]);
 
+        return redirect('/');
         return 'ok';
     }
 }

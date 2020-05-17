@@ -26,6 +26,16 @@ class DirProgramaController extends Controller
         $this->middleware('rol:' . $roles['coordinador']->nombre);
     }
 
+    public function index()
+    {
+        return redirect('/dirprograma/solicitudes');
+    }
+
+    public function solicitudes()
+    {
+        return view('dirprograma.solicitudes');
+    }
+
     public function activarEstudiante(ActivarEstudianteRequest $request)
     {
         $solicitud = null;
