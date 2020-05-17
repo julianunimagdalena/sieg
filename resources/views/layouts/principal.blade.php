@@ -53,6 +53,33 @@
                 </li>
                 @endif
 
+
+                @if (session('ur')->rol->nombre === 'Estudiante')
+                    <style>
+                        .nav-item span {
+                            font-size: .8rem !important;
+                        }
+                    </style>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}">
+                            <i class="fas fa-fw fa-graduation-cap"></i>
+                            <span>Proceso de Grado</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}/encuesta">
+                            <i class="fas fa-file-invoice"></i>
+                            <span>Encuesta Momento de Grado</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}/ficha-egresado">
+                            <i class="fas fa-fw fa-poll-h"></i>
+                            <span>Ficha de Egresado</span>
+                        </a>
+                    </li>
+                @endif
+
                 <!-- Nav Item - Pages Collapse Menu -->
                 <!-- <li class="nav-item">
                     <a
@@ -155,7 +182,7 @@
                     <!-- End of Topbar -->
 
                     <!-- Begin Page Content -->
-                    <div class="container-fluid" v-if="!iscargando">
+                    <div class="container-fluid" id="app">
                         @yield('content')
                         <!-- <slot /> -->
                     </div>
@@ -213,6 +240,9 @@
     <script src="{{asset('vendor/vue.js')}}"></script>
     <script src="{{asset('vendor/sweetalert.min.js')}}"></script>
     <script src="{{asset('vendor/axios.min.js')}}"></script>
+    <script>
+        $(`a[href='${window.location.href}']`).parent().addClass('active');
+    </script>
     @stack('components')
     @stack('scripts')
 </body>

@@ -55,15 +55,15 @@ Route::get('/estudiante/datos-academicos', 'EstudianteController@datosAcademicos
 Route::get('/estudiante/datos-hoja', 'EstudianteController@datosHoja');
 Route::get('/estudiante/datos-laborales', 'EstudianteController@datosLaborales');
 
-Route::get('/vista/{path?}', function ($req, $path = '') {
-    $root = env('APP_ENV') === 'local' ? '/sieg/public/' : '/';
-    $template = Auth::check() ? 'welcome' : 'login';
-
-    return view($template, compact('root'));
-})->where('path', '(.*?)');
-
 Route::get('/direccion', 'DirProgramaController@index');
 Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
+
+//RUTAS VISTAS DE EGRESADO
+
+Route::get('/egresado', 'EstudianteController@getIndexEgresado');
+Route::get('/egresado/ficha-egresado', 'EstudianteController@getFichaEgresado');
+
+//FIN
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

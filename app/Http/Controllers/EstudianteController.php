@@ -169,4 +169,14 @@ class EstudianteController extends Controller
 
         return compact('actualidad_laboral', 'experiencias');
     }
+
+    public function getIndexEgresado()
+    {
+        return view('egresado.index');
+    }
+
+    public function getFichaEgresado()
+    {
+        return view('egresado.ficha');
+    }
 }
