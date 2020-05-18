@@ -49,6 +49,7 @@
                             <label>Departamento de nacimiento</label>
                             <select class="form-control" v-model="input.departamento_nacimiento_id" :disabled="input.departamento_nacimiento_id">
                                 <option value="" selected hidden>Seleccione una opción</option>
+
                                 <option v-for="(departamento) in datos.departamentos" :value="departamento.id">@{{ departamento.nombre }}</option>
                             </select>
                         </div>
