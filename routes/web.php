@@ -50,18 +50,30 @@ Route::get('/recursos/generos', 'RecursosController@generos');
 Route::get('/recursos/tipos-documento', 'RecursosController@tiposDocumento');
 Route::get('/recursos/estados-civiles', 'RecursosController@estadosCiviles');
 
-Route::get('/estudiante/datos', 'EstudianteController@datos');
-Route::get('/estudiante/datos-academicos', 'EstudianteController@datosAcademicos');
-Route::get('/estudiante/datos-hoja', 'EstudianteController@datosHoja');
-Route::get('/estudiante/datos-laborales', 'EstudianteController@datosLaborales');
+Route::get('/egresado/datos', 'EstudianteController@datos');
+Route::get('/egresado/datos-academicos', 'EstudianteController@datosAcademicos');
+Route::get('/egresado/datos-hoja', 'EstudianteController@datosHoja');
+Route::get('/egresado/datos-laborales', 'EstudianteController@datosLaborales');
+Route::post('/egresado/datos', 'EstudianteController@guardarDatosPersonales');
+Route::post('/egresado/estudio', 'EstudianteController@guardarEstudio');
+Route::post('/egresado/eliminar-estudio', 'EstudianteController@eliminarEstudio');
+Route::post('/egresado/perfil-profesional', 'EstudianteController@editarPerfilProfesional');
+Route::post('/egresado/distincion', 'EstudianteController@guardarDistincion');
+Route::post('/egresado/eliminar-distincion', 'EstudianteController@eliminarDistincion');
+Route::post('/egresado/asociacion', 'EstudianteController@guardarAsociacion');
+Route::post('/egresado/eliminar-asociacion', 'EstudianteController@eliminarAsociacion');
+Route::post('/egresado/concejo', 'EstudianteController@guardarConcejo');
+Route::post('/egresado/eliminar-concejo', 'EstudianteController@eliminarConcejo');
+Route::post('/egresado/agregar-discapacidad', 'EstudianteController@agregarDiscapacidad');
+Route::post('/egresado/eliminar-discapacidad', 'EstudianteController@eliminarDiscapacidad');
 
 Route::get('/direccion', 'DirProgramaController@index');
 Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
 
 //RUTAS VISTAS DE EGRESADO
 
-Route::get('/egresado', 'EstudianteController@getIndexEgresado');
-Route::get('/egresado/ficha-egresado', 'EstudianteController@getFichaEgresado');
+Route::get('/egresado', 'EstudianteController@index');
+Route::get('/egresado/ficha-egresado', 'EstudianteController@fichaEgresado');
 
 //FIN
 

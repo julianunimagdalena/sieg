@@ -2,9 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Concejo;
+use App\Http\Requests\EstudioRequest;
 use App\Models\UsuarioRol;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
+
+use App\Http\Requests\PersonaRequest;
+use App\Models\Asociacion;
+use App\Models\Discapacidad;
+use App\Models\Distincion;
+use App\Models\Estudio;
+use App\Models\HojaVida;
 
 class EstudianteController extends Controller
 {
@@ -13,7 +22,9 @@ class EstudianteController extends Controller
         $roles = Variables::roles();
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
-        $this->middleware('auth');
+        // danielviloriaap estudiante
+        session(['ur' => UsuarioRol::find(30013)]);
+        // $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
     }
 
@@ -96,7 +107,7 @@ class EstudianteController extends Controller
                     'id' => $est->id,
                     'nombre' => $est->titulo,
                     'institucion' => $est->institucion,
-                    'semestres' => $est->duracion,
+                    'meses' => $est->duracion,
                     'graduado' => $est->graduado,
                     'anio_culminacion' => $est->anioGrado,
                     'mes_culminacion' => $est->mesGrado
@@ -170,13 +181,218 @@ class EstudianteController extends Controller
         return compact('actualidad_laboral', 'experiencias');
     }
 
-    public function getIndexEgresado()
+    public function index()
     {
         return view('egresado.index');
     }
 
-    public function getFichaEgresado()
+    public function fichaEgresado()
     {
         return view('egresado.ficha');
+    }
+
+    public function guardarDatosPersonales(PersonaRequest $request)
+    {
+        $persona = session('ur')->usuario->persona;
+
+        $persona->fecha_expedicion = $request->fecha_expedicion_cedula;
+        $persona->idEstadoCivil = $request->estado_civil_id;
+        $persona->idGenero = $request->genero_id;
+        $persona->direccion = $request->direccion;
+        $persona->sector = $request->barrio;
+        $persona->ciudadResidencia = $request->municipio_residencia_id;
+        $persona->estrato = $request->estrato;
+        $persona->telefono_fijo = $request->telefono_fijo;
+        $persona->celular = $request->celular;
+        $persona->celular2 = $request->celular2;
+        $persona->correo = $request->correo;
+        $persona->correo2 = $request->correo2;
+        $persona->save();
+
+        return 'ok';
+    }
+
+    public function guardarEstudio(EstudioRequest $request)
+    {
+        $hv = session('ur')->usuario->persona->hojaVida;
+        $estudio = null;
+
+        if ($request->id) $estudio = $hv->estudios()->find($request->id);
+        else $estudio = new Estudio();
+
+        if (!$estudio) return response('No permitido', 401);
+
+        $estudio->idHoja = $hv->id;
+        $estudio->titulo = $request->nombre;
+        $estudio->institucion = $request->institucion;
+        $estudio->duracion = $request->meses;
+        $estudio->graduado = $request->graduado;
+        $estudio->anioGrado = $request->anio_culminacion;
+        $estudio->mesGrado = $request->mes_culminacion;
+        $estudio->save();
+
+        return 'ok';
+    }
+
+    public function eliminarEstudio(Request $request)
+    {
+        $this->validate($request, ['id' => 'required|exists:estudiosrealizados,id']);
+
+        $estudio = session('ur')->usuario->persona->hojaVida->estudios()->find($request->id);
+        if (!$estudio) return response('no permitido', 401);
+
+        $estudio->delete();
+        return 'ok';
+    }
+
+    public function editarPerfilProfesional(Request $request)
+    {
+        $this->validate($request, ['perfil' => 'required']);
+        $hv = session('ur')->usuario->persona->hojaVida;
+
+        $hv->perfil = $request->perfil;
+        $hv->save();
+
+        return 'ok';
+    }
+
+    public function guardarDistincion(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'exists:distinciones,id',
+            'nombre' => 'required'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $distincion = null;
+        $hv = session('ur')->usuario->persona->hojaVida;
+
+        if ($request->id) $distincion = $hv->distinciones()->find($request->id);
+        else $distincion = new Distincion();
+
+        if (!$distincion) return response('no permitido', 401);
+
+        $distincion->idHoja = $hv->id;
+        $distincion->nombre = $request->nombre;
+        $distincion->save();
+
+        return 'ok';
+    }
+
+    public function eliminarDistincion(Request $request)
+    {
+        $this->validate($request, ['id' => 'exists:distinciones,id']);
+
+        $distincion = session('ur')->usuario->persona->hojaVida->distinciones()->find($request->id);
+        if (!$distincion) return response('no permitido', 401);
+
+        $distincion->delete();
+        return 'ok';
+    }
+
+    public function guardarAsociacion(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'exists:asociaciones,id',
+            'nombre' => 'required'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $asociacion = null;
+        $hv = session('ur')->usuario->persona->hojaVida;
+
+        if ($request->id) $asociacion = $hv->asociaciones()->find($request->id);
+        else $asociacion = new Asociacion();
+
+        if (!$asociacion) return response('no permitido', 401);
+
+        $asociacion->idHoja = $hv->id;
+        $asociacion->nombre = $request->nombre;
+        $asociacion->save();
+
+        return 'ok';
+    }
+
+    public function eliminarAsociacion(Request $request)
+    {
+        $this->validate($request, ['id' => 'exists:asociaciones,id']);
+
+        $asociacion = session('ur')->usuario->persona->hojaVida->asociaciones()->find($request->id);
+        if (!$asociacion) return response('no permitido', 401);
+
+        $asociacion->delete();
+        return 'ok';
+    }
+
+    public function guardarConcejo(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'exists:concejos_profesionales,id',
+            'nombre' => 'required'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $concejo = null;
+        $hv = session('ur')->usuario->persona->hojaVida;
+
+        if ($request->id) $concejo = $hv->concejos()->find($request->id);
+        else $concejo = new Concejo();
+
+        if (!$concejo) return response('no permitido', 401);
+
+        $concejo->idHoja = $hv->id;
+        $concejo->nombre = $request->nombre;
+        $concejo->save();
+
+        return 'ok';
+    }
+
+    public function eliminarConcejo(Request $request)
+    {
+        $this->validate($request, ['id' => 'exists:concejos_profesionales,id']);
+
+        $concejo = session('ur')->usuario->persona->hojaVida->concejos()->find($request->id);
+        if (!$concejo) return response('no permitido', 401);
+
+        $concejo->delete();
+        return 'ok';
+    }
+
+    public function guardarDiscapacidad(Request $request)
+    {
+        $this->validate($request, [
+            'discapacidad_id' => 'required|exists:discapacidades,id'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $discapacidad = null;
+        $hv = session('ur')->usuario->persona->hojaVida;
+
+        $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
+        if ($discapacidad) return response('ya se encuentra esta discapacidad registrada', 400);
+
+        $hv->discapacidades()->attach($discapacidad->id);
+        return 'ok';
+    }
+
+    public function eliminarDiscapacidad(Request $request)
+    {
+        $this->validate($request, ['discapacidad_id' => 'exists:discapacidades,id']);
+
+        $hv = session('ur')->usuario->persona->hojaVida;
+        $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
+
+        if (!$discapacidad) return response('no encontrado', 404);
+
+        $hv->discapacidades()->detach($discapacidad->id);
+        return 'ok';
     }
 }

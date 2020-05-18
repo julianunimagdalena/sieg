@@ -22,7 +22,7 @@
     }
 
     .decorative.tab-content {
-        border: 1px solid lightblue;
+        border: 1px solid transparent;
         padding: 15px 0;
         border-radius: 0 5px 5px 5px;
     }
@@ -33,16 +33,20 @@
 
     .decorative .nav-link.active {
         border: 0;
-        background-color: lightblue !important;
-        color: #004A87 !important;
+        background-color: transparent !important;
+        color: black !important;
     }
 </style>
 
 @endsection
 
 @push('components')
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/locale/es.min.js"></script>
     @include('components.tab.tabcontent')
     @include('components.tab.tabpane')
+    @include('components.app.card')
+    @include('components.app.input')
     @include('components.ficha.datosbasicos')
     @include('components.ficha.datosacademicos')
     @include('components.ficha.hojadevida')
@@ -53,7 +57,7 @@
 @section('content')
 <h3 class="text-primary text-uppercase">Ficha de Egresado</h3>
 <div>Los campos con <span class="text-danger">*</span> son requeridos</div>
-<div class="mt-3">
+<div class="mt-3 decorative">
     <ul class="nav nav-tabs tab" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="datos-basicos-tab" data-toggle="tab" href="#datos-basicos" role="tab"

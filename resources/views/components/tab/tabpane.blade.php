@@ -1,5 +1,5 @@
 @component('component', ['id' => 'tab-pane-component'])
-    <div class="tab-pane" :id="id" v-bind:class="{'show active': active}" :aria-labelledby="id + '-tab' " role="tabpanel">
+    <div class="tab-pane fade" :id="id" v-bind:class="{'show active': active}" :aria-labelledby="id + '-tab' " role="tabpanel">
         <slot/>
     </div>
 @endcomponent

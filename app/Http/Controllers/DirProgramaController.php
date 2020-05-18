@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ActivarEstudianteRequest;
 use App\Models\Estudiante;
 use App\Models\Genero;
+use App\Models\HojaVida;
 use App\Models\Municipio;
 use App\Models\Persona;
 use App\Models\ProcesoGrado;
@@ -89,6 +90,12 @@ class DirProgramaController extends Controller
             $persona->idGenero = Genero::where('nombre', $genero)->first()->id;
             $persona->tipodoc = $tipoDoc->id;
             $persona->save();
+        }
+
+        if (!$persona->hojaVida) {
+            $hoja = new HojaVida();
+            $hoja->idPersona = $persona->id;
+            $hoja->save();
         }
 
         if (!$persona->usuario) {
