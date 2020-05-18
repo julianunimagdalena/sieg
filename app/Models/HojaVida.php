@@ -36,7 +36,7 @@ class HojaVida extends Model
 
     public function discapacidades()
     {
-        return $this->hasManyThrough('App\Models\Discapacidad', 'hoja_discapacidades', 'idHoja', 'idDiscapacidad');
+        return $this->belongsToMany('App\Models\Discapacidad', 'hoja_discapacidades', 'idHoja', 'idDiscapacidad');
     }
 
     public function idiomas()

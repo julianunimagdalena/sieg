@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class HojaVidaIdioma extends Model
 {
     public $timestamps = false;
-    protected $table = 'distinciones';
+    protected $table = 'hojadevida_idiomas';
     protected $casts = [
         'idHoja' => 'integer',
         'idIdioma' => 'integer',

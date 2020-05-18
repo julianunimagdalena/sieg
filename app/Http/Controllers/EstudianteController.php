@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Concejo;
 use App\Http\Requests\EstudioRequest;
+use App\Http\Requests\ExperienciaLaboralRequest;
 use App\Models\UsuarioRol;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
 
 use App\Http\Requests\PersonaRequest;
 use App\Models\Asociacion;
+use App\Models\Concejo;
 use App\Models\Discapacidad;
 use App\Models\Distincion;
 use App\Models\Estudio;
+use App\Models\ExperienciaLaboral;
 use App\Models\HojaVida;
+use App\Models\HojaVidaIdioma;
+use Carbon\Carbon;
 
 class EstudianteController extends Controller
 {
@@ -23,7 +27,8 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        session(['ur' => UsuarioRol::find(30013)]);
+        session(['ur' => UsuarioRol::find(20026)]);
+
         // $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
     }
@@ -61,10 +66,11 @@ class EstudianteController extends Controller
         ];
     }
 
-    public function datosAcademicos()
+    public function datosAcademicos(Request $req)
     {
         $tipos = Variables::tiposEstudiante();
-        $persona = session('ur')->usuario->persona;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $persona = $ur->usuario->persona;
 
         $info_grado = [];
         $estudiantesEgresados = $persona->estudiantes()
@@ -126,7 +132,8 @@ class EstudianteController extends Controller
         $concejos = [];
         $discapacidades = [];
         $idiomas = [];
-        $hoja = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hoja = $ur->usuario->persona->hojaVida;
 
         if ($hoja) {
             $perfil = $hoja->perfil;
@@ -191,11 +198,30 @@ class EstudianteController extends Controller
         return view('egresado.ficha');
     }
 
+    public function actualizarProgresoFicha()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        $persona = $ur->usuario->persona;
+        $progreso = $persona->progreso_ficha;
+
+        if ($progreso === 100) {
+            $tipos = Variables::tiposEstudiante();
+            $estudiantes = $persona->estudiantes()->where('idTipo', $tipos['egresado']->id)->get();
+
+            foreach ($estudiantes as $est) {
+                $pg = $est->procesoGrado;
+                $pg->estado_ficha = 1;
+                $pg->fecha_ficha = Carbon::now();
+                $pg->save();
+            }
+        }
+    }
+
     public function guardarDatosPersonales(PersonaRequest $request)
     {
         $persona = session('ur')->usuario->persona;
 
-        $persona->fecha_expedicion = $request->fecha_expedicion_cedula;
+        $persona->fecha_expedicion = $request->fecha_expedicion_documento;
         $persona->idEstadoCivil = $request->estado_civil_id;
         $persona->idGenero = $request->genero_id;
         $persona->direccion = $request->direccion;
@@ -209,13 +235,15 @@ class EstudianteController extends Controller
         $persona->correo2 = $request->correo2;
         $persona->save();
 
+        $this->actualizarProgresoFicha();
         return 'ok';
     }
 
     public function guardarEstudio(EstudioRequest $request)
     {
-        $hv = session('ur')->usuario->persona->hojaVida;
         $estudio = null;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
 
         if ($request->id) $estudio = $hv->estudios()->find($request->id);
         else $estudio = new Estudio();
@@ -227,8 +255,8 @@ class EstudianteController extends Controller
         $estudio->institucion = $request->institucion;
         $estudio->duracion = $request->meses;
         $estudio->graduado = $request->graduado;
-        $estudio->anioGrado = $request->anio_culminacion;
-        $estudio->mesGrado = $request->mes_culminacion;
+        $estudio->anioGrado = $request->graduado ? $request->anio_culminacion : null;
+        $estudio->mesGrado = $request->graduado ? $request->mes_culminacion : null;
         $estudio->save();
 
         return 'ok';
@@ -238,7 +266,10 @@ class EstudianteController extends Controller
     {
         $this->validate($request, ['id' => 'required|exists:estudiosrealizados,id']);
 
-        $estudio = session('ur')->usuario->persona->hojaVida->estudios()->find($request->id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $estudio = $hv->estudios()->find($request->id);
+
         if (!$estudio) return response('no permitido', 401);
 
         $estudio->delete();
@@ -248,11 +279,13 @@ class EstudianteController extends Controller
     public function editarPerfilProfesional(Request $request)
     {
         $this->validate($request, ['perfil' => 'required']);
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
 
+        $hv = $ur->usuario->persona->hojaVida;
         $hv->perfil = $request->perfil;
         $hv->save();
 
+        $this->actualizarProgresoFicha();
         return 'ok';
     }
 
@@ -267,7 +300,8 @@ class EstudianteController extends Controller
         ]);
 
         $distincion = null;
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
 
         if ($request->id) $distincion = $hv->distinciones()->find($request->id);
         else $distincion = new Distincion();
@@ -278,6 +312,7 @@ class EstudianteController extends Controller
         $distincion->nombre = $request->nombre;
         $distincion->save();
 
+        $this->actualizarProgresoFicha();
         return 'ok';
     }
 
@@ -285,10 +320,15 @@ class EstudianteController extends Controller
     {
         $this->validate($request, ['id' => 'exists:distinciones,id']);
 
-        $distincion = session('ur')->usuario->persona->hojaVida->distinciones()->find($request->id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $distincion = $hv->distinciones()->find($request->id);
+
         if (!$distincion) return response('no permitido', 401);
 
         $distincion->delete();
+        $this->actualizarProgresoFicha();
+
         return 'ok';
     }
 
@@ -303,7 +343,8 @@ class EstudianteController extends Controller
         ]);
 
         $asociacion = null;
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
 
         if ($request->id) $asociacion = $hv->asociaciones()->find($request->id);
         else $asociacion = new Asociacion();
@@ -314,6 +355,7 @@ class EstudianteController extends Controller
         $asociacion->nombre = $request->nombre;
         $asociacion->save();
 
+        $this->actualizarProgresoFicha();
         return 'ok';
     }
 
@@ -321,10 +363,14 @@ class EstudianteController extends Controller
     {
         $this->validate($request, ['id' => 'exists:asociaciones,id']);
 
-        $asociacion = session('ur')->usuario->persona->hojaVida->asociaciones()->find($request->id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $asociacion = $ur->usuario->persona->hojaVida->asociaciones()->find($request->id);
+
         if (!$asociacion) return response('no permitido', 401);
 
         $asociacion->delete();
+        $this->actualizarProgresoFicha();
+
         return 'ok';
     }
 
@@ -339,7 +385,8 @@ class EstudianteController extends Controller
         ]);
 
         $concejo = null;
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
 
         if ($request->id) $concejo = $hv->concejos()->find($request->id);
         else $concejo = new Concejo();
@@ -350,6 +397,7 @@ class EstudianteController extends Controller
         $concejo->nombre = $request->nombre;
         $concejo->save();
 
+        $this->actualizarProgresoFicha();
         return 'ok';
     }
 
@@ -357,14 +405,19 @@ class EstudianteController extends Controller
     {
         $this->validate($request, ['id' => 'exists:concejos_profesionales,id']);
 
-        $concejo = session('ur')->usuario->persona->hojaVida->concejos()->find($request->id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $concejo = $hv->concejos()->find($request->id);
+
         if (!$concejo) return response('no permitido', 401);
 
         $concejo->delete();
+        $this->actualizarProgresoFicha();
+
         return 'ok';
     }
 
-    public function guardarDiscapacidad(Request $request)
+    public function agregarDiscapacidad(Request $request)
     {
         $this->validate($request, [
             'discapacidad_id' => 'required|exists:discapacidades,id'
@@ -374,12 +427,15 @@ class EstudianteController extends Controller
         ]);
 
         $discapacidad = null;
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
 
         $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
         if ($discapacidad) return response('ya se encuentra esta discapacidad registrada', 400);
 
         $hv->discapacidades()->attach($discapacidad->id);
+        $this->actualizarProgresoFicha();
+
         return 'ok';
     }
 
@@ -387,12 +443,124 @@ class EstudianteController extends Controller
     {
         $this->validate($request, ['discapacidad_id' => 'exists:discapacidades,id']);
 
-        $hv = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
         $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
 
         if (!$discapacidad) return response('no encontrado', 404);
 
         $hv->discapacidades()->detach($discapacidad->id);
+        $this->actualizarProgresoFicha();
+
         return 'ok';
+    }
+
+    public function guardarIdioma(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'exists:hojadevida_idiomas,id',
+            'idioma_id' => 'required|exists:idiomas,id',
+            'nivel_habla_id' => 'required|exists:niveles_idiomas,id',
+            'nivel_escritura_id' => 'required|exists:niveles_idiomas,id',
+            'nivel_lectura_id' => 'required|exists:niveles_idiomas,id'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $hvi = null;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+
+        if ($request->id) $hvi = $hv->idiomas()->find($request->id);
+        else $hvi = new HojaVidaIdioma();
+
+        if (!$hvi) return response('no permitido', 401);
+        if (!$hvi->id && $hv->idiomas()->where('idIdioma', $request->idioma_id)->count() > 0)
+            return response('Ya se encuentra registrado', 400);
+
+        $hvi->idHoja = $hv->id;
+        $hvi->idIdioma = $request->idioma_id;
+        $hvi->lectura = $request->nivel_lectura_id;
+        $hvi->escritura = $request->nivel_escritura_id;
+        $hvi->habla = $request->nivel_habla_id;
+        $hvi->save();
+
+        return 'ok';
+    }
+
+    public function eliminarIdioma(Request $request)
+    {
+        $this->validate($request, ['id' => 'exists:hojadevida_idiomas,id']);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $idioma = $hv->idiomas()->find($request->id);
+
+        if (!$idioma) return response('no permitido', 401);
+
+        $idioma->delete();
+        return 'ok';
+    }
+
+    public function guardarActualidadLaboral(Request $request)
+    {
+        $this->validate($request, ['laborando' => 'required|boolean']);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $hv->laborando = $request->laborando;
+
+        $hv->save();
+        $this->actualizarProgresoFicha();
+
+        return 'ok';
+    }
+
+    public function guardarExperiencia(ExperienciaLaboralRequest $request)
+    {
+        $experiencia = null;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+
+        if ($request->id) $experiencia = $hv->experiencias()->find($request->id);
+        else $experiencia = new ExperienciaLaboral();
+
+        if (!$experiencia) return response('no permitido', 401);
+
+        $experiencia->idHoja = $hv->id;
+        $experiencia->empresa = $request->empresa;
+        $experiencia->cargo = $request->cargo;
+        $experiencia->nivel_cargo_id = $request->nivel_cargo_id;
+        $experiencia->municipio_id = $request->municipio_id;
+        $experiencia->duracion = $request->duracion_id;
+        $experiencia->tipo_vinculacion_id = $request->tipo_vinculacion_id;
+        $experiencia->salario_id = $request->salario_id;
+        $experiencia->email = $request->correo;
+        $experiencia->telefono = $request->telefono;
+        $experiencia->funcioneslogros = $request->funciones;
+        $experiencia->save();
+
+        return 'ok';
+    }
+
+    public function eliminarExperiencia(Request $request)
+    {
+        $this->validate($request, ['id' => 'exists:experiencias_laborales,id']);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hv = $ur->usuario->persona->hojaVida;
+        $experiencia = $hv->experiencias()->find($request->id);
+
+        if (!$experiencia) return response('no permitido', 401);
+
+        $experiencia->delete();
+        return 'ok';
+    }
+
+    public function progresoFicha()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        return $ur->persona->progreso_ficha;
     }
 }

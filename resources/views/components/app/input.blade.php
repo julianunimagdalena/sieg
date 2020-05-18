@@ -1,6 +1,6 @@
 @component('component', ['id' => 'app-input-component'])
 <span>
-    <label>@{{ label }}</label>
+    <label>@{{ label }} </label><small class="text-danger ml-1" v-if="required">*</small>
     <input
     :type="type"
     class="form-control"
@@ -24,6 +24,10 @@
                 type: {
                     type: String,
                     default: 'text'
+                },
+                required: {
+                    type: Boolean,
+                    default: false
                 }
             },
             methods: {

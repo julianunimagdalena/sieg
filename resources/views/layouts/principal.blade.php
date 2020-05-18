@@ -18,8 +18,16 @@
         .form-group label {
             font-weight: bold;
         }
+        .app-text-black-0 {
+            color: black;
+        }
+        .app-text-black-1 {
+            color: #2d3436;
+        }
+
     </style>
     @yield('css')
+    @stack('csscomponent')
 </head>
 
 <body>

@@ -17,4 +17,9 @@ class Estudiante extends Model
     {
         return $this->belongsTo('App\Models\DependenciaModalidad', 'idPrograma');
     }
+
+    public function procesoGrado()
+    {
+        return $this->hasOne('App\Models\ProcesoGrado', 'idEstudiante');
+    }
 }

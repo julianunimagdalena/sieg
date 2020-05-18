@@ -1,6 +1,6 @@
 @component('component', ['id' => 'modal'])
 <div class="modal fade" :id="id" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog" v-bind:class="{'modal-lg': large}" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary" v-if="title">
                 <h5 class="modal-title" style="color: #fff; text-transform: uppercase">@{{title}}</h5>

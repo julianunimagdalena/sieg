@@ -46,6 +46,7 @@
     @include('components.tab.tabcontent')
     @include('components.tab.tabpane')
     @include('components.app.card')
+    @include('components.modals.Modal')
     @include('components.app.input')
     @include('components.ficha.datosbasicos')
     @include('components.ficha.datosacademicos')
@@ -78,11 +79,11 @@
     </ul>
 
     <tab-content>
-        <tab-pane id="datos-basicos" active>
+        <tab-pane id="datos-basicos" >
             <datos-basicos />
         </tab-pane>
 
-        <tab-pane id="datos-academicos">
+        <tab-pane id="datos-academicos" active>
             <datos-academicos />
         </tab-pane>
 

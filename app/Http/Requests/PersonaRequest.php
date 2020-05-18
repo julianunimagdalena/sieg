@@ -35,7 +35,7 @@ class PersonaRequest extends FormRequest
             'celular' => 'required',
             'celular2' => '',
             'correo' => 'required',
-            'correo2' => 'required'
+            'correo2' => ''
         ];
     }
 

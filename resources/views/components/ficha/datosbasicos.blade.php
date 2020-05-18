@@ -79,11 +79,12 @@
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <label>Estado civil</label>
-                            <select class="form-control" ng-model="input.estado_civil_id">
+                            <label>Estado civil</label> <small class="text-danger ml-1">*</small>
+                            <select class="form-control" v-model="input.estado_civil_id" @input="errors.estado_civil_id = undefined">
                                 <option value="" selected hidden>Seleccione una opción</option>
                                 <option v-for="(estado) in datos.estados_civiles" :value="estado.id">@{{ estado.nombre }}</option>
                             </select>
+                            <small class="text-danger" v-if="errors.estado_civil_id">@{{errors.estado_civil_id[0]}}</small>
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -92,6 +93,7 @@
                                 v-model="input.estrato"
                                 type="number"
                                 label="Estrato"
+                                required
                                 @input="errors.estrato = undefined"
                                 placeholder="Estrato"
                                 v-bind:errors="errors.estrato"/>
@@ -121,7 +123,7 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Tipo</label>
-                        <select class="form-control" v-model="input.tipo_documento_id">
+                        <select class="form-control" v-model="input.tipo_documento_id" :disabled="datos.tipos_documento && input.tipo_documento_id">
                             <option value="" selected hidden>Seleccione una opción</option>
                             <option v-for="(t_documento) in datos.tipos_documento" :value="t_documento.id">@{{ t_documento.abrv || t_documento.nombre }}</option>
                         </select>
@@ -145,6 +147,7 @@
                         v-model="input.fecha_expedicion_documento"
                         type="date"
                         label="Fecha De Expedición"
+                        required
                         @input="errors.fecha_expedicion_documento = undefined"
                         placeholder="Fecha"
                         v-bind:errors="errors.fecha_expedicion_documento"/>
@@ -176,10 +179,10 @@
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <label>Municipio de residencia</label>
+                        <label>Municipio de residencia</label><small class="text-danger ml-1">*</small>
                         <select class="form-control" v-model="input.municipio_residencia_id" @input="errors.municipio_residencia_id = undefined">
                             <option value="" selected hidden>Seleccione una opción</option>
-                            <option v-for="(municipio) in datos.municipios_residencia" value="municipio.id">@{{ municipio.nombre }}</option>
+                            <option v-for="(municipio) in datos.municipios_residencia" :value="municipio.id">@{{ municipio.nombre }}</option>
                         </select>
                         <small class="text-danger" v-if="errors.municipio_residencia_id">@{{ errors.municipio_residencia_id[0] }}</small>
                     </div>
@@ -202,6 +205,7 @@
                         <app-input
                         v-model="input.celular"
                         type="number"
+                        required
                         label="Celular"
                         @input="errors.celular = undefined"
                         placeholder="Celular"
@@ -226,6 +230,7 @@
                         <app-input
                         v-model="input.direccion"
                         label="Dirección"
+                        required
                         @input="errors.direccion = undefined"
                         placeholder="Dirección"
                         v-bind:errors="errors.direccion"/>
@@ -236,6 +241,7 @@
                         <app-input
                         v-model="input.barrio"
                         label="Barrio / Sector"
+                        required
                         @input="errors.barrio = undefined"
                         placeholder="Barrio o Sector"
                         v-bind:errors="errors.barrio"/>
@@ -248,6 +254,7 @@
                         <app-input
                         v-model="input.correo"
                         type="email"
+                        required
                         label="Correo Electronico"
                         @input="errors.correo = undefined"
                         placeholder="Correo Electronico"

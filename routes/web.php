@@ -66,6 +66,12 @@ Route::post('/egresado/concejo', 'EstudianteController@guardarConcejo');
 Route::post('/egresado/eliminar-concejo', 'EstudianteController@eliminarConcejo');
 Route::post('/egresado/agregar-discapacidad', 'EstudianteController@agregarDiscapacidad');
 Route::post('/egresado/eliminar-discapacidad', 'EstudianteController@eliminarDiscapacidad');
+Route::post('/egresado/idioma', 'EstudianteController@guardarIdioma');
+Route::post('/egresado/eliminar-idioma', 'EstudianteController@eliminarIdioma');
+Route::post('/egresado/actualidad-laboral', 'EstudianteController@guardarActualidadLaboral');
+Route::post('/egresado/experiencia-laboral', 'EstudianteController@guardarExperiencia');
+Route::post('/egresado/eliminar-experiencia-laboral', 'EstudianteController@eliminarExperiencia');
+Route::get('/egresado/progreso-ficha', 'EstudianteController@progresoFicha');
 
 Route::get('/direccion', 'DirProgramaController@index');
 Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');

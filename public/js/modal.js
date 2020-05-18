@@ -14,6 +14,10 @@ Vue.component('modal', {
         buttonDisabled: {
             type: Boolean,
             default: false
+        },
+        large: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {

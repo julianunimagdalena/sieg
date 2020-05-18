@@ -1,0 +1,28 @@
+
+.AppTable {
+    background-color: transparent;
+    padding: 0 1rem;
+    margin-top: 1rem;
+    /*border-collapse:separate;
+    border-spacing: 0 .8em;*/
+}
+
+.TableRow {
+    min-height: 69px;
+    margin-bottom: 20px !important;
+    border: 0;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.03)/*rgba(223, 230, 233,0.8)*/;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.TableRow td {
+    border-top: none !important;
+}
+
+.TableRow:hover {
+    cursor: pointer;
+    transform: translateY(-4px);
+}

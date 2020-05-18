@@ -45,4 +45,27 @@ class Persona extends Model
     {
         return $this->hasOne('App\Models\HojaVida', 'idPersona');
     }
+
+    public function getProgresoFichaAttribute()
+    {
+        $progreso = 0;
+        $hoja = $this->hojaVida;
+
+        if ($this->idEstadoCivil) $progreso += 2;
+        if ($this->estrato) $progreso += 2;
+        if ($this->fecha_expedicion) $progreso += 2;
+        if ($this->ciudadResidencia) $progreso += 2;
+        if ($this->celular) $progreso += 2;
+        if ($this->direccion) $progreso += 2;
+        if ($this->sector) $progreso += 2;
+        if ($this->correo) $progreso += 2;
+        if ($hoja->perfil) $progreso += 14;
+        if ($hoja->asociaciones()->count() > 0) $progreso += 14;
+        if ($hoja->concejos()->count() > 0) $progreso += 14;
+        if ($hoja->distinciones()->count() > 0) $progreso += 14;
+        if ($hoja->discapacidades()->count() > 0) $progreso += 14;
+        if ($hoja->laborando !== null) $progreso += 14;
+
+        return $progreso;
+    }
 }

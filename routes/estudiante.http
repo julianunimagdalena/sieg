@@ -1,15 +1,41 @@
 ### datos
-get http://167.172.127.114/sieg/public/estudiante/datos
+get http://167.172.127.114/sieg/public/egresado/datos
 Accept: application/json
 
 ### datos academicos
-get http://167.172.127.114/sieg/public/estudiante/datos-academicos
+get http://167.172.127.114/sieg/public/egresado/datos-academicos
 Accept: application/json
 
 ### datos hoja
-get http://167.172.127.114/sieg/public/estudiante/datos-hoja
+get http://167.172.127.114/sieg/public/egresado/datos-hoja
 Accept: application/json
 
 ### datos laborales
-get http://167.172.127.114/sieg/public/estudiante/datos-laborales
+get http://167.172.127.114/sieg/public/egresado/datos-laborales
 Accept: application/json
+
+### agregar idioma
+post http://167.172.127.114/sieg/public/egresado/idioma
+Content-Type: application/json
+Accept: application/json
+
+{
+    "id": 2,
+    "idioma_id": 33,
+    "nivel_lectura_id": 5,
+    "nivel_escritura_id": 1,
+    "nivel_habla_id": 3
+}
+
+### progreso ficha
+get http://167.172.127.114/sieg/public/egresado/progreso-ficha
+Accept: application/json
+
+### actualizar actualidad laboral
+post http://167.172.127.114/sieg/public/egresado/actualidad-laboral
+Content-Type: application/json
+Accept: application/json
+
+{
+    "laborando": 1
+}
