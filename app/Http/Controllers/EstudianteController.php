@@ -27,9 +27,9 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        session(['ur' => UsuarioRol::find(20026)]);
+        // session(['ur' => UsuarioRol::find(20026)]);
 
-        // $this->middleware('auth');
+        $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
     }
 

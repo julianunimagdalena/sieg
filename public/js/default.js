@@ -42,3 +42,19 @@ function alertErrorServidor() {
 function alertTareaRealizada() {
     swal('Info', 'La tarea ha sido realizada con exito', 'success');
 }
+
+
+const meses = [
+    'ENERO',
+    'FEBRERO',
+    'MARZO',
+    'ABRIL',
+    'MAYO',
+    'JUNIO',
+    'JULIO',
+    'AGOSTO',
+    'SEPTIEMBRE',
+    'OCTUBRE',
+    'NOVIEMBRE',
+    'DICIEMBRE'
+];

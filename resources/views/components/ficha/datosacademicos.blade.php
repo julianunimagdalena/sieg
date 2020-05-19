@@ -52,38 +52,55 @@
             <th class="text-white p-1">Acciones</th>
         </thead>
         <tbody class="app-text-black-0">
-            <tr class="TableRow">
-                <td>Nombre de Estudio</td>
-                <td>Institución del Estudio</td>
-                <td>123456</td>
+            <tr class="TableRow" v-for="(info) in datos.info_academica">
+                <td>@{{ info.nombre}}</td>
+                <td>@{{ info.institucion }}</td>
+                <td>@{{ info.meses }}</td>
                 <td>
-                    <span class="badge badge-success">SI</span>
+                    <span class="badge badge-success" v-if="info.graduado">SI</span>
+                    <span class="badge badge-danger" v-else>NO</span>
                 </td>
                 <td>
-                    <i class="far fa-edit text-warning action-btn"></i>
+                    <i class="far fa-edit text-warning action-btn" v-click="editInfoAcademica(info)"></i>
                     <i class="far fa-trash-alt text-danger action-btn ml-3"></i>
                 </td>
             </tr>
         </tbody>
     </table>
-    <modal id="modalAddInfoAcademica" title="Agregar Estudio externo" buttonText="Añadir" large>
+    <modal id="modalAddInfoAcademica" title="Agregar Estudio externo" buttonText="Añadir" :onSubmit="handleSubmitInfoAcademica" large>
         <div class="row">
             <div class="col-sm-5">
                 <div class="form-group">
-                    <label>Nombre del estudio</label>
-                    <input type="text" class="form-control" placeholder="Nombre" ng-model="forms.estudio.nombre">
+                    <app-input
+                    v-model="input.nombre"
+                    label="Nombre"
+                    required
+                    @input="errors.nombre = undefined"
+                    placeholder="Nombre"
+                    v-bind:errors="errors.nombre"/>
                 </div>
             </div>
             <div class="col-sm-4">
                 <div class="form-group">
-                    <label>Institución</label>
-                    <input type="text" class="form-control" placeholder="Institución" ng-model="forms.estudio.institucion">
+                    <app-input
+                    v-model="input.institucion"
+                    label="Institución"
+                    required
+                    @input="errors.institucion = undefined"
+                    placeholder="Institución"
+                    v-bind:errors="errors.institucion"/>
                 </div>
             </div>
             <div class="col-sm-3">
                 <div class="form-group">
-                    <label>Semestres cursados</label>
-                    <input type="number" class="form-control" placeholder="Meses" ng-model="forms.estudio.duracion">
+                    <app-input
+                    v-model="input.meses"
+                    type="number"
+                    label="Meses Cursados"
+                    required
+                    @input="errors.meses = undefined"
+                    placeholder="Meses"
+                    v-bind:errors="errors.meses"/>
                 </div>
             </div>
         </div>
@@ -91,34 +108,37 @@
             <div class="col-sm-4">
                 <label>¿Se graduó de este estudio?</label>
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="estudio-graduado1" class="custom-control-input" ng-value="1" ng-model="forms.estudio.graduado">
+                    <input type="radio" id="estudio-graduado1" class="custom-control-input" value="1" v-model="input.graduado">
                     <label class="custom-control-label" for="estudio-graduado1">Si</label>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="estudio-graduado2" class="custom-control-input" ng-value="0" ng-model="forms.estudio.graduado">
+                    <input type="radio" id="estudio-graduado2" class="custom-control-input" value="0" v-model="input.graduado">
                     <label class="custom-control-label" for="estudio-graduado2">No</label>
                 </div>
             </div>
-            <div ng-if="forms.estudio.graduado==1" class="col-sm-4">
-                <div class="form-group">
-                    <app-input
-                    v-model="input.anio_culminacion"
-                    type="number"
-                    label="Año de Culminación"
-                    required
-                    @input="errors.anio_culminacion = undefined"
-                    placeholder="Año"
-                    v-bind:errors="errors.anio_culminacion"/>
+            <template v-if="input.graduado==1">
+                <div  class="col-sm-4">
+                    <div class="form-group">
+                        <app-input
+                        v-model="input.anio_culminacion"
+                        type="number"
+                        label="Año de Culminación"
+                        required
+                        @input="errors.anio_culminacion = undefined"
+                        placeholder="Año"
+                        v-bind:errors="errors.anio_culminacion"/>
+                    </div>
                 </div>
-            </div>
-            <div ng-if="forms.estudio.graduado==1" class="col-sm-4">
-                <div class="form-group">
-                    <label>Mes de culminación</label>
-                    <select class="form-control" ng-model="forms.estudio.mes_culminacion" ng-options="item.id as item.nombre for item in datos.meses">
-                        <option value="" selected hidden>Seleccione una opción</option>
-                    </select>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <label>Mes de culminación</label>
+                        <select class="form-control" v-model="input.mes_culminacion">
+                            <option  selected disabled>Seleccione una opción</option>
+                            <option v-for="(mes, index) in datos.meses" value="index">@{{ mes }}</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
+            </template>
         </div>
     </modal>
 </div>
