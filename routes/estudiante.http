@@ -39,3 +39,7 @@ Accept: application/json
 {
     "laborando": 1
 }
+
+### informacion de grado
+get http://167.172.127.114/sieg/public/egresado/info-grado
+Accept: application/json

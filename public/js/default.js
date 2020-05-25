@@ -1,3 +1,6 @@
+
+
+
 const swalHtml = document.createElement("div");
 
 const setLoadingText = (text) =>
@@ -26,21 +29,21 @@ function cerrarCargando() {
 }
 
 
-function alertConfirmar() {
+function alertConfirmar(text = '¿Está seguro de realizar esta acción?') {
     return swal({
-        text: '¿Está seguro de realizar esta acción?',
+        text,
         icon: "warning",
         closeOnClickOutside: false,
         buttons: ["Cancelar", "Continuar"]
     });
 }
 
-function alertErrorServidor() {
-    swal("Error", 'Ha ocurrido un error en el servidor', 'error');
+function alertErrorServidor(text = 'Ha ocurrido un error en el servidor') {
+    swal("Error", text, 'error');
 }
 
-function alertTareaRealizada() {
-    swal('Info', 'La tarea ha sido realizada con exito', 'success');
+function alertTareaRealizada(text = 'La tarea ha sido realizada con exito') {
+    swal('Info', text, 'success');
 }
 
 
@@ -58,3 +61,27 @@ const meses = [
     'NOVIEMBRE',
     'DICIEMBRE'
 ];
+
+
+function getNivelIdioma(id, niveles = [])
+{
+    return niveles.find((element) => id === element.id);
+}
+
+
+function resolveIdiomas(data, idiomas = [], niveles = [])
+{
+    return {
+        idioma: idiomas.find( (element) => { return element.id === data.idioma_id } ).nombre,
+        nivel_habla: getNivelIdioma(data.nivel_habla_id, niveles).nombre,
+        nivel_escritura: getNivelIdioma(data.nivel_escritura_id, niveles).nombre,
+        nivel_lectura: getNivelIdioma(data.nivel_lectura_id, niveles).nombre
+    }
+}
+
+
+function openModal(target="")
+{
+    $(target).modal('show');
+}
+

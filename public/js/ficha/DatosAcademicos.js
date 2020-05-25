@@ -51,21 +51,22 @@ Vue.component('datos-academicos', {
         },
         editInfoAcademica(info)
         {
-            this.input = info;
+            this.input = {...info, graduado: Number(info.graduado)};
             $('#modalAddInfoAcademica').modal('show');
         },
         deleteInfoAcademica(info)
         {
-            alertConfirmar().then( (ok) =>
+            alertConfirmar().then( ( ok ) =>
             {
                 if(!ok)
                     return;
 
                 cargando();
-                http.post('egresado/eliminar-estudio', { id: info.id}).then (
+                http.post('egresado/eliminar-estudio', { id: info.id }).then (
                     ( ) =>
                     {
                         alertTareaRealizada();
+                        this.init();
                     },
                     err =>
                     {

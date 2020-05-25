@@ -49,10 +49,17 @@ Route::get('/recursos/tipos-vinculacion', 'RecursosController@tiposVinculacion')
 Route::get('/recursos/generos', 'RecursosController@generos');
 Route::get('/recursos/tipos-documento', 'RecursosController@tiposDocumento');
 Route::get('/recursos/estados-civiles', 'RecursosController@estadosCiviles');
+Route::get('/recursos/discapacidades', 'RecursosController@discapacidades');
+Route::get('/recursos/consejos', 'RecursosController@consejos');
 
 Route::get('/egresado/datos', 'EstudianteController@datos');
 Route::get('/egresado/datos-academicos', 'EstudianteController@datosAcademicos');
-Route::get('/egresado/datos-hoja', 'EstudianteController@datosHoja');
+Route::get('/egresado/perfil', 'EstudianteController@perfil');
+Route::get('/egresado/distinciones', 'EstudianteController@distinciones');
+Route::get('/egresado/asociaciones', 'EstudianteController@asociaciones');
+Route::get('/egresado/concejos', 'EstudianteController@concejos');
+Route::get('/egresado/discapacidades', 'EstudianteController@discapacidades');
+Route::get('/egresado/idiomas', 'EstudianteController@idiomas');
 Route::get('/egresado/datos-laborales', 'EstudianteController@datosLaborales');
 Route::post('/egresado/datos', 'EstudianteController@guardarDatosPersonales');
 Route::post('/egresado/estudio', 'EstudianteController@guardarEstudio');
@@ -72,6 +79,11 @@ Route::post('/egresado/actualidad-laboral', 'EstudianteController@guardarActuali
 Route::post('/egresado/experiencia-laboral', 'EstudianteController@guardarExperiencia');
 Route::post('/egresado/eliminar-experiencia-laboral', 'EstudianteController@eliminarExperiencia');
 Route::get('/egresado/progreso-ficha', 'EstudianteController@progresoFicha');
+Route::get('/egresado/info-grado', 'EstudianteController@infoGrado');
+Route::get('/egresado/documentos-grado', 'EstudianteController@documentosGrado');
+Route::post('/egresado/cargar-documento', 'EstudianteController@cargarDocumento');
+
+Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
 
 Route::get('/direccion', 'DirProgramaController@index');
 Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
@@ -80,6 +92,7 @@ Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
 
 Route::get('/egresado', 'EstudianteController@index');
 Route::get('/egresado/ficha-egresado', 'EstudianteController@fichaEgresado');
+Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos');
 
 //FIN
 

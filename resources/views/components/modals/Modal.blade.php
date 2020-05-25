@@ -21,5 +21,43 @@
 @endcomponent
 
 @push('scripts')
-<script type="module" src="{{asset('js/modal.js')}}"></script>
+<script type="module">
+    Vue.component('modal', {
+        template: "#modal",
+        props: {
+            id: String,
+            title: {
+                type: String,
+                default: ""
+            },
+            onSubmit: Function,
+            buttonText: {
+                type: String,
+                default: "Guardar"
+            },
+            buttonDisabled: {
+                type: Boolean,
+                default: false
+            },
+            large: {
+                type: Boolean,
+                default: false
+            }
+        },
+        computed: {
+            submit() {
+                let fn = new Function();
+                if (this.onSubmit) fn = this.onSubmit;
+
+                return fn;
+            }
+        },
+        mounted: function ()
+        {
+            $('#'+this.id).on('hidden.bs.modal', function () {
+                this.$emit('onHide');
+            }.bind(this));
+        }
+    });
+</script>
 @endpush

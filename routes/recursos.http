@@ -33,3 +33,6 @@ get http://167.172.127.114/sieg/public/recursos/tipos-documento
 
 ### estados civiles
 get http://167.172.127.114/sieg/public/recursos/estados-civiles
+
+### consejos
+get http://167.172.127.114/sieg/public/recursos/consejos

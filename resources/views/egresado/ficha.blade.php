@@ -41,17 +41,18 @@
 @endsection
 
 @push('components')
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/locale/es.min.js"></script>
-    @include('components.tab.tabcontent')
-    @include('components.tab.tabpane')
-    @include('components.app.card')
-    @include('components.modals.Modal')
-    @include('components.app.input')
-    @include('components.ficha.datosbasicos')
-    @include('components.ficha.datosacademicos')
-    @include('components.ficha.hojadevida')
-    @include('components.ficha.datoslaborales')
+@include('components.tab.tabcontent')
+@include('components.tab.tabpane')
+@include('components.app.card')
+@include('components.app.card-action')
+@include('components.app.list-group')
+@include('components.modals.Modal')
+@include('components.app.input')
+@include('components.app.select')
+@include('components.ficha.datosbasicos')
+@include('components.ficha.datosacademicos')
+@include('components.ficha.hojadevida')
+@include('components.ficha.datoslaborales')
 @endpush
 
 
@@ -79,19 +80,19 @@
     </ul>
 
     <tab-content>
-        <tab-pane id="datos-basicos" >
+        <tab-pane id="datos-basicos">
             <datos-basicos />
         </tab-pane>
 
-        <tab-pane id="datos-academicos" active>
+        <tab-pane id="datos-academicos">
             <datos-academicos />
         </tab-pane>
 
-        <tab-pane id="hoja-vida">
+        <tab-pane id="hoja-vida" >
             <hoja-de-vida />
         </tab-pane>
 
-        <tab-pane id="datos-laborales">
+        <tab-pane id="datos-laborales" active>
             <datos-laborales />
         </tab-pane>
     </tab-content>

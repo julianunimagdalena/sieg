@@ -31,7 +31,7 @@ class HojaVida extends Model
 
     public function concejos()
     {
-        return $this->hasMany('App\Models\Concejo', 'idHoja');
+        return $this->belongsToMany('App\Models\Concejo', 'hojavida_concejos', 'idHoja', 'idConcejo');
     }
 
     public function discapacidades()

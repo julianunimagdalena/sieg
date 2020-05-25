@@ -37,7 +37,7 @@
     <h6 class="text-uppercase font-weight-bold text-primary mb-4">
         Información académica desarrollada en otras instituciones
     </h6>
-    <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#modalAddInfoAcademica">
+    <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#modalAddInfoAcademica" @click="input = {}">
         <span class="icon text-white-50">
             <i class="fas fa-plus"></i>
         </span>
@@ -57,12 +57,12 @@
                 <td>@{{ info.institucion }}</td>
                 <td>@{{ info.meses }}</td>
                 <td>
-                    <span class="badge badge-success" v-if="info.graduado">SI</span>
+                    <span class="badge badge-success" v-if="info.graduado == true">SI</span>
                     <span class="badge badge-danger" v-else>NO</span>
                 </td>
                 <td>
-                    <i class="far fa-edit text-warning action-btn" v-click="editInfoAcademica(info)"></i>
-                    <i class="far fa-trash-alt text-danger action-btn ml-3"></i>
+                    <i class="far fa-edit text-warning action-btn" @click="editInfoAcademica(info)"></i>
+                    <i class="far fa-trash-alt text-danger action-btn ml-3" @click="deleteInfoAcademica(info)"></i>
                 </td>
             </tr>
         </tbody>
@@ -134,7 +134,7 @@
                         <label>Mes de culminación</label>
                         <select class="form-control" v-model="input.mes_culminacion">
                             <option  selected disabled>Seleccione una opción</option>
-                            <option v-for="(mes, index) in datos.meses" value="index">@{{ mes }}</option>
+                            <option v-for="(mes, index) in datos.meses" :value="index">@{{ mes }}</option>
                         </select>
                     </div>
                 </div>

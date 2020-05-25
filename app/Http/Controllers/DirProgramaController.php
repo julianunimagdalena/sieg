@@ -12,6 +12,7 @@ use App\Models\ProcesoGrado;
 use App\Models\SolicitudGrado;
 use App\Models\TipoDocumento;
 use App\Models\User;
+use App\Tools\PersonaHelper;
 use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
 use Carbon\Carbon;
@@ -107,8 +108,9 @@ class DirProgramaController extends Controller
         }
 
         $persona = Persona::find($persona->id);
-        $rol = $persona->usuario->roles()->find($roles['estudiante']->id);
+        PersonaHelper::actualizarProgresoFicha($persona);
 
+        $rol = $persona->usuario->roles()->find($roles['estudiante']->id);
         if (!$rol) $persona->usuario->roles()->attach($roles['estudiante']->id, ['activo' => true]);
 
         $zonal = $dataEstudiante->zonal === 'NO DEFINIDO' ? 'SANTA MARTA' : $dataEstudiante->zonal;
@@ -121,10 +123,17 @@ class DirProgramaController extends Controller
         $estudiante->idZonal = $municipioZonal->id;
         $estudiante->save();
 
+        // PAZ Y SALVOS
         $estudiante->pazSalvos()->attach([
             $pazSalvos['biblioteca']->id,
             $pazSalvos['bienestar']->id,
             $pazSalvos['recursosEducativos']->id
+        ]);
+
+        // DOCUMENTOS
+        $documentos = Variables::documentos();
+        $estudiante->documentos()->attach([
+            $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id]
         ]);
 
         $proceso = new ProcesoGrado();

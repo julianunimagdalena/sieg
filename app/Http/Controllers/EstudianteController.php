@@ -17,7 +17,9 @@ use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
 use App\Models\HojaVida;
 use App\Models\HojaVidaIdioma;
+use App\Tools\PersonaHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Storage;
 
 class EstudianteController extends Controller
 {
@@ -27,7 +29,8 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        // session(['ur' => UsuarioRol::find(20026)]);
+        session(['ur' => UsuarioRol::find(20026)]);
+        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
@@ -124,46 +127,63 @@ class EstudianteController extends Controller
         return compact('info_grado', 'programas', 'info_academica');
     }
 
-    public function datosHoja()
+    public function perfil()
     {
-        $perfil = null;
-        $distinciones = [];
-        $asociaciones = [];
-        $concejos = [];
-        $discapacidades = [];
-        $idiomas = [];
         $ur = UsuarioRol::find(session('ur')->id);
-        $hoja = $ur->usuario->persona->hojaVida;
+        return $ur->usuario->persona->hojaVida->perfil;
+    }
 
-        if ($hoja) {
-            $perfil = $hoja->perfil;
+    public function distinciones()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        return $ur->usuario->persona->hojaVida->distinciones;
+    }
 
-            foreach ($hoja->distinciones as $dis) array_push($distinciones, $dis);
-            foreach ($hoja->asociaciones as $asc) array_push($asociaciones, $asc);
-            foreach ($hoja->concejos as $con) array_push($concejos, $con);
-            foreach ($hoja->discapacidades as $dis) array_push($discapacidades, $dis);
+    public function asociaciones()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        return $ur->usuario->persona->hojaVida->asociaciones;
+    }
 
-            foreach ($hoja->idiomas as $idm) {
-                array_push($idiomas, [
-                    'id' => $idm->id,
-                    'idioma_id' => $idm->idioma->id,
-                    'nivel_habla_id' => $idm->nivelHabla->id,
-                    'nivel_escritura_id' => $idm->nivelEscritura->id,
-                    'nivel_lectura_id' => $idm->nivelLectura->id
-                ]);
-            }
+    public function concejos()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        return $ur->usuario->persona->hojaVida->concejos;
+    }
+
+    public function discapacidades()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        return $ur->usuario->persona->hojaVida->discapacidades;
+    }
+
+    public function idiomas()
+    {
+        $res = [];
+        $ur = UsuarioRol::find(session('ur')->id);
+
+        foreach ($ur->usuario->persona->hojaVida->idiomas as $idm) {
+            array_push($res, [
+                'id' => $idm->id,
+                'idioma_id' => $idm->idioma->id,
+                'nivel_habla_id' => $idm->nivelHabla->id,
+                'nivel_escritura_id' => $idm->nivelEscritura->id,
+                'nivel_lectura_id' => $idm->nivelLectura->id
+            ]);
         }
 
-        return compact('perfil', 'distinciones', 'asociaciones', 'concejos', 'discapacidades', 'idiomas');
+        return $res;
     }
 
     public function datosLaborales()
     {
         $actualidad_laboral = null;
         $experiencias = [];
-        $hoja = session('ur')->usuario->persona->hojaVida;
+        $ur = UsuarioRol::find(session('ur')->id);
+        $hoja = $ur->usuario->persona->hojaVida;
 
         if ($hoja) {
+            // return $hoja;
             $actualidad_laboral = $hoja->laborando;
 
             foreach ($hoja->experiencias as $exp) {
@@ -201,20 +221,7 @@ class EstudianteController extends Controller
     public function actualizarProgresoFicha()
     {
         $ur = UsuarioRol::find(session('ur')->id);
-        $persona = $ur->usuario->persona;
-        $progreso = $persona->progreso_ficha;
-
-        if ($progreso === 100) {
-            $tipos = Variables::tiposEstudiante();
-            $estudiantes = $persona->estudiantes()->where('idTipo', $tipos['egresado']->id)->get();
-
-            foreach ($estudiantes as $est) {
-                $pg = $est->procesoGrado;
-                $pg->estado_ficha = 1;
-                $pg->fecha_ficha = Carbon::now();
-                $pg->save();
-            }
-        }
+        PersonaHelper::actualizarProgresoFicha($ur->usuario->persona);
     }
 
     public function guardarDatosPersonales(PersonaRequest $request)
@@ -378,7 +385,6 @@ class EstudianteController extends Controller
     {
         $this->validate($request, [
             'id' => 'exists:concejos_profesionales,id',
-            'nombre' => 'required'
         ], [
             '*.required' => 'Obligatorio',
             '*.exists' => 'No valido'
@@ -388,16 +394,12 @@ class EstudianteController extends Controller
         $ur = UsuarioRol::find(session('ur')->id);
         $hv = $ur->usuario->persona->hojaVida;
 
-        if ($request->id) $concejo = $hv->concejos()->find($request->id);
-        else $concejo = new Concejo();
+        $concejo = $hv->concejos()->find($request->id);
+        if ($concejo) return response('ya se encuentra este concejo registrada', 400);
 
-        if (!$concejo) return response('no permitido', 401);
-
-        $concejo->idHoja = $hv->id;
-        $concejo->nombre = $request->nombre;
-        $concejo->save();
-
+        $hv->concejos()->attach($concejo->id);
         $this->actualizarProgresoFicha();
+
         return 'ok';
     }
 
@@ -407,11 +409,11 @@ class EstudianteController extends Controller
 
         $ur = UsuarioRol::find(session('ur')->id);
         $hv = $ur->usuario->persona->hojaVida;
-        $concejo = $hv->concejos()->find($request->id);
+        $concejo = $hv->concejoes()->find($request->id);
 
-        if (!$concejo) return response('no permitido', 401);
+        if (!$concejo) return response('no encontrado', 404);
 
-        $concejo->delete();
+        $hv->concejos()->detach($concejo->id);
         $this->actualizarProgresoFicha();
 
         return 'ok';
@@ -514,7 +516,7 @@ class EstudianteController extends Controller
         $hv->save();
         $this->actualizarProgresoFicha();
 
-        return 'ok';
+        return [$hv->laborando];
     }
 
     public function guardarExperiencia(ExperienciaLaboralRequest $request)
@@ -562,5 +564,106 @@ class EstudianteController extends Controller
     {
         $ur = UsuarioRol::find(session('ur')->id);
         return $ur->persona->progreso_ficha;
+    }
+
+    public function infoGrado()
+    {
+        $res = [];
+        $tipos = Variables::tiposEstudiante();
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiantes = $ur->usuario->persona->estudiantes()
+            ->where('idTipo', $tipos['egresado']->id)
+            ->get();
+
+        foreach ($estudiantes as $est) {
+            $paz_salvos = [];
+
+            foreach ($est->estudiantePazSalvo as $eps) {
+                array_push($paz_salvos, [
+                    'nombre' => $eps->pazSalvo->nombre,
+                    'dependencia' => $eps->pazSalvo->dependencia->nombre,
+                    'comentario' => $eps->comentario,
+                    'paz_salvo' => $eps->paz_salvo,
+                ]);
+            }
+
+            array_push($res, [
+                'nombre' => $est->persona->nombre,
+                'programa' => $est->estudio->programa->nombre,
+                'codigo' => $est->codigo,
+                'estado_encuesta' => $est->procesoGrado->estado_encuesta,
+                'estado_ficha' => $est->procesoGrado->estado_encuesta,
+                'estado_programa' => $est->procesoGrado->estado_encuesta,
+                'estado_secretaria' => $est->procesoGrado->estado_encuesta,
+                'confirmacion_ceremonia' => $est->procesoGrado->confirmacion_asistencia,
+                'estado_documentos' => $est->estado_documentos,
+                'paz_salvos' => $paz_salvos
+            ]);
+        }
+
+        return $res;
+    }
+
+    public function cargaDocumentos()
+    {
+        return view('egresado.carga_documentos');
+    }
+
+    public function documentosGrado()
+    {
+        $res = [];
+        $tipos = Variables::tiposEstudiante();
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiantes = $ur->usuario->persona->estudiantes()
+            ->where('idTipo', $tipos['egresado']->id)
+            ->get();
+
+        foreach ($estudiantes as $est) {
+            $documentos = [];
+
+            foreach ($est->estudianteDocumento as $ed) {
+                array_push($documentos, [
+                    'id' => $ed->id,
+                    'nombre' => $ed->documento->nombre,
+                    'estado' => $ed->estado->nombre
+                ]);
+            }
+
+            array_push($res, [
+                'nombre' => $est->persona->nombre,
+                'programa' => $est->estudio->programa->nombre,
+                'codigo' => $est->codigo,
+                'documentos' => $documentos
+            ]);
+        }
+
+        return $res;
+    }
+
+    public function cargarDocumento(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'required|integer|exists:estudiante_documento,id',
+            'file' => 'required|file|mimetypes:application/pdf',
+            'codigo' => 'required|exists:estudiantes,codigo'
+        ], [
+            'required' => 'Obligatorio'
+        ]);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->persona->estudiantes()->where('codigo', $request->codigo)->first();
+
+        if (!$estudiante) return response('Este codigo no pertenece a este estudiante', 400);
+
+        $ed = $estudiante->estudianteDocumento()->find($request->id);
+        if (!$ed) return response('Este documento no pertenece a este estudiante', 400);
+
+        $estados = Variables::estados();
+        Storage::put($ed->path, file_get_contents($request->file('file')->getRealPath()));
+        $ed->estado_id = $estados['pendiente']->id;
+        $ed->url_documento = $ed->path;
+        $ed->save();
+
+        return 'ok';
     }
 }

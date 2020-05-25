@@ -7,7 +7,7 @@
     border-spacing: 0 .8em;*/
 }
 
-.TableRow {
+.TableRow, .TableRow-2 {
     min-height: 69px;
     margin-bottom: 20px !important;
     border: 0;
@@ -22,7 +22,9 @@
     border-top: none !important;
 }
 
-.TableRow:hover {
+
+
+.TableRow:hover, .TableRow-2:hover {
     cursor: pointer;
     transform: translateY(-4px);
 }

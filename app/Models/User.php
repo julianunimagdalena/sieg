@@ -18,6 +18,11 @@ class User extends Authenticatable
         'activo' => 'boolean'
     ];
 
+    public function usuarioRol()
+    {
+        return $this->hasMany('App\Models\UsuarioRol', 'usuario_id');
+    }
+
     public function roles()
     {
         return $this->belongsToMany('App\Models\Rol', 'usuario_rol', 'usuario_id', 'rol_id')->withPivot('activo');

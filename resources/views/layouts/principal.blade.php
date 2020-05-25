@@ -18,13 +18,51 @@
         .form-group label {
             font-weight: bold;
         }
+
         .app-text-black-0 {
             color: black;
         }
+
         .app-text-black-1 {
             color: #2d3436;
         }
 
+        table {
+            text-align: center
+        }
+
+        .table-hover tbody tr:hover {
+            color: black;
+        }
+
+        thead {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        tbody {
+            color: black;
+        }
+
+        .badge.PENDIENTE {
+            color: var(--white);
+            background-color: var(--warning);
+        }
+
+        .badge.APROBADO {
+            color: var(--white);
+            background-color: var(--primary);
+        }
+
+        .badge.RECHAZADO {
+            color: var(--white);
+            background-color: var(--danger);
+        }
+
+        .badge.SIN.CARGAR {
+            color: var(--white);
+            background-color: var(--secondary);
+        }
     </style>
     @yield('css')
     @stack('csscomponent')
@@ -69,29 +107,35 @@
 
 
                 @if (session('ur')->rol->nombre === 'Estudiante')
-                    <style>
-                        .nav-item span {
-                            font-size: .8rem !important;
-                        }
-                    </style>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}">
-                            <i class="fas fa-fw fa-graduation-cap"></i>
-                            <span>Proceso de Grado</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}/encuesta">
-                            <i class="fas fa-file-invoice"></i>
-                            <span>Encuesta Momento de Grado</span>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{Request::root().session('ur')->rol->home_egresados}}/ficha-egresado">
-                            <i class="fas fa-fw fa-poll-h"></i>
-                            <span>Ficha de Egresado</span>
-                        </a>
-                    </li>
+                <style>
+                    .nav-item span {
+                        font-size: .8rem !important;
+                    }
+                </style>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/egresado">
+                        <i class="fas fa-fw fa-graduation-cap"></i>
+                        <span>Proceso de Grado</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/egresado/encuesta">
+                        <i class="fas fa-file-invoice"></i>
+                        <span>Encuesta Momento de Grado</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/egresado/ficha-egresado">
+                        <i class="fas fa-fw fa-poll-h"></i>
+                        <span>Ficha de Egresado</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/egresado/carga-documentos">
+                        <i class="fas fa-fw fa-file-alt"></i>
+                        <span>Carga de documentos</span>
+                    </a>
+                </li>
                 @endif
 
                 <!-- Nav Item - Pages Collapse Menu -->
@@ -125,10 +169,8 @@
                 <hr class="sidebar-divider d-none d-md-block" />
 
                 <!-- Sidebar Toggler (Sidebar) -->
-                <div class="text-center d-none">
-                    <button class="rounded-circle border-0" id="sidebarToggle2">
-                        <i :class="'fas fa-chevron-' + (collapsed ? 'right' : 'left')"></i>
-                    </button>
+                <div class="text-center d-none d-md-inline">
+                    <button class="rounded-circle border-0" id="sidebarToggle"></button>
                 </div>
             </ul>
             <!-- End of Sidebar -->
@@ -255,8 +297,11 @@
     <script src="{{asset('vendor/sweetalert.min.js')}}"></script>
     <script src="{{asset('js/default.js')}}"></script>
     <script src="{{asset('vendor/axios.min.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/locale/es.min.js"></script>
     <script>
         $(`a[href='${window.location.href}']`).parent().addClass('active');
+        document.querySelector('#sidebarToggle').click();
     </script>
     @stack('components')
     @stack('scripts')

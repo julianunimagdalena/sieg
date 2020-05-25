@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Concejo;
 use App\Models\Departamento;
+use App\Models\Discapacidad;
 use Illuminate\Http\Request;
 
 use App\Models\Duracion;
@@ -95,5 +97,15 @@ class RecursosController extends Controller
     public function estadosCiviles()
     {
         return EstadoCivil::all();
+    }
+
+    public function discapacidades()
+    {
+        return Discapacidad::all();
+    }
+
+    public function consejos()
+    {
+        return Concejo::all();
     }
 }
