@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AsistenciaCeremoniaRequest;
 use App\Http\Requests\EstudioRequest;
 use App\Http\Requests\ExperienciaLaboralRequest;
 use App\Models\UsuarioRol;
@@ -17,6 +18,7 @@ use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
 use App\Models\HojaVida;
 use App\Models\HojaVidaIdioma;
+use App\Models\ProcesoGrado;
 use App\Tools\PersonaHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -29,8 +31,8 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        session(['ur' => UsuarioRol::find(20026)]);
-        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        // session(['ur' => UsuarioRol::find(20026)]);
+        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
@@ -397,7 +399,7 @@ class EstudianteController extends Controller
         $concejo = $hv->concejos()->find($request->id);
         if ($concejo) return response('ya se encuentra este concejo registrada', 400);
 
-        $hv->concejos()->attach($concejo->id);
+        $hv->concejos()->attach($request->id);
         $this->actualizarProgresoFicha();
 
         return 'ok';
@@ -409,11 +411,11 @@ class EstudianteController extends Controller
 
         $ur = UsuarioRol::find(session('ur')->id);
         $hv = $ur->usuario->persona->hojaVida;
-        $concejo = $hv->concejoes()->find($request->id);
+        $concejo = $hv->concejos()->find($request->id);
 
         if (!$concejo) return response('no encontrado', 404);
 
-        $hv->concejos()->detach($concejo->id);
+        $hv->concejos()->detach($request->id);
         $this->actualizarProgresoFicha();
 
         return 'ok';
@@ -435,7 +437,7 @@ class EstudianteController extends Controller
         $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
         if ($discapacidad) return response('ya se encuentra esta discapacidad registrada', 400);
 
-        $hv->discapacidades()->attach($discapacidad->id);
+        $hv->discapacidades()->attach($request->discapacidad_id);
         $this->actualizarProgresoFicha();
 
         return 'ok';
@@ -443,15 +445,15 @@ class EstudianteController extends Controller
 
     public function eliminarDiscapacidad(Request $request)
     {
-        $this->validate($request, ['discapacidad_id' => 'exists:discapacidades,id']);
+        $this->validate($request, ['id' => 'exists:discapacidades,id']);
 
         $ur = UsuarioRol::find(session('ur')->id);
         $hv = $ur->usuario->persona->hojaVida;
-        $discapacidad = $hv->discapacidades()->find($request->discapacidad_id);
+        $discapacidad = $hv->discapacidades()->find($request->id);
 
         if (!$discapacidad) return response('no encontrado', 404);
 
-        $hv->discapacidades()->detach($discapacidad->id);
+        $hv->discapacidades()->detach($request->id);
         $this->actualizarProgresoFicha();
 
         return 'ok';
@@ -592,9 +594,9 @@ class EstudianteController extends Controller
                 'programa' => $est->estudio->programa->nombre,
                 'codigo' => $est->codigo,
                 'estado_encuesta' => $est->procesoGrado->estado_encuesta,
-                'estado_ficha' => $est->procesoGrado->estado_encuesta,
-                'estado_programa' => $est->procesoGrado->estado_encuesta,
-                'estado_secretaria' => $est->procesoGrado->estado_encuesta,
+                'estado_ficha' => $est->procesoGrado->estado_ficha,
+                'estado_programa' => $est->procesoGrado->estado_programa,
+                'estado_secretaria' => $est->procesoGrado->estado_secretaria,
                 'confirmacion_ceremonia' => $est->procesoGrado->confirmacion_asistencia,
                 'estado_documentos' => $est->estado_documentos,
                 'paz_salvos' => $paz_salvos
@@ -663,6 +665,47 @@ class EstudianteController extends Controller
         $ed->estado_id = $estados['pendiente']->id;
         $ed->url_documento = $ed->path;
         $ed->save();
+
+        return 'ok';
+    }
+
+    public function infoAsistenciaCeremonia($codigo)
+    {
+        $tipos = Variables::tiposEstudiante();
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->persona->estudiantes()
+            ->where('idTipo', $tipos['egresado']->id)
+            ->where('codigo', $codigo)
+            ->first();
+
+        if (!$estudiante) return response('Estudiante no encontrado', 400);
+
+        $pg = $estudiante->procesoGrado;
+        return [
+            'pg_id' => $pg->id,
+            'confirmacion_asistencia' => $pg->confirmacion_asistencia,
+            'talla_camisa' => $pg->talla_camisa,
+            'estatura' => $pg->estatura,
+            'tamano_birrete' => $pg->tamano_birrete,
+            'num_acompanantes' => $pg->num_acompaniantes
+        ];
+    }
+
+    public function guardarAsistenciaCeremonia(AsistenciaCeremoniaRequest $request)
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        $pg = ProcesoGrado::whereHas('estudiante.persona', fn ($per) => $per->where('id', $ur->usuario->persona->id))
+            ->find($request->pg_id);
+
+        if (!$pg) return response('no encontrado', 400);
+
+        $confirmacion = $request->confirmacion_asistencia;
+        $pg->confirmacion_asistencia = $confirmacion;
+        $pg->talla_camisa = $confirmacion ? $request->talla_camisa : null;
+        $pg->estatura = $confirmacion ? $request->estatura : null;
+        $pg->tamano_birrete = $confirmacion ? $request->tamano_birrete : null;
+        $pg->num_acompaniantes = $confirmacion ? $request->num_acompanantes : null;
+        $pg->save();
 
         return 'ok';
     }

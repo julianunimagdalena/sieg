@@ -1,6 +1,6 @@
 @component('component', ['id' => 'datos-laborales-component'])
-<div>
-    <card title="Actualidad Laboral">
+<div >
+    <card title="Actualidad Laboral" id="actualidad-laboral-form">
         <form>
             <div class="form-group">
                 <label>¿Actualmente se encuentra laborando?</label>
@@ -31,7 +31,7 @@
     </card>
 
     <div class="mt-4">
-        <card-action title="Información de Experiencias Laborales" fluid @onAdd="openModal('#modalInformacionLaboral')">
+        <card-action title="Información de Experiencias Laborales" fluid @onAdd="openModal('#modalInformacionLaboral')" id="xp-laboral-form">
             <table class="table table-sm">
                 <thead class="thead-light">
                   <tr>

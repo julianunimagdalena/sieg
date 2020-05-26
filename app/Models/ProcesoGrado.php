@@ -13,5 +13,11 @@ class ProcesoGrado extends Model
         'estado_secretaria' => 'boolean',
         'estado_programa' => 'boolean',
         'confirmacion_asistencia' => 'boolean',
+        'idEstudiante' => 'integer'
     ];
+
+    public function estudiante()
+    {
+        return $this->belongsTo('App\Models\Estudiante', 'idEstudiante');
+    }
 }

@@ -82,8 +82,17 @@ Route::get('/egresado/progreso-ficha', 'EstudianteController@progresoFicha');
 Route::get('/egresado/info-grado', 'EstudianteController@infoGrado');
 Route::get('/egresado/documentos-grado', 'EstudianteController@documentosGrado');
 Route::post('/egresado/cargar-documento', 'EstudianteController@cargarDocumento');
+Route::get('/egresado/info-asistencia-ceremonia/{codigo}', 'EstudianteController@infoAsistenciaCeremonia');
+Route::post('/egresado/asistencia-ceremonia', 'EstudianteController@guardarAsistenciaCeremonia');
 
 Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
+
+Route::get('/administrador/usuarios', 'AdminController@usuarios');
+Route::post('/administrador/usuario', 'AdminController@usuario');
+Route::post('/administrador/eliminar-usuario', 'AdminController@eliminarUsuario');
+Route::get('/administrador/datos-usuario/{ur_id}', 'AdminController@datosUsuario');
+
+//RUTAS VISTAS DIRECCION DE PROGRAMA
 
 Route::get('/direccion', 'DirProgramaController@index');
 Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
@@ -94,7 +103,10 @@ Route::get('/egresado', 'EstudianteController@index');
 Route::get('/egresado/ficha-egresado', 'EstudianteController@fichaEgresado');
 Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos');
 
-//FIN
+//RUTAS VISTA ADMIN
+
+Route::get('/administrador', 'AdminController@index');
+Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

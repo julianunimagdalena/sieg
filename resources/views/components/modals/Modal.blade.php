@@ -1,12 +1,12 @@
 @component('component', ['id' => 'modal'])
 <div class="modal fade" :id="id" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog" v-bind:class="{'modal-lg': large}" role="document">
+    <div class="modal-dialog" :id="'dialog-'+id" v-bind:class="{'modal-lg': large}" role="document">
         <div class="modal-content">
             <div class="modal-header bg-primary" v-if="title">
                 <h5 class="modal-title" style="color: #fff; text-transform: uppercase">@{{title}}</h5>
             </div>
-            <form @submit.prevent="submit">
-                <div class="modal-body">
+            <form @submit.prevent="submit" :id="'form-'+id">
+                <div class="modal-body" :id="'body-'+id">
                     <slot />
                 </div>
                 <div class="modal-footer">
@@ -54,6 +54,7 @@
         },
         mounted: function ()
         {
+            $('#'+this.id).on('show.bs.modal', () => this.$emit('show'));
             $('#'+this.id).on('hidden.bs.modal', function () {
                 this.$emit('onHide');
             }.bind(this));

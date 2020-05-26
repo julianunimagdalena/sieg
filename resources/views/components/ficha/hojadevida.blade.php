@@ -42,12 +42,12 @@
 @component('component', ['id' => 'hoja-de-vida-component'])
 <div>
     <div class="row">
-        <div class="col col-md-8 col-sm-12">
+        <div class="col col-md-8 col-sm-12" id="perfil-profesional-form">
             <card title="Perfil Profesional">
-                <form>
+                <form @submit.prevent="onSubmitPerfil">
                     <div class="form-group">
                         <textarea class="form-control" placeholder="Ingrese su perfil profesional"
-                            style="min-height: 150px;"></textarea>
+                             v-model="forms.perfil.perfil" style="min-height: 150px;"></textarea>
                     </div>
                     <div class="form-group">
                         <button class="btn btn-primary float-right" type="submit">Guardar</button>
@@ -55,8 +55,8 @@
                 </form>
             </card>
         </div>
-        <div class="col col-md-4 col-sm-12">
-            <card-action title="Información de Idiomas" @onAdd="openModal('modal-idioma')" fluid>
+        <div class="col col-md-4 col-sm-12" >
+            <card-action title="Información de Idiomas" id="info-idiomas-form" @onAdd="openModal('modal-idioma')" fluid>
                 <list-group flush>
                     <list-group-item v-for="(idioma) in datos.user_idiomas" actions light v-bind:key="idioma.id"
                         @onEdit="editItem('idioma',idioma)" @onDelete="deleteItem('eliminar-idioma',idioma, initUserIdiomas)">
@@ -80,51 +80,13 @@
                     </list-group-item>
                 </list-group>
             </card-action>
-            <!--<h6 class="text-primary font-weight-bold">Información de Idiomas</h6>
-            <div class="">
-                <div class="row mt-4">
-                    <div class="col col-md-12 col-lg-12 col-sm-12 mb-3" v-for="(idioma) in datos.user_idiomas">
-                        <card-action :title="idioma.resolve.idioma">
-                            <template v-slot:actions>
-                                <div>
-                                    <i @click="editLanguageInformation(idioma)"
-                                        class="text-primary fas fa-pencil-alt mr-1 action-btn" title="Editar estudio"></i>
-                                    <i @click="deleteLanguajeInformation(idioma)" class="text-danger fas fa-times action-btn"
-                                        title="Eliminar estudio"></i>
-                                </div>
-                            </template>
-                            <div class="row no-gutters align-items-center">
-                                <div class="col mr-2">
-                                    <div class="app-text-md font-weight-bold mb-1">
-                                        <i class="fas fa-comment icon-habla mr-3"></i> Nivel de habla: <span
-                                            :class="idioma.resolve.nivel_habla">@{{idioma.resolve.nivel_habla}}</span>
-                                    </div>
-                                    <div class="app-text-md font-weight-bold mb-1">
-                                        <i class="fas fa-pencil-alt icon-escritura mr-3"></i> Nivel de escritura: <span
-                                            :class="idioma.resolve.nivel_escritura">@{{ idioma.resolve.nivel_escritura }}</span>
-                                    </div>
-                                    <div class="app-text-md font-weight-bold mb-1">
-                                        <i class="fas fa-book-open icon-lectura mr-3"></i> Nivel de lectura: <span
-                                            :class="idioma.resolve.nivel_lectura">@{{ idioma.resolve.nivel_lectura }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </card-action>
-                    </div>
-                </div>
-                <div class="text-center mt-4">
-                    <button class="btn btn-primary btn-circle" data-toggle="modal" data-target="#addIdioma">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-            </div>-->
         </div>
         <hr />
     </div>
     <div class="mb-4 mt-4">
         <div class="row">
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Distinciones" @onAdd="openModal('modal-distincion')" fluid>
+                <card-action title="Distinciones" @onAdd="openModal('modal-distincion')" fluid id="distinciones-form">
                     <list-group flush>
                         <list-group-item v-for="(dist) in datos.distinciones" :key="dist.id"
                             actions
@@ -137,7 +99,7 @@
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Información de Asociaciones" @onAdd="openModal('modal-asociacion')" fluid>
+                <card-action title="Información de Asociaciones" @onAdd="openModal('modal-asociacion')" fluid id="asociaciones-form">
                     <list-group flush>
                         <list-group-item v-for="(aso) in datos.asociaciones" :key="aso.id"
                             actions
@@ -150,25 +112,27 @@
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Consejos Profesionales" @onAdd="openModal('modal-consejo')">
-                    <list-group-item v-for="(con) in datos.consejos" :key="con.id"
-                        actions
-                        light
-                        @onEdit="editItem('consejo',con)"
-                        @onDelete="deleteItem('eliminar-consejo',con, initConsejos)">
-                        @{{ con.nombre }}
-                    </list-group-item>
+                <card-action title="Consejos Profesionales" @onAdd="openModal('modal-consejo')" fluid id="consejos-form">
+                    <list-group flush>
+                        <list-group-item v-for="(con) in datos.consejos" :key="con.id"
+                            actions
+                            light
+                            @onDelete="deleteItem('eliminar-concejo',con, initConsejos)">
+                            @{{ con.nombre }}
+                        </list-group-item>
+                    </list-group>
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Información de discapacidades" @onAdd="openModal('modalDiscapacidad')">
-                    <list-group-item v-for="(disc) in datos.discapacidades" :key="disc.id"
-                        actions
-                        light
-                        @onEdit="editItem('discapacidad',disc)"
-                        @onDelete="deleteItem('eliminar-discapacidad',disc, initDiscapacidades)">
-                        @{{ disc.nombre }}
-                    </list-group-item>
+                <card-action title="Información de discapacidades" @onAdd="openModal('modal-discapacidad')" fluid id="discapacidad-form">
+                    <list-group flush>
+                        <list-group-item v-for="(disc) in datos.discapacidades" :key="disc.id"
+                            actions
+                            light
+                            @onDelete="deleteItem('eliminar-discapacidad',disc, initDiscapacidades)">
+                            @{{ disc.nombre }}
+                        </list-group-item>
+                    </list-group>
                 </card-action>
             </div>
 
@@ -255,13 +219,28 @@
         <div class="row">
             <div class="col col-md-8 offset-md-2">
                 <div class="form-group">
-                    <app-select label="Consejo Profesional" v-model="forms.distincion.nombre" required>
-
+                    <app-select label="Consejo Profesional" v-model="forms.consejo.id" required>
+                        <option v-for="(consejo) in datos.t_consejos" :value="consejo.id">@{{ consejo.nombre }}</option>
                     </app-select>
                 </div>
             </div>
         </div>
     </modal>
+
+        <modal title="Añadir Dispacidad" id="modal-discapacidad" :onSubmit="onSubmitDiscapacidad" @onHide="forms.discapacidad = {}">
+        <div class="row">
+            <div class="col col-md-8 offset-md-2">
+                <div class="form-group">
+                    <app-select label="Discapacidad" v-model="forms.discapacidad.discapacidad_id" required
+                        :errors="errors.discapacidad.discapacidad_id"
+                        @input="errors.discapacidad.discapacidad_id = undefined">
+                        <option v-for="(disc) in datos.t_discapacidades" :value="disc.id">@{{ disc.nombre }}</option>
+                    </app-select>
+                </div>
+            </div>
+        </div>
+    </modal>
+
 
 
 </div>

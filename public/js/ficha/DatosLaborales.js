@@ -7,6 +7,7 @@ Vue.component('datos-laborales', {
     data: () => ({
         datos: {
             paises: [],
+            experiencias: [],
             departamentos: [],
             municipios: [],
             niveles_cargo: [],
@@ -37,7 +38,6 @@ Vue.component('datos-laborales', {
 
                     this.datos.experiencias         = experiencias;
                     this.forms.a_laboral            = Number(data.actualidad_laboral);
-                    console.log(this.forms.a_laboral);
                 }
             )
         },
@@ -46,26 +46,35 @@ Vue.component('datos-laborales', {
             http.post('egresado/actualidad-laboral', { laborando }).then(
                 ( ) =>
                 {
-
+                    this.$emit('updateprogreso');
                 }
             );
         },
-        onChangePais()
+        onChangePais(pais_id = null)
         {
             this.errors.xp.pais = undefined;
-            getDepartamentos(this.forms.xp.pais_id).then( (data) => this.datos.departamentos = data );
+            return getDepartamentos(pais_id || this.forms.xp.pais_id).then( (data) => this.datos.departamentos = data );
         },
-        onChangeDepartamento()
+        onChangeDepartamento(departamento_id = null)
         {
             this.errors.xp.departamento = undefined;
-            getMunicipios(this.forms.xp.departamento_id).then( (data) => this.datos.municipios = data );
+            return getMunicipios(departamento_id || this.forms.xp.departamento_id).then( (data) => this.datos.municipios = data );
         },
         onEditDatoLaboral(experiencia)
         {
-            this.forms.xp = { ...experiencia };
-            $('#modalInformacionLaboral').modal('show');
-            this.onChangePais();
-            this.onChangeDepartamento();
+            cargando();
+            Promise.all([
+                this.onChangePais(experiencia.pais_id),
+                this.onChangeDepartamento(experiencia.departamento_id)
+            ]).then(
+                ( ) =>
+                {
+                    this.forms.xp = { ...experiencia };
+                    $('#modalInformacionLaboral').modal('show');
+                    cerrarCargando();
+                }
+            );
+
         },
         onDeleteDatoLaboral(experiencia)
         {
@@ -76,11 +85,12 @@ Vue.component('datos-laborales', {
                         return;
 
                     cargando('Eliminando...');
-                    http('egresado/eliminar-experiencia-laboral', {id: experiencia.id}).then(
+                    http.post('egresado/eliminar-experiencia-laboral', {id: experiencia.id}).then(
                         ( )=>
                         {
-                           alertTareaRealizada('Eliminado con exito');
-                           this.init();
+                            this.init();
+                            alertTareaRealizada('Eliminado con exito');
+                            this.$emit('updateprogreso');
                         },
                         err =>
                         {
@@ -121,7 +131,6 @@ Vue.component('datos-laborales', {
             http.get('recursos/duraciones-laborales'),
             http.get('recursos/tipos-vinculacion'),
             http.get('recursos/salarios'),
-            http.get('egresado/datos-laborales')
         ]).then(
             (response) =>
             {

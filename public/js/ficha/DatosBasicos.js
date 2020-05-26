@@ -1,5 +1,7 @@
 import http from '../http.js';
 
+
+
 Vue.component('datos-basicos',{
     template: '#datos-basicos-component',
     data: () => ({
@@ -101,7 +103,9 @@ Vue.component('datos-basicos',{
             ( {data, ...datos} ) =>
             {
                 this.input = data;
-                this.datos = { ...this.datos, ...datos}
+                this.datos = { ...this.datos, ...datos};
+
+
             }
         );
     }

@@ -1,7 +1,7 @@
 @component('component', ['id' => 'datos-basicos-component'])
 <form @submit.prevent="handleSubmit">
     <div class="row">
-        <div class="col col-md-10">
+        <div class="col col-md-10" id="datos-personales-form">
             <card title="Datos Personales">
                 <div class="row">
                     <div class="col-md-4">
@@ -102,7 +102,7 @@
                 </div>
             </card>
         </div>
-        <div class="col col-md-2 mt-3">
+        <div class="col col-md-2 mt-3" id="imagen-perfil-form">
             <div class="text-center">
                 <img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid">
                 <br>
@@ -117,7 +117,7 @@
             </div>
         </div>
     </div>
-    <div class="mt-3">
+    <div class="mt-3" id="documento-info-form">
         <card title="Información Documento">
             <div class="row">
                 <div class="col-md-6">
@@ -156,7 +156,7 @@
             </div>
         </card>
     </div>
-    <div class="mt-3">
+    <div class="mt-3" id="info-contacto-form">
         <card title="Información de Contacto">
             <div class="row">
                 <div class="col-md-4">
@@ -275,7 +275,7 @@
             </div>
         </card>
     </div>
-    <div class="mt-3">
+    <div class="mt-3" id="btn-guardar">
         <button type="submit" class="btn btn-primary btn-block">
             Guardar
         </button>

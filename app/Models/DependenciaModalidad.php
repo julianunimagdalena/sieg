@@ -8,6 +8,12 @@ class DependenciaModalidad extends Model
 {
     public $timestamps = false;
     protected $table = 'dependencias_modalidades';
+    protected $casts = [
+        'idPrograma' => 'integer',
+        'idFacultad' => 'integer',
+        'idJornada' => 'integer',
+        'idModalidad' => 'integer'
+    ];
 
     public function programa()
     {

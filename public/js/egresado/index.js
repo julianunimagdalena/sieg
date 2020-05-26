@@ -7,10 +7,7 @@ new Vue({
         info: undefined
     }),
     created() {
-        http.get('egresado/info-grado').then(res => {
-            this.infos = res.data;
-            this.info = this.infos[0];
-        });
+        this.fetchData();
     },
     computed: {
         programas() {
@@ -33,6 +30,17 @@ new Vue({
         }
     },
     methods: {
+        fetchData() {
+            let codigo = null;
+            if (this.info) codigo = this.info.codigo;
+
+            http.get('egresado/info-grado').then(res => {
+                this.infos = res.data;
+
+                if (!codigo) this.info = this.infos[0];
+                else this.info = this.infos.filter(i => i.codigo === codigo)[0];
+            });
+        },
         getEstado(value) {
             return value ? 'APROBADO' : 'PENDIENTE';
         },

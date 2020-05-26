@@ -9,17 +9,26 @@ Vue.component('hoja-de-vida', {
             user_idiomas: [],
             distinciones: [],
             asociaciones: [],
+            consejos: [],
+            discapacidades: [],
+            t_consejos: [],
             t_discapacidades: []
         },
         forms: {
             idioma: {},
             distincion: {},
-            asociacion: {}
+            asociacion: {},
+            consejo: {},
+            discapacidad: {},
+            perfil: {}
         },
         errors: {
             idioma: {},
             distincion: {},
-            asociacion: {}
+            asociacion: {},
+            consejo: {},
+            discapacidad: {},
+            perfil: {}
         }
     }),
     methods: {
@@ -53,11 +62,21 @@ Vue.component('hoja-de-vida', {
         },
         initConsejos()
         {
-
+            http.get('egresado/concejos').then(
+                ({ data }) =>
+                {
+                    this.datos.consejos = data;
+                }
+            )
         },
         initDiscapacidades()
         {
-
+            http.get('egresado/discapacidades').then(
+                ({ data }) =>
+                {
+                    this.datos.discapacidades = data;
+                }
+            );
         },
         editItem(varName,data)
         {
@@ -78,6 +97,7 @@ Vue.component('hoja-de-vida', {
                         {
                             alertTareaRealizada('Se ha eliminado la información');
                             callBack();
+                            this.$emit('updateprogreso');
                         },
                         err =>
                         {
@@ -86,6 +106,23 @@ Vue.component('hoja-de-vida', {
                     ).then(cerrarCargando);
                 }
             )
+        },
+        onSubmitPerfil()
+        {
+            cargando('Guardando...')
+            http.post('egresado/perfil-profesional', this.forms.perfil).then(
+                ( ) =>
+                {
+                    alertTareaRealizada('Guardado');
+                },
+                ({ response }) =>
+                {
+                    if(response.status === 422)
+                        this.errors.perfil = response.data.errors;
+                    else
+                        alertErrorServidor();
+                }
+            ).then(cerrarCargando);
         },
         onSubmitLanguaje() {
             cargando('Enviando...')
@@ -154,19 +191,44 @@ Vue.component('hoja-de-vida', {
         onSubmitConsejo()
         {
             cargando('Enviando Consejo...');
-            http.post('egresado/concejo', this.forms.distincion).then(
+            http.post('egresado/concejo', this.forms.consejo).then(
                 ( ) =>
                 {
                     alertTareaRealizada('Se ha añadido con exito el consejo profesional');
 
                     $('#modal-consejo').modal('hide');
 
-                    this.initDistinciones();
+                    this.initConsejos();
                 },
                 ({ response }) =>
                 {
                     if(response.status === 422)
                         this.errors.distincion = response.data.errors;
+                    else if(response.status === 400)
+                        swal('Error!', response.data.errors, 'error');
+                    else
+                        alertErrorServidor();
+                }
+            ).then(cerrarCargando);
+        },
+        onSubmitDiscapacidad()
+        {
+            cargando();
+            http.post('egresado/agregar-discapacidad', this.forms.discapacidad).then(
+                ( ) =>
+                {
+                    alertTareaRealizada();
+
+                    $('#modal-discapacidad').modal('hide');
+
+                    this.initDiscapacidades();
+                },
+                ({ response }) =>
+                {
+                    if(response.status === 422)
+                        this.errors.distincion = response.data.errors;
+                    else if(response.status === 400)
+                        swal('Error!', response.data.errors, 'error');
                     else
                         alertErrorServidor();
                 }
@@ -180,12 +242,19 @@ Vue.component('hoja-de-vida', {
 
         Promise.all([
             http.get('recursos/idiomas'),
-            http.get('recursos/niveles-idioma')
+            http.get('recursos/niveles-idioma'),
+            http.get('recursos/discapacidades'),
+            http.get('recursos/consejos'),
+            http.get('egresado/perfil')
         ]).then(
             ( response ) =>
             {
-                this.datos.idiomas = response[0].data;
-                this.datos.niveles = response[1].data;
+                this.datos.idiomas              = response[0].data;
+                this.datos.niveles              = response[1].data;
+                this.datos.t_discapacidades     = response[2].data;
+                this.datos.t_consejos           = response[3].data;
+
+                this.forms.perfil.perfil        = response[4].data;
 
                 this.initUserIdiomas();
             }

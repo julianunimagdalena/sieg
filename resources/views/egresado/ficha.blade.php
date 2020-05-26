@@ -36,8 +36,11 @@
         background-color: transparent !important;
         color: black !important;
     }
+    .no-opacity {
+        opacity: 0;
+    }
 </style>
-
+<link rel="stylesheet" href="https://unpkg.com/driver.js/dist/driver.min.css">
 @endsection
 
 @push('components')
@@ -57,51 +60,71 @@
 
 
 @section('content')
-<h3 class="text-primary text-uppercase">Ficha de Egresado</h3>
-<div>Los campos con <span class="text-danger">*</span> son requeridos</div>
+<div class="row">
+    <div class="col col-md-8">
+        <h3 class="text-primary text-uppercase">Ficha de Egresado</h3>
+        <div>Los campos con <span class="text-danger">*</span> son requeridos</div>
+    </div>
+    <div class="col col-md-4" id="progreso-view">
+        <div class="font-weight-bold app-text-back-1 mb-3">
+            Progreso
+        </div>
+        <div class="progress" style="height: 10px;">
+            <div class="progress-bar bg-success progress-bar-animated" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+    </div>
+</div>
 <div class="mt-3 decorative">
-    <ul class="nav nav-tabs tab" role="tablist">
+    <ul class="nav nav-tabs tab" role="tablist" id="tab-list">
         <li class="nav-item">
-            <a class="nav-link active" id="datos-basicos-tab" data-toggle="tab" href="#datos-basicos" role="tab"
+            <a
+                v-bind:class ="{'active' : active.datos_basicos}"
+                class="nav-link"
+                id="datos-basicos-tab" data-toggle="tab" href="#datos-basicos" role="tab" @click="setActiveTab('datos_basicos')"
                 aria-controls="datos-basicos" aria-selected="true">Datos básicos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="datos-academicos-tab" data-toggle="tab" href="#datos-academicos" role="tab"
+            <a
+                v-bind:class ="{'active' : active.datos_academicos}"
+                class="nav-link" id="datos-academicos-tab" data-toggle="tab" href="#datos-academicos" role="tab" @click="setActiveTab('datos_academicos')"
                 aria-controls="datos-academicos" aria-selected="false">Datos académicos</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="hoja-vida-tab" data-toggle="tab" href="#hoja-vida" role="tab"
+            <a
+                v-bind:class ="{'active' : active.hoja_de_vida}"
+                class="nav-link" id="hoja-vida-tab" data-toggle="tab" href="#hoja-vida" role="tab" @click="setActiveTab('hoja_de_vida')"
                 aria-controls="hoja-vida" aria-selected="false">Datos de hoja de vida</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="datos-laborales-tab" data-toggle="tab" href="#datos-laborales" role="tab"
+            <a
+                v-bind:class ="{'active' : active.datos_laborales}"
+                class="nav-link" id="datos-laborales-tab" data-toggle="tab" href="#datos-laborales" role="tab" @click="setActiveTab('datos_laborales')"
                 aria-controls="datos-laborales" aria-selected="false">Datos laborales</a>
         </li>
     </ul>
 
     <tab-content>
-        <tab-pane id="datos-basicos">
+        <tab-pane id="datos-basicos" :active="active.datos_basicos">
             <datos-basicos />
         </tab-pane>
 
-        <tab-pane id="datos-academicos">
-            <datos-academicos />
+        <tab-pane id="datos-academicos" :active="active.datos_academicos">
+            <datos-academicos @updateprogreso="updateProgreso()"/>
         </tab-pane>
 
-        <tab-pane id="hoja-vida" >
-            <hoja-de-vida />
+        <tab-pane id="hoja-vida" :active="active.hoja_de_vida">
+            <hoja-de-vida @updateprogreso="updateProgreso()"/>
         </tab-pane>
 
-        <tab-pane id="datos-laborales" active>
-            <datos-laborales />
+        <tab-pane id="datos-laborales" :active="active.datos_laborales">
+            <datos-laborales @updateprogreso="updateProgreso()"/>
         </tab-pane>
     </tab-content>
 </div>
 @endsection
 
 @push('scripts')
-<script type="module">
-
-    new Vue({ el: '#app' })
-</script>
+<script src="https://unpkg.com/driver.js/dist/driver.min.js"></script>
+<script type="module" src="{{ asset('js/ficha/main.js')}}"></script>
+<script type="module" src="{{ asset('js/ficha/tutorial.js')}}"></script>
 @endpush

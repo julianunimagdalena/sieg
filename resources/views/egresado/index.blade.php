@@ -13,6 +13,8 @@
 @push('components')
 @include('components.app.Titulo')
 @include('components.app.SelectorInfoGrado')
+@include('components.modals.Modal')
+@include('components.modals.AsistenciaCeremoniaModal')
 @endpush
 
 @section('content')
@@ -65,7 +67,9 @@
                         <td>Confirmación de asistencia a ceremonia de grado</td>
                         <td>Estudiante</td>
                         <td>
-                            <span :class="['badge', confirmacionCeremonia]">@{{confirmacionCeremonia}}</span>
+                            <a href="#asistenciaCeremoniaModal" data-toggle="modal">
+                                <span :class="['badge', confirmacionCeremonia]">@{{confirmacionCeremonia}}</span>
+                            </a>
                         </td>
                     </tr>
                     <tr class="TableRow">
@@ -97,7 +101,8 @@
         </table>
     </div>
 </div>
-
+<asistencia-ceremonia-modal id="asistenciaCeremoniaModal" v-if="info" :codigo="info.codigo" v-on:complete="fetchData">
+</asistencia-ceremonia-modal>
 @endsection
 
 @push('scripts')

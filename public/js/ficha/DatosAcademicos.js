@@ -67,6 +67,7 @@ Vue.component('datos-academicos', {
                     {
                         alertTareaRealizada();
                         this.init();
+                        this.$emit('updateprogreso');
                     },
                     err =>
                     {

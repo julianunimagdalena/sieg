@@ -1,49 +1,15 @@
 @component('component', ['id' => 'datos-academicos-component'])
 <div class="container-fluid mt-3">
-    <!--<h6 class="text-uppercase font-weight-bold text-primary mb-3">
-        Información académica en la que se aspira a grado en la Universidad del Magdalena
-    </h6>
-    <table class="table table-responsive-md text-center">
-        <thead class="bg-primary">
-            <th class="text-white p-1">Código</th>
-            <th class="text-white p-1">Facultad</th>
-            <th class="text-white p-1">Programa</th>
-            <th class="text-white p-1">Modalidad</th>
-        </thead>
-        <tbody>
-            <td class="font-weight-bold p-1">CODIGO</td>
-            <td class="font-weight-bold p-1">FACULTAD</td>
-            <td class="font-weight-bold p-1">PROGRAMA</td>
-            <td class="font-weight-bold p-1">MODALIDAD</td>
-        </tbody>
-    </table>
-    <br/>
-    <h6 class="text-uppercase font-weight-bold text-primary mb-3">Información académica desarrollada en la Universidad del Magdalena</h6>
-    <table class="table table-responsive-md text-center">
-        <thead class="bg-primary">
-            <th class="text-white p-1">Código</th>
-            <th class="text-white p-1">Facultad</th>
-            <th class="text-white p-1">Programa</th>
-            <th class="text-white p-1">Modalidad</th>
-        </thead>
-        <tbody>
-            <td class="p-1">CODIGO</td>
-            <td class="p-1">FACULTAD</td>
-            <td class="p-1">PROGRAMA</td>
-            <td class="p-1">MODALIDAD</td>
-        </tbody>
-    </table>
-    <hr/>-->
     <h6 class="text-uppercase font-weight-bold text-primary mb-4">
         Información académica desarrollada en otras instituciones
     </h6>
-    <button class="btn btn-primary btn-icon-split" data-toggle="modal" data-target="#modalAddInfoAcademica" @click="input = {}">
+    <button class="btn btn-primary btn-icon-split" id="btn-añadir-datos-academicos" data-toggle="modal" data-target="#modalAddInfoAcademica" @click="input = {}">
         <span class="icon text-white-50">
             <i class="fas fa-plus"></i>
         </span>
         <span class="text">Añadir</span>
     </button>
-    <table class="table table-sm table-responsive-md text-center AppTable">
+    <table class="table table-sm table-responsive-md text-center AppTable" id="table-datos-academicos">
         <thead class="bg-primary">
             <th class="text-white p-1">Nombre</th>
             <th class="text-white p-1">Institucion</th>
@@ -51,9 +17,9 @@
             <th class="text-white p-1">Graduado</th>
             <th class="text-white p-1">Acciones</th>
         </thead>
-        <tbody class="app-text-black-0">
+        <tbody class="app-text-black-1">
             <tr class="TableRow" v-for="(info) in datos.info_academica">
-                <td>@{{ info.nombre}}</td>
+                <td class="font-weight-bold">@{{ info.nombre}}</td>
                 <td>@{{ info.institucion }}</td>
                 <td>@{{ info.meses }}</td>
                 <td>

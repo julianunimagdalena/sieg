@@ -51,7 +51,7 @@
 
         .badge.APROBADO {
             color: var(--white);
-            background-color: var(--primary);
+            background-color: var(--success);
         }
 
         .badge.RECHAZADO {
@@ -115,25 +115,39 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/egresado">
                         <i class="fas fa-fw fa-graduation-cap"></i>
-                        <span>Proceso de Grado</span>
+                        <span>Proceso de grado</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/egresado/encuesta">
                         <i class="fas fa-file-invoice"></i>
-                        <span>Encuesta Momento de Grado</span>
+                        <span>Encuesta momento de grado</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/egresado/ficha-egresado">
                         <i class="fas fa-fw fa-poll-h"></i>
-                        <span>Ficha de Egresado</span>
+                        <span>Ficha de egresado</span>
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/egresado/carga-documentos">
                         <i class="fas fa-fw fa-file-alt"></i>
                         <span>Carga de documentos</span>
+                    </a>
+                </li>
+                @endif
+
+                @if (session('ur')->rol->nombre === 'Administrador Egresados')
+                <style>
+                    .nav-item span {
+                        font-size: .8rem !important;
+                    }
+                </style>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/administrador/administrar-usuarios">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Administrar usuarios</span>
                     </a>
                 </li>
                 @endif
