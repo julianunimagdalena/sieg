@@ -31,8 +31,8 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        // session(['ur' => UsuarioRol::find(20026)]);
-        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        session(['ur' => UsuarioRol::find(20026)]);
+        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
@@ -121,7 +121,8 @@ class EstudianteController extends Controller
                     'meses' => $est->duracion,
                     'graduado' => $est->graduado,
                     'anio_culminacion' => $est->anioGrado,
-                    'mes_culminacion' => $est->mesGrado
+                    'mes_culminacion' => $est->mesGrado,
+                    'nivel_estudio_id' => $est->nivel_estudio_id
                 ]);
             }
         }
@@ -202,6 +203,7 @@ class EstudianteController extends Controller
                     'salario_id' => $exp->salario_id,
                     'correo' => $exp->email,
                     'telefono' => $exp->telefono,
+                    'contrato_activo' => $exp->contrato_activo,
                     'funciones' => $exp->funcioneslogros
                 ]);
             }
@@ -263,6 +265,7 @@ class EstudianteController extends Controller
         $estudio->titulo = $request->nombre;
         $estudio->institucion = $request->institucion;
         $estudio->duracion = $request->meses;
+        $estudio->nivel_estudio_id = $request->nivel_estudio_id;
         $estudio->graduado = $request->graduado;
         $estudio->anioGrado = $request->graduado ? $request->anio_culminacion : null;
         $estudio->mesGrado = $request->graduado ? $request->mes_culminacion : null;
@@ -543,6 +546,7 @@ class EstudianteController extends Controller
         $experiencia->email = $request->correo;
         $experiencia->telefono = $request->telefono;
         $experiencia->funcioneslogros = $request->funciones;
+        $experiencia->contrato_activo = $request->contrato_activo;
         $experiencia->save();
 
         return 'ok';

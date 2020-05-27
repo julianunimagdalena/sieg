@@ -12,6 +12,8 @@
     <link
         href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
         rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
     <link href="{{asset('css/principal.css')}}" rel="stylesheet">
     <link href="{{asset('css/spin.css')}}" rel="stylesheet">
     <style>
@@ -305,14 +307,13 @@
     <script src="{{asset('vendor/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
     <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
 
     {{-- OWN SCRIPTS --}}
     <script src="{{asset('vendor/vue.js')}}"></script>
     <script src="{{asset('vendor/sweetalert.min.js')}}"></script>
     <script src="{{asset('js/default.js')}}"></script>
     <script src="{{asset('vendor/axios.min.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/locale/es.min.js"></script>
     <script>
         $(`a[href='${window.location.href}']`).parent().addClass('active');
         document.querySelector('#sidebarToggle').click();

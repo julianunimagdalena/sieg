@@ -1,6 +1,6 @@
 @component('component', ['id' => 'datos-laborales-component'])
 <div >
-    <card title="Actualidad Laboral" id="actualidad-laboral-form">
+    <!--<card title="Actualidad Laboral" id="actualidad-laboral-form">
         <form>
             <div class="form-group">
                 <label>¿Actualmente se encuentra laborando?</label>
@@ -28,9 +28,9 @@
                 </div>
             </div>
         </form>
-    </card>
+    </card>-->
 
-    <div class="mt-4">
+    <div class="">
         <card-action title="Información de Experiencias Laborales" fluid @onAdd="openModal('#modalInformacionLaboral')" id="xp-laboral-form">
             <table class="table table-sm">
                 <thead class="thead-light">
@@ -188,7 +188,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <div class="form-group">
                     <app-input
                         label ="Correo Electronico"
@@ -200,7 +200,7 @@
                     />
                 </div>
             </div>
-            <div class="col-sm-6">
+            <div class="col-sm-4">
                 <div class="form-group">
                     <app-input
                         label ="Teléfono"
@@ -210,6 +210,20 @@
                         :errors="errors.xp.telefono"
                         @input="errors.xp.telefono = undefined"
                     />
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <app-select
+                        label="Contrato Activo"
+                        required
+                        v-model="forms.xp.contrato_activo"
+                        :errors="errors.xp.contrato_activo"
+                        @input="errors.xp.contrato_activo = undefined"
+                        >
+                        <option :value="true" >Si</option>
+                        <option :value="false" >No</option>
+                    </app-select>
                 </div>
             </div>
         </div>

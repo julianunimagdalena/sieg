@@ -38,4 +38,14 @@ function objectToFormData(obj, rootName, ignoreList) {
     return formData;
 }
 
-export { objectToFormData };
+function initBootstrapSelect(time = 10) {
+    $.fn.selectpicker.Constructor.DEFAULTS.style = 'form-control';
+    $.fn.selectpicker.Constructor.DEFAULTS.styleBase = 'form-control';
+    $.fn.selectpicker.Constructor.DEFAULTS.noneSelectedText = 'Seleccione';
+    $.fn.selectpicker.Constructor.DEFAULTS.liveSearch = true;
+    $.fn.selectpicker.Constructor.DEFAULTS.countSelectedText = '{0} elementos seleccionados';
+    $.fn.selectpicker.Constructor.DEFAULTS.selectedTextFormat = 'count';
+    setTimeout(() => $('.bselect').selectpicker('refresh'), time);
+}
+
+export { objectToFormData, initBootstrapSelect };

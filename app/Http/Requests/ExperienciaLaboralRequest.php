@@ -34,7 +34,8 @@ class ExperienciaLaboralRequest extends FormRequest
             'salario_id' => 'required|exists:salarios,id',
             'correo' => 'required',
             'telefono' => 'required',
-            'funciones' => 'required'
+            'funciones' => 'required',
+            'contrato_activo' => 'required|boolean'
         ];
     }
 }

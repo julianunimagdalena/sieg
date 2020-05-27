@@ -51,6 +51,9 @@ Route::get('/recursos/tipos-documento', 'RecursosController@tiposDocumento');
 Route::get('/recursos/estados-civiles', 'RecursosController@estadosCiviles');
 Route::get('/recursos/discapacidades', 'RecursosController@discapacidades');
 Route::get('/recursos/consejos', 'RecursosController@consejos');
+Route::get('/recursos/roles', 'RecursosController@roles');
+Route::get('/recursos/programas', 'RecursosController@programas');
+Route::get('/recursos/niveles-estudio', 'RecursosController@nivelesEstudio');
 
 Route::get('/egresado/datos', 'EstudianteController@datos');
 Route::get('/egresado/datos-academicos', 'EstudianteController@datosAcademicos');
@@ -90,7 +93,7 @@ Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
 Route::get('/administrador/usuarios', 'AdminController@usuarios');
 Route::post('/administrador/usuario', 'AdminController@usuario');
 Route::post('/administrador/eliminar-usuario', 'AdminController@eliminarUsuario');
-Route::get('/administrador/datos-usuario/{ur_id}', 'AdminController@datosUsuario');
+Route::get('/administrador/datos-usuario', 'AdminController@datosUsuario');
 
 //RUTAS VISTAS DIRECCION DE PROGRAMA
 

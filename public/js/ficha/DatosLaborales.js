@@ -17,7 +17,9 @@ Vue.component('datos-laborales', {
         },
         forms: {
             a_laboral: {},
-            xp: {}
+            xp: {
+                //contrato_activo: false
+            }
         },
         errors: {
             xp: {}

@@ -29,6 +29,7 @@ class EstudioRequest extends FormRequest
             'institucion' => 'required',
             'meses' => 'required',
             'graduado' => 'required|boolean',
+            'nivel_estudio_id' => 'required|exists:nivel_estudio,id',
             'anio_culminacion' => 'required_if:graduado,true|integer',
             'mes_culminacion' => 'required_if:graduado,true'
         ];

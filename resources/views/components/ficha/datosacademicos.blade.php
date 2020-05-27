@@ -1,5 +1,52 @@
 @component('component', ['id' => 'datos-academicos-component'])
 <div class="container-fluid mt-3">
+
+    <div class="row mb-3">
+        <div class="col col-md-6 col-sm-12">
+            <h6 class="text-uppercase font-weight-bold text-primary">
+                Información académica en la que se aspira a grado <!--en la Universidad del Magdalena-->
+            </h6>
+            <table class="table table-responsive-md">
+                <thead class="bg-primary">
+                    <th class="text-white p-1">Código</th>
+                    <th class="text-white p-1">Facultad</th>
+                    <th class="text-white p-1">Programa</th>
+                    <th class="text-white p-1">Modalidad</th>
+                </thead>
+                <tbody>
+                    <tr v-for="(info) in datos.info_grado" class="app-text-black-1">
+                        <td class="font-weight-bold p-1">@{{ info.codigo }}</td>
+                        <td class="p-1">@{{ info.facultad }}</td>
+                        <td class="p-1">@{{ info.programa }}</td>
+                        <td class="p-1">@{{ info.modalidad}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="col col-md-6 col-sm-12">
+            <h6 class="text-uppercase font-weight-bold text-primary">
+            Información académica desarrollada en la Universidad del Magdalena</h6>
+            <table class="table">
+                <thead class="bg-primary">
+                    <th class="text-white p-1">Código</th>
+                    <th class="text-white p-1">Facultad</th>
+                    <th class="text-white p-1">Programa</th>
+                    <th class="text-white p-1">Modalidad</th>
+                </thead>
+                <tbody>
+                    <tr v-for="(info) in datos.programas" class="app-text-black-1">
+                        <td class="font-weight-bold p-1">@{{ info.codigo }}</td>
+                        <td class="p-1">@{{ info.facultad }}</td>
+                        <td class="p-1">@{{ info.programa }}</td>
+                        <td class="p-1">@{{ info.modalidad}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <hr/>
+
     <h6 class="text-uppercase font-weight-bold text-primary mb-4">
         Información académica desarrollada en otras instituciones
     </h6>

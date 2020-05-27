@@ -103,6 +103,9 @@ Vue.component('datos-basicos',{
             ( {data, ...datos} ) =>
             {
                 this.input = data;
+                
+                this.input.edad = moment().diff(data.fecha_nacimiento, 'years', false);
+
                 this.datos = { ...this.datos, ...datos};
 
 

@@ -74,7 +74,7 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Edad</label>
-                            <input type="number" class="form-control" placeholder="Edad" disabled>
+                            <input type="number" class="form-control" placeholder="Edad" v-model="input.edad" disabled>
                         </div>
                     </div>
                     <div class="col-md-3">

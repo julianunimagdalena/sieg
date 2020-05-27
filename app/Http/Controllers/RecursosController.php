@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Concejo;
 use App\Models\Departamento;
+use App\Models\Dependencia;
 use App\Models\Discapacidad;
 use Illuminate\Http\Request;
 
@@ -13,11 +14,13 @@ use App\Models\Genero;
 use App\Models\Idioma;
 use App\Models\Municipio;
 use App\Models\NivelCargo;
+use App\Models\NivelEstudio;
 use App\Models\NivelIdioma;
 use App\Models\Pais;
 use App\Models\Salario;
 use App\Models\TipoDocumento;
 use App\Models\TipoVinculacion;
+use App\Tools\Variables;
 
 class RecursosController extends Controller
 {
@@ -107,5 +110,37 @@ class RecursosController extends Controller
     public function consejos()
     {
         return Concejo::all();
+    }
+
+    public function roles()
+    {
+        $res = [];
+        $roles = Variables::roles();
+
+        $blacklistElegir = [$roles['estudiante']->id, $roles['dependencia']->id];
+
+        foreach ($roles as $rol) {
+            array_push($res, [
+                'id' => $rol->id,
+                'nombre' => $rol->nombre,
+                'canElegirProgramas' => $rol->id === $roles['coordinador']->id,
+                'canElegir' => !in_array($rol->id, $blacklistElegir),
+            ]);
+        }
+
+        return $res;
+    }
+
+    public function programas()
+    {
+        $tipos = Variables::tiposDependencia();
+        return Dependencia::where('idTipo', $tipos['dir_programa']->id)
+            ->select('id', 'nombre')
+            ->get();
+    }
+
+    public function nivelesEstudio()
+    {
+        return NivelEstudio::all();
     }
 }

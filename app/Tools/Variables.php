@@ -6,6 +6,7 @@ use App\Models\Documento;
 use App\Models\Estado;
 use App\Models\PazSalvo;
 use App\Models\Rol;
+use App\Models\TipoDependencia;
 use App\Models\TipoEstudiante;
 
 class Variables
@@ -53,6 +54,15 @@ class Variables
     {
         return [
             'ecaes' => Documento::where('abrv', 'ECAES')->first()
+        ];
+    }
+
+    static public function tiposDependencia()
+    {
+        return [
+            'dir_programa' => TipoDependencia::where('nombre', 'Dirección de programa')->first(),
+            'administrativa' => TipoDependencia::where('nombre', 'Administrativa')->first(),
+            'facultad' => TipoDependencia::where('nombre', 'Facultad')->first()
         ];
     }
 }

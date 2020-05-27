@@ -8,4 +8,8 @@ class Dependencia extends Model
 {
     public $timestamps = false;
     protected $table = 'dependencias';
+    protected $casts = [
+        'idTipo' => 'integer',
+        'idNivelEstudio' => 'integer'
+    ];
 }

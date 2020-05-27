@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UsuarioRequest;
 use App\Models\DependenciaModalidad;
 use App\Models\Persona;
 use App\Models\User;
 use App\Models\UsuarioRol;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
+use App\Http\Requests\UsuarioRequest;
 
 class AdminController extends Controller
 {
@@ -66,16 +66,16 @@ class AdminController extends Controller
 
     public function usuario(UsuarioRequest $request)
     {
+        $ur = UsuarioRol::find($request->id);
         $roles = Variables::roles();
-
-        if ($request->id) $ur = UsuarioRol::find($request->id);
-        else $ur = new UsuarioRol();
-
-        $usuario = $ur->usuario;
+        $usuario = $ur ? $ur->usuario : User::where('identificacion', $request->username)->first();
 
         if ($usuario) {
-            $rol = $usuario->usuarioRol()->where('rol_id', $request->rol_id)->first();
-            if ($rol) return response('El usuario ya posee este rol', 400);
+            $query = $usuario->usuarioRol()->where('rol_id', $request->rol_id);
+            if ($ur) $query = $query->where('id', '<>', $ur->id);
+
+            $count = $query->count();
+            if ($count === 1) return response('El usuario ya posee este rol', 400);
         } else {
             $persona = new Persona();
             $persona->nombres = $request->nombres;
@@ -86,9 +86,12 @@ class AdminController extends Controller
 
             $usuario = new User();
             $usuario->idPersona = $persona->id;
-            $usuario->identificacion = $request->username;
-            $usuario->save();
         }
+
+        $usuario->identificacion = $request->username;
+        $usuario->save();
+
+        if (!$ur) $ur = new UsuarioRol();
 
         $ur->usuario_id = $usuario->id;
         $ur->rol_id = $request->rol_id;
@@ -114,25 +117,39 @@ class AdminController extends Controller
         return 'ok';
     }
 
-    public function datosUsuario($ur_id)
+    public function datosUsuario(Request $request)
     {
-        $ur = UsuarioRol::find($ur_id);
-        $usuario = $ur->usuario;
-        $persona = $usuario->persona;
+        $roles = Variables::roles();
+        $ur = null;
+        $usuario = null;
+        $persona = null;
+
+        if ($request->ur_id) {
+            $ur = UsuarioRol::find($request->ur_id);
+            $usuario = $ur->usuario;
+            $persona = $usuario->persona;
+        } else if ($request->identificacion) {
+            $persona = Persona::where('identificacion', $request->identificacion)->first();
+            $usuario = $persona->usuario;
+        }
+
+        if (!$usuario) return response('No encontrado', 400);
 
         $programas = [];
-        foreach ($usuario->dependenciasModalidades as $dm) {
-            if (!in_array($dm->idPrograma, $programas)) array_push($programas, $dm->idPrograma);
+        if ($ur && $ur->rol_id === $roles['coordinador']->id) {
+            foreach ($usuario->dependenciasModalidades as $dm) {
+                if (!in_array($dm->idPrograma, $programas)) array_push($programas, $dm->idPrograma);
+            }
         }
 
         return [
-            'id' => $ur->id,
+            'id' => $ur ? $ur->id : null,
+            'activo' => $ur ? $ur->activo : null,
+            'rol_id' => $ur ? $ur->rol_id : null,
             'nombres' => $persona->nombres,
             'apellidos' => $persona->apellidos,
             'identificacion' => $persona->identificacion,
             'username' => $usuario->identificacion,
-            'activo' => $ur->activo,
-            'rol_id' => $ur->rol_id,
             'programa_ids' => $programas
         ];
     }

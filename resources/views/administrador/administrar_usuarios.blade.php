@@ -47,7 +47,8 @@
         </tr>
     </tbody>
 </table>
-<usuario-modal id="usuarioModal" :usuario="usuario"></usuario-modal>
+<usuario-modal id="usuarioModal" :usuario="usuario" :roles="datos.roles" :programas="datos.programas"
+    v-on:complete="fetchUsuarios"></usuario-modal>
 @endsection
 
 @push('scripts')

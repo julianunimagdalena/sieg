@@ -34,7 +34,7 @@ class UsuarioRequest extends FormRequest
             'username' => 'required',
             'activo' => 'required|boolean',
             'rol_id' => 'required|integer|exists:roles,id',
-            'programa_ids' => 'required_if:rol_id,' . $roles['coordinador']->id.'|array'
+            'programa_ids' => 'required_if:rol_id,' . $roles['coordinador']->id . '|array'
         ];
     }
 
@@ -43,6 +43,6 @@ class UsuarioRequest extends FormRequest
         return [
             '*.required' => 'Obligatorio',
             '*.required_if' => 'Obligatorio'
-        ]
+        ];
     }
 }
