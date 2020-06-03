@@ -16,7 +16,16 @@ class FechaGradoController extends Controller
 
     public function getFechasActivas()
     {
-        $fechas = FechaGrado::where('estado', 1)->get();
-        return $fechas;
+        $res = [];
+        $fechas = FechaGrado::where('estado', 1)->orderBy('fecha_grado')->get();
+
+        foreach ($fechas as $fec) {
+            array_push($res, [
+                'id' => $fec->id,
+                'nombre' => $fec->descripcion
+            ]);
+        }
+
+        return $res;
     }
 }

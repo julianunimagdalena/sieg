@@ -20,4 +20,19 @@ class ProcesoGrado extends Model
     {
         return $this->belongsTo('App\Models\Estudiante', 'idEstudiante');
     }
+
+    public function fechaGrado()
+    {
+        return $this->belongsTo('App\Models\FechaGrado', 'idFecha');
+    }
+
+    public function estadoPrograma()
+    {
+        return $this->belongsTo('App\Models\Estado', 'estado_programa_id');
+    }
+
+    public function estadoSecretaria()
+    {
+        return $this->belongsTo('App\Models\Estado', 'estado_secretaria_id');
+    }
 }

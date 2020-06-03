@@ -27,7 +27,7 @@
 <br>
 <div v-if="info">
     <div class="row">
-        <div class="col-lg-4 col-md-6 col-12" v-for="doc in info.documentos">
+        <div class="col-lg-4 col-md-6 col-12 mb-2" v-for="doc in info.documentos">
             <documento-card :documento="doc" :seleccionar="modalDocumento"></documento-card>
         </div>
     </div>

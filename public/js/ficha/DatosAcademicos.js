@@ -4,10 +4,11 @@ Vue.component('datos-academicos', {
     template: '#datos-academicos-component',
     data: () => ({
         datos: {
-            meses: meses
+            meses: meses,
+            niveles_estudio: []
         },
         input: {
-            graduado: "0"
+            graduado: false
         },
         errors: {
         }
@@ -25,12 +26,12 @@ Vue.component('datos-academicos', {
                     if(err)
                         alertErrorServidor();
                 }
-            )
+            );
         },
         handleSubmitInfoAcademica()
         {
             cargando();
-            http.post('egresado/estudio', {...this.input, graduado: Boolean(Number(this.input.graduado))}).then(
+            http.post('egresado/estudio', {...this.input }).then(
                 ( ) =>
                 {
                     swal('Info', 'Información académica añadida con exito', 'success');
@@ -51,7 +52,7 @@ Vue.component('datos-academicos', {
         },
         editInfoAcademica(info)
         {
-            this.input = {...info, graduado: Number(info.graduado)};
+            this.input = {...info };
             $('#modalAddInfoAcademica').modal('show');
         },
         deleteInfoAcademica(info)
@@ -79,6 +80,13 @@ Vue.component('datos-academicos', {
     },
     mounted: function()
     {
+        http.get('recursos/niveles-estudio').then(
+            ({ data }) =>
+            {
+                this.datos.niveles_estudio = data;
+            }
+        );
+
         this.init();
     }
 })

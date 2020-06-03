@@ -4,7 +4,7 @@ new Vue({
     el: '#app',
     data: () => ({
         infos: [],
-        info: undefined
+        info: {}
     }),
     created() {
         this.fetchData();

@@ -33,4 +33,40 @@ class EstudianteDocumento extends Model
     {
         return Variables::$carpetaDocumentosEstudiantes . $this->id . '/' . $this->filename;
     }
+
+    public function getCanGenerarAttribute()
+    {
+        $estados = Variables::estados();
+        $canGenerar = Variables::documentosCanGenerar();
+
+        return in_array($this->idDocumento, $canGenerar) && $this->estado_id !== $estados['aprobado']->id;
+    }
+
+    public function getCanShowAttribute()
+    {
+        $estados = Variables::estados();
+        return in_array($this->estado_id, [$estados['aprobado']->id, $estados['pendiente']->id]);
+    }
+
+    public function getCanAprobarAttribute()
+    {
+        $estados = Variables::estados();
+        $can = Variables::documentosCanCambiarEstado();
+
+        return in_array($this->idDocumento, $can) && !in_array($this->estado_id, [$estados['aprobado']->id, $estados['sin_cargar']->id]);
+    }
+
+    public function getCanRechazarAttribute()
+    {
+        $estados = Variables::estados();
+        $can = Variables::documentosCanCambiarEstado();
+
+        return in_array($this->idDocumento, $can) && !in_array($this->estado_id, [$estados['rechazado']->id, $estados['sin_cargar']->id]);
+    }
+
+    public function getCanCargarDireccionAttribute()
+    {
+        $can = Variables::documentosCanCargarDireccion();
+        return in_array($this->idDocumento, $can);
+    }
 }

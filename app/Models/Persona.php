@@ -46,6 +46,11 @@ class Persona extends Model
         return $this->hasOne('App\Models\HojaVida', 'idPersona');
     }
 
+    public function tipoDocumento()
+    {
+        return $this->belongsTo('App\Models\TipoDocumento', 'tipodoc');
+    }
+
     public function getProgresoFichaAttribute()
     {
         $progreso = 0;
@@ -77,5 +82,13 @@ class Persona extends Model
     public function setApellidosAttribute($value)
     {
         $this->attributes['apellidos'] = strtoupper($value);
+    }
+
+    public function getLugarNacimientoAttribute()
+    {
+        $municipio = $this->municipioNacimiento;
+        $departamento = $municipio->departamento;
+
+        return $municipio->nombre . ' - ' . $departamento->nombre . ', ' . $departamento->pais->nombre;
     }
 }

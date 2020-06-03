@@ -7,6 +7,15 @@
     border-spacing: 0 .8em;*/
 }
 
+.AppTable-Separated {
+    border-collapse:separate;
+    border-spacing: 0 .8em;
+}
+
+.Table-Image {
+    max-height: 70px;
+}
+
 .TableRow, .TableRow-2 {
     min-height: 69px;
     margin-bottom: 20px !important;
@@ -22,9 +31,92 @@
     border-top: none !important;
 }
 
-
+.TableRow-Rounded {
+    border-radius: 1rem;
+}
 
 .TableRow:hover, .TableRow-2:hover {
     cursor: pointer;
     transform: translateY(-4px);
+}
+
+@media screen and (min-width: 1280px ){
+    .AppTable-List {
+        position: relative;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+    }
+
+    .AppTable-List thead {
+        display: flex;
+        text-align: center;
+    }
+
+    .AppTable-List thead tr {
+        display: flex;
+        -moz-box-align: stretch;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .AppTable-List thead tr th {
+        position: relative;
+        display: flex;
+        -moz-box-align: center;
+        text-align: center;
+        align-items: center;
+        box-sizing: border-box;
+        line-height: normal;
+        padding-left: 16px;
+        padding-right: 16px;
+        -moz-box-flex: 1;
+        flex: 1 0 0px;
+        max-width: 100%;
+        min-width: 100px;
+    }
+
+
+
+
+    .TableRow-Centered {
+        display: flex;
+        -moz-box-align: stretch;
+        align-items: stretch;
+        align-content: stretch;
+        width: 100%;
+        box-sizing: border-box;
+        font-size: 15px;
+
+        background-color: rgb(255, 255, 255);
+        min-height: 48px;
+    }
+
+    .TableRow-Centered td {
+        position: relative;
+        display: flex;
+        -moz-box-align: center;
+        align-items: center;
+        box-sizing: border-box;
+        line-height: normal;
+        padding-left: 16px;
+        padding-right: 16px;
+        word-break: break-word;
+        -moz-box-flex: 1;
+        flex: 1 0 0px;
+        max-width: 100%;
+        /*min-width: 100px;*/
+        font-weight: 400;
+    }
+
+    .TableItem-Center {
+        display: inline-block !important;
+        position: relative !important;
+        padding-top: 30px !important;
+        padding-left: 10px !important;
+    }
+
 }

@@ -85,3 +85,36 @@ function openModal(target="")
     $(target).modal('show');
 }
 
+
+function getEstados (
+        estado = '',
+        class_sin_cargar='badge-secondary',
+        class_pendiente= 'badge-warning',
+        class_aprobado='badge-success',
+        class_rechazado = 'badge-danger')
+{
+    estado = estado.toLowerCase();
+
+    return {
+        [class_sin_cargar]: estado === 'sin cargar' ,
+        [class_pendiente]: estado === 'pendiente' || estado === 'por aprobar' || estado === 'no generado' || estado === 'generar',
+        [class_aprobado]: estado === 'aprobado',
+        [class_rechazado]: estado === 'rechazado'
+    }
+}
+
+function getBadgeClass(estado)
+{
+   let classes = getEstados(estado);
+    for (let key in classes)
+    {
+        if (classes[key] === true)
+            return key;
+    }
+}
+
+function getUrlData()
+{
+    return location.href.split('/').pop();
+}
+

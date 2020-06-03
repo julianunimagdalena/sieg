@@ -14,8 +14,11 @@
         rel="stylesheet">
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.css" />
     <link href="{{asset('css/principal.css')}}" rel="stylesheet">
+    <link href="{{asset('css/app-principal.css')}}" rel="stylesheet">
     <link href="{{asset('css/spin.css')}}" rel="stylesheet">
+
     <style>
         .form-group label {
             font-weight: bold;
@@ -100,7 +103,13 @@
 
                 @if (session('ur')->rol->nombre === 'Coordinador de programa')
                 <li class="nav-item">
-                    <a class="nav-link" href="{{Request::root()}}/dirprograma/solicitudes">
+                    <a class="nav-link" href="{{Request::root()}}/direccion/estudiantes">
+                        <i class=" fas fa-fw fa-users"></i>
+                        <span>Aspirantes a grado</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/direccion/solicitudes">
                         <i class=" fas fa-fw fa-file-alt"></i>
                         <span>Solicitudes de grado</span>
                     </a>
@@ -150,6 +159,12 @@
                     <a class="nav-link" href="{{Request::root()}}/administrador/administrar-usuarios">
                         <i class="fas fa-fw fa-users"></i>
                         <span>Administrar usuarios</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/administrador/fechas-grado">
+                        <i class="fas fa-fw fa-calendar-day"></i>
+                        <span>Administrar fechas de grado</span>
                     </a>
                 </li>
                 @endif
@@ -308,6 +323,7 @@
     <script src="{{asset('vendor/jquery-easing/jquery.easing.min.js')}}"></script>
     <script src="{{asset('js/sb-admin-2.min.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.21/datatables.min.js"></script>
 
     {{-- OWN SCRIPTS --}}
     <script src="{{asset('vendor/vue.js')}}"></script>

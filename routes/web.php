@@ -17,12 +17,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/prueba', function () {
+    return session('estudiante_id');
     $ws = new WSAdmisiones();
-    // return $ws->getInformacionGraduadoByCodigo('2014114136');
-    return $ws->getInformacionGraduadoByDocumentoIdentidad('1083029383');
-    return $ws->getInfoEstudianteByCodigo('2014114136');
-    return [$ws->getListaGraduadoByFechas('2019-07-13', '2019-07-14')];
-    return [$ws->getInfoEstudianteByCodigo('2014114136')[0], $ws->getInformacionGraduadoByDocumentoIdentidad('1083029383')[0]];
+    $codigo = '2013243078';
+    $documento = '1082999764';
+
+    return [
+        'getInfoEstudianteByCodigo' => $ws->getInfoEstudianteByCodigo($codigo),
+        'getInformacionGraduadoByCodigo' => $ws->getInformacionGraduadoByCodigo($codigo),
+        'getInformacionGraduadoByDocumentoIdentidad' => $ws->getInformacionGraduadoByDocumentoIdentidad($documento),
+    ];
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -33,9 +37,10 @@ Route::get('/programas-por-identificacion/{identificacion}', 'SolicitudGradoCont
 Route::post('/solicitar-grado', 'SolicitudGradoController@solicitar');
 Route::get('/solicitud-grado/pendientes', 'SolicitudGradoController@pendientes');
 
-Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');
-
 Route::get('/fechas-grado/activas', 'FechaGradoController@getFechasActivas');
+
+
+// RECURSOS DEL SISTEMA
 
 Route::get('/recursos/duraciones-laborales', 'RecursosController@duracionesLaborales');
 Route::get('/recursos/idiomas', 'RecursosController@idiomas');
@@ -54,7 +59,10 @@ Route::get('/recursos/consejos', 'RecursosController@consejos');
 Route::get('/recursos/roles', 'RecursosController@roles');
 Route::get('/recursos/programas', 'RecursosController@programas');
 Route::get('/recursos/niveles-estudio', 'RecursosController@nivelesEstudio');
+Route::get('/recursos/tipos-grado', 'RecursosController@tiposGrado');
+Route::get('/recursos/fechas-grado', 'RecursosController@fechasGrado');
 
+// PETICIONES DEL EGRESADO
 Route::get('/egresado/datos', 'EstudianteController@datos');
 Route::get('/egresado/datos-academicos', 'EstudianteController@datosAcademicos');
 Route::get('/egresado/perfil', 'EstudianteController@perfil');
@@ -88,17 +96,31 @@ Route::post('/egresado/cargar-documento', 'EstudianteController@cargarDocumento'
 Route::get('/egresado/info-asistencia-ceremonia/{codigo}', 'EstudianteController@infoAsistenciaCeremonia');
 Route::post('/egresado/asistencia-ceremonia', 'EstudianteController@guardarAsistenciaCeremonia');
 
+// PETICIONES DIRECCION DE PROGRAMA
+Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');
+Route::get('/direccion/programas-coordinados', 'DirProgramaController@programasCoordinados');
+Route::post('/direccion/obtener-estudiantes', 'DirProgramaController@obtenerEstudiantes');
+Route::get('/direccion/proceso-grado/{estudiante_id}', 'DirProgramaController@procesoGrado');
+Route::get('/direccion/datos-estudiante/{estudiante_id}', 'DirProgramaController@datosEstudiante');
+Route::get('/direccion/documentos-estudiante/{estudiante_id}', 'DirProgramaController@documentosEstudiante');
+
+// PETICIONES DOCUMENTO
 Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
 
+// PETICIONES ADMIN
 Route::get('/administrador/usuarios', 'AdminController@usuarios');
 Route::post('/administrador/usuario', 'AdminController@usuario');
 Route::post('/administrador/eliminar-usuario', 'AdminController@eliminarUsuario');
 Route::get('/administrador/datos-usuario', 'AdminController@datosUsuario');
+Route::get('/administrador/fecha-grado/{fecha_grado_id}', 'AdminController@fechaGrado');
+Route::post('/administrador/fecha-grado', 'AdminController@editarFechaGrado');
 
 //RUTAS VISTAS DIRECCION DE PROGRAMA
 
 Route::get('/direccion', 'DirProgramaController@index');
-Route::get('/dirprograma/solicitudes', 'DirProgramaController@solicitudes');
+Route::get('/direccion/estudiante/{estudiante_id}', 'DirProgramaController@estudiante');
+Route::get('/direccion/solicitudes', 'DirProgramaController@solicitudes');
+Route::get('/direccion/estudiantes', 'DirProgramaController@estudiantes');
 
 //RUTAS VISTAS DE EGRESADO
 
@@ -110,6 +132,7 @@ Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos')
 
 Route::get('/administrador', 'AdminController@index');
 Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
+Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

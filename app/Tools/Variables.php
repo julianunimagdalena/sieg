@@ -8,6 +8,7 @@ use App\Models\PazSalvo;
 use App\Models\Rol;
 use App\Models\TipoDependencia;
 use App\Models\TipoEstudiante;
+use App\Models\TipoGrado;
 
 class Variables
 {
@@ -33,6 +34,12 @@ class Variables
         ];
     }
 
+    /**
+     * @return array [
+     *      egresado,
+     *      graduado
+     * ]
+     */
     static public function tiposEstudiante()
     {
         return [
@@ -47,13 +54,48 @@ class Variables
             'biblioteca' => PazSalvo::where('nombre', 'BIBLIOTECA')->first(),
             'recursosEducativos' => PazSalvo::where('nombre', 'GRUPO DE RECURSOS EDUCATIVOS')->first(),
             'bienestar' => PazSalvo::where('nombre', 'BIENESTAR UNIVERSITARIO')->first(),
+            'pago' => PazSalvo::where('nombre', 'PAGO DERECHO A GRADO')->first(),
         ];
     }
 
     static public function documentos()
     {
         return [
-            'ecaes' => Documento::where('abrv', 'ECAES')->first()
+            'ecaes' => Documento::where('abrv', 'ECAES')->first(),
+            'identificacion' => Documento::where('abrv', 'DOCIDENTIDAD')->first(),
+            'paz_salvos' => Documento::where('abrv', 'PAZSALVOS')->first(),
+            'ficha' => Documento::where('abrv', 'FICHA')->first(),
+            'titulo_grado' => Documento::where('abrv', 'TITULOGRADO')->first(),
+            'ayre' => Documento::where('abrv', 'PSAYRE')->first(),
+        ];
+    }
+
+    static public function documentosCanGenerar()
+    {
+        $documentos = Variables::documentos();
+
+        return [
+            $documentos['paz_salvos']->id,
+            $documentos['ficha']->id,
+            $documentos['ayre']->id
+        ];
+    }
+
+    static public function documentosCanCargarDireccion()
+    {
+        $documentos = Variables::documentos();
+
+        return [
+            $documentos['titulo_grado']->id
+        ];
+    }
+
+    static public function documentosCanCambiarEstado()
+    {
+        $documentos = Variables::documentos();
+
+        return [
+            $documentos['ecaes']->id
         ];
     }
 
@@ -63,6 +105,18 @@ class Variables
             'dir_programa' => TipoDependencia::where('nombre', 'Dirección de programa')->first(),
             'administrativa' => TipoDependencia::where('nombre', 'Administrativa')->first(),
             'facultad' => TipoDependencia::where('nombre', 'Facultad')->first()
+        ];
+    }
+
+    static public function tiposGrado()
+    {
+        return [
+            'ceremonia' => TipoGrado::where('nombre', 'Ceremonia')->first(),
+            'postumo' => TipoGrado::where('nombre', 'Postumo')->first(),
+            'privado' => TipoGrado::where('nombre', 'Privado')->first(),
+            'ventanilla' => TipoGrado::where('nombre', 'Ventanilla')->first(),
+            'extratemporaneo' => TipoGrado::where('nombre', 'Ventanilla extemporáneo')->first(),
+            'no_reporta' => TipoGrado::where('nombre', 'NO REPORTA')->first()
         ];
     }
 }

@@ -7,14 +7,15 @@
     class="form-control"
     :placeholder="placeholder"
     v-on:input="onChange($event)"
+    :disabled="disabled"
     v-bind:class="{'is-invalid': errors}"
     :value="value" />
-    <textarea 
+    <textarea
         :value="value"
         v-on:input="onChange($event)"
-        v-else 
-        :placeholder="placeholder" 
-        class="form-control" 
+        v-else
+        :placeholder="placeholder"
+        class="form-control"
         v-bind:class="{'is-invalid': errors}"
         >
     </textarea>
@@ -39,6 +40,10 @@
                     type: Boolean,
                     default: false
                 },
+                disabled: {
+                    type: Boolean,
+                    default: false
+                }
             },
             methods: {
                 onChange(e)

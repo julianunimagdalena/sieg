@@ -255,7 +255,7 @@
                         v-model="input.correo"
                         type="email"
                         required
-                        label="Correo Electronico"
+                        label="Correo Institucional"
                         @input="errors.correo = undefined"
                         placeholder="Correo Electronico"
                         v-bind:errors="errors.correo"/>
@@ -266,7 +266,7 @@
                         <app-input
                         v-model="input.correo2"
                         type="email"
-                        label="Correo Electronico 2 (Opcional)"
+                        label="Correo Personal"
                         @input="errors.correo2 = undefined"
                         placeholder="Correo Electronico"
                         v-bind:errors="errors.correo2"/>

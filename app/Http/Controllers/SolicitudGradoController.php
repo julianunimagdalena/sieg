@@ -46,9 +46,9 @@ class SolicitudGradoController extends Controller
         $estados = Variables::estados();
         $ws = new WSAdmisiones();
         $data = $ws->getInformacionGraduadoByDocumentoIdentidad($req->identificacion);
-        $datarow = array_filter($data, function ($d) use ($req) {
+        $datarow = array_values(array_filter($data, function ($d) use ($req) {
             return $d->nombreDelPrograma === $req->programa;
-        })[0];
+        }))[0];
 
         if (!$datarow) return response('', 400);
 
@@ -61,17 +61,20 @@ class SolicitudGradoController extends Controller
 
         if (!$dm) return response('No se encuentra la dependencia correspondiente, favor notificar e intentar más tarde', 500);
 
-        $persona = Persona::where('identificacion', $datarow->numeroDocumento)->first();
-
-        if ($persona) {
-            $estudiante = Estudiante::where('idPrograma', $dm->id)->first();
-            if ($estudiante) return response('Ya se encuentra registrado en el sistema con este programa', 401);
-        }
-
         $solicitud = SolicitudGrado::where('identificacion_estudiante', $datarow->numeroDocumento)
             ->where('programa_id', $dm->id)
             ->first();
         if ($solicitud) return response('Ya hay una solicitud para este programa', 401);
+
+        $persona = Persona::where('identificacion', $datarow->numeroDocumento)->first();
+
+        if ($persona) {
+            $estados = Variables::estados();
+            $estudiante = Estudiante::where('idPrograma', $dm->id)->first();
+
+            if ($estudiante->procesoGrado->estado_programa_id !== $estados['rechazado']->id)
+                return response('Ya se encuentra registrado en el sistema con este programa', 401);
+        }
 
         $solicitud = new SolicitudGrado();
         $solicitud->fecha = Carbon::now();
@@ -81,8 +84,8 @@ class SolicitudGradoController extends Controller
         $solicitud->fecha_grado_id = $req->fecha_id;
         $solicitud->programa_id = $dm->id;
         $solicitud->estado_id = $estados['pendiente']->id;
-        $solicitud->save();
 
+        $solicitud->save();
         return 'ok';
     }
 

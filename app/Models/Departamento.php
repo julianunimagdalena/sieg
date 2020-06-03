@@ -11,4 +11,9 @@ class Departamento extends Model
     protected $casts = [
         'idPais' => 'integer'
     ];
+
+    public function pais()
+    {
+        return $this->belongsTo('App\Models\Pais', 'idPais');
+    }
 }

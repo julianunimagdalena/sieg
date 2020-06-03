@@ -4,7 +4,7 @@
         <span class="font-weight-bold">PROGRAMA:</span>
     </div>
     <div class="d-inline-block">
-        <select v-model="info" v-on:change="handleChange">
+        <select v-model="info" v-on:change="handleChange" >
             <option v-for="inf in infos" :value="inf">@{{inf.programa}}</option>
         </select>
     </div>

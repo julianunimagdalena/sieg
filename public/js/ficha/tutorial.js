@@ -14,6 +14,8 @@ function onClickNext(driver, doAction, delayTime = 200)
 const driver = new Driver({
     doneBtnText: 'Finalizar',
     closeBtnText: 'Cerrar',
+    nextBtnText: 'Siguiente',
+    prevBtnText: 'Anterior',
     onReset: () =>
     {
         localStorage.setItem('tutorial', 'true');
@@ -195,11 +197,11 @@ $(function () {
             onNext: () =>
             {
                 localStorage.setItem('tutorial', 'true');
-                
+
             }
         }
     ]);
-    
+
     if(!localStorage.getItem('tutorial'))
     {
         driver.start();

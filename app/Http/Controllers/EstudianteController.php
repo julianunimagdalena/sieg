@@ -14,6 +14,7 @@ use App\Models\Asociacion;
 use App\Models\Concejo;
 use App\Models\Discapacidad;
 use App\Models\Distincion;
+use App\Models\Estudiante;
 use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
 use App\Models\HojaVida;
@@ -32,10 +33,12 @@ class EstudianteController extends Controller
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
         session(['ur' => UsuarioRol::find(20026)]);
+        session(['estudiante_id' => 27300]);
         \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre);
+        // dd(session('ur'));
     }
 
     public function datos(Request $req)
@@ -572,40 +575,39 @@ class EstudianteController extends Controller
         return $ur->persona->progreso_ficha;
     }
 
+    // DEMAS PETICIONES
     public function infoGrado()
     {
         $res = [];
-        $tipos = Variables::tiposEstudiante();
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiantes = $ur->usuario->persona->estudiantes()
-            ->where('idTipo', $tipos['egresado']->id)
-            ->get();
+        $paz_salvos = [];
+        $estudiante = Estudiante::find(session('estudiante_id'));
 
-        foreach ($estudiantes as $est) {
-            $paz_salvos = [];
+        foreach ($estudiante->estudiantePazSalvo as $eps) {
+            $ps = $eps->pazSalvo;
+            $dependencia = $ps->dependencia;
 
-            foreach ($est->estudiantePazSalvo as $eps) {
-                array_push($paz_salvos, [
-                    'nombre' => $eps->pazSalvo->nombre,
-                    'dependencia' => $eps->pazSalvo->dependencia->nombre,
-                    'comentario' => $eps->comentario,
-                    'paz_salvo' => $eps->paz_salvo,
-                ]);
-            }
-
-            array_push($res, [
-                'nombre' => $est->persona->nombre,
-                'programa' => $est->estudio->programa->nombre,
-                'codigo' => $est->codigo,
-                'estado_encuesta' => $est->procesoGrado->estado_encuesta,
-                'estado_ficha' => $est->procesoGrado->estado_ficha,
-                'estado_programa' => $est->procesoGrado->estado_programa,
-                'estado_secretaria' => $est->procesoGrado->estado_secretaria,
-                'confirmacion_ceremonia' => $est->procesoGrado->confirmacion_asistencia,
-                'estado_documentos' => $est->estado_documentos,
-                'paz_salvos' => $paz_salvos
+            array_push($paz_salvos, [
+                'nombre' => $ps->nombre,
+                'dependencia' => $dependencia ? $dependencia->nombre : '-',
+                'comentario' => $eps->comentario,
+                'paz_salvo' => $eps->paz_salvo,
             ]);
         }
+
+        array_push($res, [
+            'nombre' => $estudiante->persona->nombre,
+            'documento' => $estudiante->persona->identificacion,
+            'tipo_documento' => $estudiante->persona->tipoDocumento->nombre,
+            'programa' => $estudiante->estudio->programa->nombre,
+            'codigo' => $estudiante->codigo,
+            'estado_encuesta' => $estudiante->procesoGrado->estado_encuesta,
+            'estado_ficha' => $estudiante->procesoGrado->estado_ficha,
+            'estado_programa' => $estudiante->procesoGrado->estadoPrograma->nombre,
+            'estado_secretaria' => $estudiante->procesoGrado->estado_secretaria,
+            'confirmacion_ceremonia' => $estudiante->procesoGrado->confirmacion_asistencia,
+            'estado_documentos' => $estudiante->estado_documentos,
+            'paz_salvos' => $paz_salvos
+        ]);
 
         return $res;
     }
@@ -618,30 +620,28 @@ class EstudianteController extends Controller
     public function documentosGrado()
     {
         $res = [];
-        $tipos = Variables::tiposEstudiante();
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiantes = $ur->usuario->persona->estudiantes()
-            ->where('idTipo', $tipos['egresado']->id)
-            ->get();
+        $documentos = [];
+        $documentosGrado = Variables::documentos();
+        $estudiante = Estudiante::find(session('estudiante_id'));
 
-        foreach ($estudiantes as $est) {
-            $documentos = [];
+        $whitelist = [$documentosGrado['ecaes']->id];
 
-            foreach ($est->estudianteDocumento as $ed) {
-                array_push($documentos, [
-                    'id' => $ed->id,
-                    'nombre' => $ed->documento->nombre,
-                    'estado' => $ed->estado->nombre
-                ]);
-            }
+        foreach ($whitelist as $doc_id) {
+            $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc_id)->first();
 
-            array_push($res, [
-                'nombre' => $est->persona->nombre,
-                'programa' => $est->estudio->programa->nombre,
-                'codigo' => $est->codigo,
-                'documentos' => $documentos
+            array_push($documentos, [
+                'id' => $ed->id,
+                'nombre' => $ed->documento->nombre,
+                'estado' => $ed->estado->nombre
             ]);
         }
+
+        array_push($res, [
+            'nombre' => $estudiante->persona->nombre,
+            'programa' => $estudiante->estudio->programa->nombre,
+            'codigo' => $estudiante->codigo,
+            'documentos' => $documentos
+        ]);
 
         return $res;
     }
@@ -656,16 +656,14 @@ class EstudianteController extends Controller
             'required' => 'Obligatorio'
         ]);
 
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->persona->estudiantes()->where('codigo', $request->codigo)->first();
-
-        if (!$estudiante) return response('Este codigo no pertenece a este estudiante', 400);
+        $estudiante = Estudiante::find(session('estudiante_id'));
 
         $ed = $estudiante->estudianteDocumento()->find($request->id);
         if (!$ed) return response('Este documento no pertenece a este estudiante', 400);
 
-        $estados = Variables::estados();
         Storage::put($ed->path, file_get_contents($request->file('file')->getRealPath()));
+
+        $estados = Variables::estados();
         $ed->estado_id = $estados['pendiente']->id;
         $ed->url_documento = $ed->path;
         $ed->save();
@@ -675,16 +673,9 @@ class EstudianteController extends Controller
 
     public function infoAsistenciaCeremonia($codigo)
     {
-        $tipos = Variables::tiposEstudiante();
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->persona->estudiantes()
-            ->where('idTipo', $tipos['egresado']->id)
-            ->where('codigo', $codigo)
-            ->first();
-
-        if (!$estudiante) return response('Estudiante no encontrado', 400);
-
+        $estudiante = Estudiante::find(session('estudiante_id'));
         $pg = $estudiante->procesoGrado;
+
         return [
             'pg_id' => $pg->id,
             'confirmacion_asistencia' => $pg->confirmacion_asistencia,

@@ -1,6 +1,10 @@
 @component('component', ['id' => 'card-action-component'])
-<div class="card border-left-primary shadow h-100 py-2">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between" style="background-color: white !important;">
+<div class="card shadow h-100 py-2" v-bind:class="{'border-left-primary': border}">
+    <div
+        class="card-header"
+        v-bind:class="{'py-3 d-flex flex-row align-items-center justify-content-between': hflex}"
+        style="background-color: white !important;"
+        v-if="title">
         <h6 class="m-0 font-weight-bold text-primary">@{{ title }}</h6>
 
         <slot name="actions" />
@@ -10,7 +14,9 @@
             class="text-primary fas fa-plus-circle mr-1 action-btn"
             title="Añadir" @click="$emit('onAdd')"></i>
         </div>
+        <slot name="head"></slot>
     </div>
+
     <div  :class="{'card-body': !fluid}" class="d-flex flex-column justify-content-between">
         <slot />
     </div>
@@ -26,6 +32,14 @@
                 fluid: {
                     type: Boolean,
                     default: false
+                },
+                hflex: {
+                    type: Boolean,
+                    default: true
+                },
+                border: {
+                    type: Boolean,
+                    default: true
                 }
             },
             methods: {

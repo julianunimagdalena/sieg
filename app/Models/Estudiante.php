@@ -39,23 +39,48 @@ class Estudiante extends Model
         return $this->hasMany('App\Models\EstudianteDocumento', 'idEstudiante');
     }
 
+    public function getDocumentosEstudianteAttribute()
+    {
+        $documentos = Variables::documentos();
+        $valid = [
+            $documentos['ecaes']->id
+        ];
+
+        return $this->estudianteDocumento()->whereIn('idDocumento', $valid);
+    }
+
     public function documentos()
     {
         return $this->belongsToMany('App\Models\Documento', 'estudiante_documento', 'idEstudiante', 'idDocumento');
+    }
+
+    public function dependenciaModalidad()
+    {
+        return $this->belongsTo('App\Models\DependenciaModalidad', 'idPrograma');
     }
 
     public function getEstadoDocumentosAttribute()
     {
         $estado = null;
         $estados = Variables::estados();
-        $ndocTotal =  $this->estudianteDocumento()->count();
-        $ndocRechazados = $this->estudianteDocumento()->where('estado_id', $estados['rechazado']->id)->count();
-        $ndocAprobados = $this->estudianteDocumento()->where('estado_id', $estados['aprobado']->id)->count();
+        $ndocTotal =  $this->documentos_estudiante->count();
+        $ndocRechazados = $this->documentos_estudiante->where('estado_id', $estados['rechazado']->id)->count();
+        $ndocCargados = $this->documentos_estudiante
+            ->whereIn('estado_id', [$estados['aprobado']->id, $estados['pendiente']->id])
+            ->count();
 
         if ($ndocRechazados > 0) $estado = $estados['rechazado']->nombre;
-        else if ($ndocAprobados === $ndocTotal) $estado = $estados['aprobado']->nombre;
+        else if ($ndocCargados === $ndocTotal) $estado = $estados['aprobado']->nombre;
         else $estado = $estados['pendiente']->nombre;
 
         return $estado;
+    }
+
+    public function getCanAprobarAttribute()
+    {
+        $estados = Variables::estados();
+        $count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
+
+        return $count === 0;
     }
 }

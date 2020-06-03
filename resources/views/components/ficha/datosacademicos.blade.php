@@ -2,7 +2,7 @@
 <div class="container-fluid mt-3">
 
     <div class="row mb-3">
-        <div class="col col-md-6 col-sm-12">
+        <div class="col-md-6 col-sm-12">
             <h6 class="text-uppercase font-weight-bold text-primary">
                 Información académica en la que se aspira a grado <!--en la Universidad del Magdalena-->
             </h6>
@@ -23,7 +23,7 @@
                 </tbody>
             </table>
         </div>
-        <div class="col col-md-6 col-sm-12">
+        <div class="col-md-6 col-sm-12">
             <h6 class="text-uppercase font-weight-bold text-primary">
             Información académica desarrollada en la Universidad del Magdalena</h6>
             <table class="table">
@@ -50,13 +50,13 @@
     <h6 class="text-uppercase font-weight-bold text-primary mb-4">
         Información académica desarrollada en otras instituciones
     </h6>
-    <button class="btn btn-primary btn-icon-split" id="btn-añadir-datos-academicos" data-toggle="modal" data-target="#modalAddInfoAcademica" @click="input = {}">
+    <button class="btn btn-primary btn-icon-split" id="btn-añadir-datos-academicos" data-toggle="modal" data-target="#modalAddInfoAcademica">
         <span class="icon text-white-50">
             <i class="fas fa-plus"></i>
         </span>
         <span class="text">Añadir</span>
     </button>
-    <table class="table table-sm table-responsive-md text-center AppTable" id="table-datos-academicos">
+    <table class="table table-sm table-responsive-sm text-center AppTable" id="table-datos-academicos">
         <thead class="bg-primary">
             <th class="text-white p-1">Nombre</th>
             <th class="text-white p-1">Institucion</th>
@@ -80,9 +80,22 @@
             </tr>
         </tbody>
     </table>
-    <modal id="modalAddInfoAcademica" title="Agregar Estudio externo" buttonText="Añadir" :onSubmit="handleSubmitInfoAcademica" large>
+    <modal
+        @onHide="input = { graduado: false }"
+        id="modalAddInfoAcademica"
+        title="Agregar Estudio externo" buttonText="Añadir" :onSubmit="handleSubmitInfoAcademica" large>
         <div class="row">
-            <div class="col-sm-5">
+            <div class="col-md-6">
+                <app-select
+                    label="Nivel de Estudio"
+                    v-model="input.nivel_estudio_id"
+                    required
+                    @input="errors.nivel_estudio_id = undefined"
+                >
+                    <option v-for="(nivel) in datos.niveles_estudio" :value="nivel.id">@{{ nivel.nombre }}</option>
+                </app-select>
+            </div>
+            <div class="col-md-6">
                 <div class="form-group">
                     <app-input
                     v-model="input.nombre"
@@ -93,7 +106,7 @@
                     v-bind:errors="errors.nombre"/>
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-md-9">
                 <div class="form-group">
                     <app-input
                     v-model="input.institucion"
@@ -104,7 +117,7 @@
                     v-bind:errors="errors.institucion"/>
                 </div>
             </div>
-            <div class="col-sm-3">
+            <div class="col-md-3">
                 <div class="form-group">
                     <app-input
                     v-model="input.meses"
@@ -118,19 +131,20 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-md-4">
                 <label>¿Se graduó de este estudio?</label>
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="estudio-graduado1" class="custom-control-input" value="1" v-model="input.graduado">
+                    <input type="radio" id="estudio-graduado1" class="custom-control-input" :value="true" v-model="input.graduado">
                     <label class="custom-control-label" for="estudio-graduado1">Si</label>
                 </div>
                 <div class="custom-control custom-radio custom-control-inline">
-                    <input type="radio" id="estudio-graduado2" class="custom-control-input" value="0" v-model="input.graduado">
+                    <input type="radio" id="estudio-graduado2" class="custom-control-input" :value="false" v-model="input.graduado">
                     <label class="custom-control-label" for="estudio-graduado2">No</label>
                 </div>
             </div>
-            <template v-if="input.graduado==1">
-                <div  class="col-sm-4">
+
+            <template v-if="input.graduado">
+                <div  class="col-md-4">
                     <div class="form-group">
                         <app-input
                         v-model="input.anio_culminacion"
@@ -142,7 +156,7 @@
                         v-bind:errors="errors.anio_culminacion"/>
                     </div>
                 </div>
-                <div class="col-sm-4">
+                <div class="col-md-4">
                     <div class="form-group">
                         <label>Mes de culminación</label>
                         <select class="form-control" v-model="input.mes_culminacion">

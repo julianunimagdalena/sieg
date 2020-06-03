@@ -1,3 +1,5 @@
+import { baseURL } from './variables.js';
+
 function objectToFormData(obj, rootName, ignoreList) {
     var formData = new FormData();
 
@@ -48,4 +50,27 @@ function initBootstrapSelect(time = 10) {
     setTimeout(() => $('.bselect').selectpicker('refresh'), time);
 }
 
-export { objectToFormData, initBootstrapSelect };
+class DataTableManager {
+    constructor(selector = '.data-table') {
+        this.selector = selector;
+        this.table = null;
+    }
+
+    reload() {
+        if (this.table) this.table.destroy();
+
+        return new Promise(resolve => {
+            setTimeout(() => {
+                this.table = $(this.selector).DataTable({
+                    language: {
+                        url: baseURL + '/Spanish.json'
+                    }
+                });
+
+                resolve();
+            }, 10);
+        });
+    }
+}
+
+export { objectToFormData, initBootstrapSelect, DataTableManager };

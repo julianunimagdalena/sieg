@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 
 use App\Models\Duracion;
 use App\Models\EstadoCivil;
+use App\Models\FechaGrado;
 use App\Models\Genero;
 use App\Models\Idioma;
 use App\Models\Municipio;
@@ -19,6 +20,7 @@ use App\Models\NivelIdioma;
 use App\Models\Pais;
 use App\Models\Salario;
 use App\Models\TipoDocumento;
+use App\Models\TipoGrado;
 use App\Models\TipoVinculacion;
 use App\Tools\Variables;
 
@@ -142,5 +144,41 @@ class RecursosController extends Controller
     public function nivelesEstudio()
     {
         return NivelEstudio::all();
+    }
+
+    public function tiposGrado()
+    {
+        $tipos = Variables::tiposGrado();
+        $res = [];
+
+        foreach ($tipos as $key => $tipo) {
+            if ($key !== 'no_reporta') array_push($res, $tipo);
+        }
+
+        return $res;
+    }
+
+    public function fechasGrado(Request $request)
+    {
+        $this->validate($request, [
+            'activa' => 'boolean',
+            'tipo_grado_id' => 'exists:tipos_de_grados,id',
+            'fecha_min' => 'date',
+            'fecha_max' => 'date'
+        ]);
+
+        $query = new FechaGrado();
+
+        if ($request->activa !== null) $query = $query->where('estado', $request->activa);
+        if ($request->tipo_grado_id !== null) $query = $query->where('tipo_grado', $request->tipo_grado_id);
+        if ($request->fecha_min !== null) $query = $query->where('fecha_grado', '>=', $request->fecha_min);
+        if ($request->fecha_max !== null) $query = $query->where('fecha_grado', '<=', $request->fecha_max);
+
+        return $query->orderBy('fecha_grado', 'desc')->get()->map(fn ($fec) => [
+            'id' => $fec->id,
+            'nombre' => $fec->nombre,
+            'fecha' => $fec->fecha_grado,
+            'tipo' => $fec->tipoGrado ? $fec->tipoGrado->nombre : null,
+        ])->all();
     }
 }

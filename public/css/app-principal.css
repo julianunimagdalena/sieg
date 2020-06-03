@@ -1,0 +1,28 @@
+.titulo {
+    text-transform: uppercase;
+    font-weight: 800;
+}
+
+.img-perfil {
+    max-height: 120px;
+}
+
+.list-group-item-sm {
+    height: 30px;
+    padding: 5px 15px;
+}
+
+
+
+
+@media screen and (min-width: 1280px)
+{
+    .list-group-item-flex-md {
+        height: 45px;
+        padding: 5px 15px;
+    }
+    .list-group-item-flex-sm {
+        height: 30px;
+        padding: 5px 15px;
+    }
+}

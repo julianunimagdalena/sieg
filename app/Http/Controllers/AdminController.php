@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\FechaGradoRequest;
 use App\Models\DependenciaModalidad;
 use App\Models\Persona;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Models\UsuarioRol;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
 use App\Http\Requests\UsuarioRequest;
+use App\Models\FechaGrado;
 
 class AdminController extends Controller
 {
@@ -152,5 +154,54 @@ class AdminController extends Controller
             'username' => $usuario->identificacion,
             'programa_ids' => $programas
         ];
+    }
+
+    public function fechaGrado($fecha_grado_id)
+    {
+        $fecha = FechaGrado::find($fecha_grado_id);
+
+        return [
+            'id' => $fecha->id,
+            'fecha' => $fecha->fecha_grado,
+            'inscripcion_fecha_inicio' => $fecha->inscripcion_fecha_inicio,
+            'inscripcion_fecha_fin' => $fecha->inscripcion_fecha_fin,
+            'doc_est_fecha_fin' => $fecha->inscripcion_fecha_fin,
+            'paz_salvo_fecha_fin' => $fecha->paz_salvo_fecha_fin,
+            'direccion_prog_fecha_fin' => $fecha->direccion_prog_fecha_fin,
+            'secretaria_gen_fecha_fin' => $fecha->secretaria_gen_fecha_fin,
+            'tipo_grado_id' => $fecha->tipo_grado,
+            'estado' => $fecha->estado,
+            'observacion' => $fecha->observacion
+        ];
+    }
+
+    public function editarFechaGrado(FechaGradoRequest $request)
+    {
+        $fecha = FechaGrado::where('fecha_grado', $request->fecha)->where('id', '<>', $request->id)->first();
+        if ($fecha) return response('La fecha ya existe', 400);
+
+        if ($request->id) {
+            $fecha = FechaGrado::find($request->id);
+            if (!$fecha) return response('Not found', 400);
+        } else $fecha = new FechaGrado();
+
+        $fecha->fecha_grado = $request->fecha;
+        $fecha->inscripcion_fecha_inicio = $request->inscripcion_fecha_inicio;
+        $fecha->inscripcion_fecha_fin = $request->inscripcion_fecha_fin;
+        $fecha->doc_est_fecha_fin = $request->doc_est_fecha_fin;
+        $fecha->paz_salvo_fecha_fin = $request->paz_salvo_fecha_fin;
+        $fecha->direccion_prog_fecha_fin = $request->direccion_prog_fecha_fin;
+        $fecha->secretaria_gen_fecha_fin = $request->secretaria_gen_fecha_fin;
+        $fecha->tipo_grado = $request->tipo_grado_id;
+        $fecha->estado = $request->estado;
+        $fecha->observacion = $request->observacion;
+        $fecha->save();
+
+        return 'ok';
+    }
+
+    public function fechasGrado()
+    {
+        return view('administrador.fechas_grado');
     }
 }

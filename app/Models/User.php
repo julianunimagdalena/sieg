@@ -37,4 +37,22 @@ class User extends Authenticatable
     {
         return $this->belongsToMany('App\Models\DependenciaModalidad', 'coordinador_programas', 'idCoordinador', 'idPrograma');
     }
+
+    public function getProgramasCoordinadosAttribute()
+    {
+        $programa_ids = [];
+
+        foreach ($this->dependenciasModalidades as $dm) {
+            if (!in_array($dm->idPrograma, $programa_ids)) array_push($programa_ids, $dm->idPrograma);
+        }
+
+        $programas = array_map(fn ($id) => Dependencia::select('id', 'nombre')->find($id), $programa_ids);
+        return $programas;
+    }
+
+    public function getEstudiantesCoordinadosAttribute()
+    {
+        $dm_ids = $this->dependenciasModalidades->pluck('id');
+        return Estudiante::whereIn('idPrograma', $dm_ids);
+    }
 }

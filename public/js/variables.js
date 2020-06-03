@@ -2,4 +2,6 @@
 const meta = document.querySelector('meta[name="root"]');
 const baseURL = meta.content;
 
-export { baseURL };
+const defaultUserAvatar = baseURL + '/img/sin_perfil.png';
+
+export { baseURL, defaultUserAvatar };
