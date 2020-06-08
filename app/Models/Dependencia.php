@@ -12,4 +12,10 @@ class Dependencia extends Model
         'idTipo' => 'integer',
         'idNivelEstudio' => 'integer'
     ];
+
+    public function getNombreUcwordsAttribute()
+    {
+        $nombre = strtolower($this->nombre);
+        return ucwords($nombre);
+    }
 }

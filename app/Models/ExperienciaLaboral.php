@@ -15,6 +15,7 @@ class ExperienciaLaboral extends Model
         'tipo_vinculacion_id' => 'integer',
         'municipio_id' => 'integer',
         'salario_id' => 'integer',
+        'contrato_activo' => 'boolean',
     ];
 
     public function nivelCargo()

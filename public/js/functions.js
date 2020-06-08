@@ -73,4 +73,15 @@ class DataTableManager {
     }
 }
 
-export { objectToFormData, initBootstrapSelect, DataTableManager };
+function verDocumento(documento_id, url = '/documento/ver')
+{
+    let link = document.createElement('a');
+    link.setAttribute('href', `${baseURL}${url}/${documento_id}?rnd=${Math.floor(Math.random() * 10000)}`);
+    link.target = '_blank';
+    link.click();
+
+    link.remove();
+//window.open(`${baseURL}${url}/${documento_id}`, '__blank');
+}
+
+export { objectToFormData, initBootstrapSelect, DataTableManager, verDocumento };

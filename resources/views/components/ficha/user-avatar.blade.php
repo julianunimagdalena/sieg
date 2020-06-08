@@ -3,10 +3,10 @@
     <img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid" v-bind:style="imgstyle">
     <br>
     <div class="mt-4">
-        <button class="btn btn-outline-primary btn-sm btn-circle">
+        <button class="btn btn-outline-primary btn-sm btn-circle" title="Cargar Foto" type="button">
             <i class="fas fa-upload"></i>
         </button>
-        <button class="btn btn-success btn-sm btn-circle ml-3">
+        <button class="btn btn-success btn-sm btn-circle ml-3" title="Aprobar Foto" type="button">
             <i class="fas fa-check"></i>
         </button>
     </div>

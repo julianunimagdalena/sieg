@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class EstudianteDocumento extends Model
 {
     protected $table = 'estudiante_documento';
+    protected $casts = [
+        'idDocumento' => 'integer'
+    ];
 
     public function documento()
     {
@@ -29,17 +32,37 @@ class EstudianteDocumento extends Model
         return $this->documento->abrv . '_' . $this->estudiante->codigo . '.pdf';
     }
 
+    public function getFolderAttribute()
+    {
+        $estudiante = $this->estudiante;
+        $fecha = $estudiante->procesoGrado->fechaGrado;
+        $dependencia = $estudiante->estudio->programa;
+        $folder = Variables::$carpetaDocumentosEstudiantes
+            . $fecha->id
+            . '/' . $dependencia->id
+            . '/' . $estudiante->id;
+
+        return $folder;
+    }
+
     public function getPathAttribute()
     {
-        return Variables::$carpetaDocumentosEstudiantes . $this->id . '/' . $this->filename;
+        $path = $this->folder . '/' . $this->filename;
+        return $path;
     }
 
     public function getCanGenerarAttribute()
     {
-        $estados = Variables::estados();
         $canGenerar = Variables::documentosCanGenerar();
+        $documentos = Variables::documentos();
+        $can = in_array($this->idDocumento, $canGenerar);
 
-        return in_array($this->idDocumento, $canGenerar) && $this->estado_id !== $estados['aprobado']->id;
+        if ($this->idDocumento === $documentos['ficha']->id) {
+            $pg = $this->estudiante->procesoGrado;
+            $can = $can && ($pg->estado_ficha && $pg->estado_encuesta);
+        }
+
+        return $can;
     }
 
     public function getCanShowAttribute()

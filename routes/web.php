@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use App\Tools\WSAdmisiones;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -16,17 +17,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/prueba', function () {
-    return session('estudiante_id');
-    $ws = new WSAdmisiones();
-    $codigo = '2013243078';
-    $documento = '1082999764';
+Route::get('/prueba-documento/{html?}', function ($html = false) {
+    $ed = App\Models\EstudianteDocumento::find(5);
+    return App\Tools\DocumentoHelper::generarFicha($ed, true, $html);
+});
 
-    return [
-        'getInfoEstudianteByCodigo' => $ws->getInfoEstudianteByCodigo($codigo),
-        'getInformacionGraduadoByCodigo' => $ws->getInformacionGraduadoByCodigo($codigo),
-        'getInformacionGraduadoByDocumentoIdentidad' => $ws->getInformacionGraduadoByDocumentoIdentidad($documento),
-    ];
+Route::get('/prueba', function () {
+    return Carbon::now()->format('d/m/Y g:i:s A');
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -38,7 +35,6 @@ Route::post('/solicitar-grado', 'SolicitudGradoController@solicitar');
 Route::get('/solicitud-grado/pendientes', 'SolicitudGradoController@pendientes');
 
 Route::get('/fechas-grado/activas', 'FechaGradoController@getFechasActivas');
-
 
 // RECURSOS DEL SISTEMA
 
@@ -61,6 +57,10 @@ Route::get('/recursos/programas', 'RecursosController@programas');
 Route::get('/recursos/niveles-estudio', 'RecursosController@nivelesEstudio');
 Route::get('/recursos/tipos-grado', 'RecursosController@tiposGrado');
 Route::get('/recursos/fechas-grado', 'RecursosController@fechasGrado');
+Route::get('/recursos/sectores-empresa', 'RecursosController@sectoresEmpresa');
+Route::get('/recursos/sectores-economicos', 'RecursosController@sectoresEconomicos');
+Route::get('/recursos/actividades-economicas', 'RecursosController@actividadesEconomicas');
+Route::get('/recursos/areas-desempeno', 'RecursosController@areasDesempeno');
 
 // PETICIONES DEL EGRESADO
 Route::get('/egresado/datos', 'EstudianteController@datos');
@@ -103,9 +103,16 @@ Route::post('/direccion/obtener-estudiantes', 'DirProgramaController@obtenerEstu
 Route::get('/direccion/proceso-grado/{estudiante_id}', 'DirProgramaController@procesoGrado');
 Route::get('/direccion/datos-estudiante/{estudiante_id}', 'DirProgramaController@datosEstudiante');
 Route::get('/direccion/documentos-estudiante/{estudiante_id}', 'DirProgramaController@documentosEstudiante');
+Route::get('/direccion/generar/{ed_id}', 'DirProgramaController@generarDocumento');
+Route::post('/direccion/aprobar-documento', 'DirProgramaController@aprobarDocumento');
+Route::post('/direccion/rechazar-documento', 'DirProgramaController@rechazarDocumento');
+Route::post('/direccion/aprobar', 'DirProgramaController@aprobarEstudiante');
+Route::post('/direccion/no-aprobar', 'DirProgramaController@noAprobarEstudiante');
+Route::post('/direccion/actualizar-estudiante/{estudiante_id}', 'DirProgramaController@actualizarEstudiante');
 
 // PETICIONES DOCUMENTO
 Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
+Route::post('/documento/cargar', 'DocumentoController@cargar');
 
 // PETICIONES ADMIN
 Route::get('/administrador/usuarios', 'AdminController@usuarios');

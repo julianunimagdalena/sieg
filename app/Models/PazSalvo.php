@@ -13,4 +13,10 @@ class PazSalvo extends Model
     {
         return $this->belongsTo('App\Models\Dependencia', 'idDependencia');
     }
+
+    public function getNombreUcwordsAttribute()
+    {
+        $nombre = strtolower($this->nombre);
+        return ucwords($nombre);
+    }
 }

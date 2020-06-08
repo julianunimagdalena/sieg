@@ -32,3 +32,7 @@ Accept: application/json
 ### documentos del estudiante
 GET http://167.172.127.114/sieg/public/direccion/documentos-estudiante/27300 HTTP/1.1
 Accept: application/json
+
+### generar documento
+GET http://167.172.127.114/sieg/public/direccion/generar/5 HTTP/1.1
+Accept: application/json

@@ -15,10 +15,10 @@ Vue.component('carga-documento-modal', {
     }),
     methods: {
         enviar() {
-            const data = { ...this.input, id: this.documento.id, codigo: this.codigo };
+            const data = { ...this.input, id: this.documento.id };
             this.cargando = true;
 
-            http.post('egresado/cargar-documento', objectToFormData(data)).then(
+            http.post('documento/cargar', objectToFormData(data)).then(
                 res => {
                     this.$emit('documento-cargado');
                     $('#' + this.id).modal('hide');

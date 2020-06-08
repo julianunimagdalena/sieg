@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ActividadEconomica;
+use App\Models\AreaDesempeno;
 use App\Models\Concejo;
 use App\Models\Departamento;
 use App\Models\Dependencia;
@@ -19,6 +21,8 @@ use App\Models\NivelEstudio;
 use App\Models\NivelIdioma;
 use App\Models\Pais;
 use App\Models\Salario;
+use App\Models\SectorEconomico;
+use App\Models\SectorEmpresa;
 use App\Models\TipoDocumento;
 use App\Models\TipoGrado;
 use App\Models\TipoVinculacion;
@@ -180,5 +184,25 @@ class RecursosController extends Controller
             'fecha' => $fec->fecha_grado,
             'tipo' => $fec->tipoGrado ? $fec->tipoGrado->nombre : null,
         ])->all();
+    }
+
+    public function sectoresEmpresa()
+    {
+        return SectorEmpresa::all();
+    }
+
+    public function sectoresEconomicos()
+    {
+        return SectorEconomico::all();
+    }
+
+    public function actividadesEconomicas()
+    {
+        return ActividadEconomica::orderBy('nombre')->get();
+    }
+
+    public function areasDesempeno()
+    {
+        return AreaDesempeno::all();
     }
 }

@@ -16,14 +16,14 @@
 
 <titulo>Carga documentos de grado</titulo>
 <alert color="primary">A continuacion los documentos que debe cargar como estudiante: </alert>
-<card>
+<!--<card>
     <selector-info-grado v-model="info" :infos="infos"></selector-info-grado>
     <div v-if="info">
         <span class="font-weight-bold">NOMBRE DEL ESTUDIANTE:</span> <span class="text-primary">@{{info.nombre}}</span>
         <br>
         <span class="font-weight-bold">CODIGO DEL ESTUDIANTE:</span> <span class="text-primary">@{{info.codigo}}</span>
     </div>
-</card>
+</card>-->
 <br>
 <div v-if="info">
     <div class="row">

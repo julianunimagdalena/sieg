@@ -104,7 +104,8 @@
         </div>
         <div class="col col-md-2 mt-3" id="imagen-perfil-form">
             <div class="text-center">
-                <img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid">
+                <user-avatar :imgstyle="{'max-height': '200px'}"></user-avatar >
+                <!--<img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid">
                 <br>
                 <div class="btn-group-vertical" style="width:100%;" role="group" aria-label="...">
                     <button type="button" class="btn btn-light btn-block" title="Actualizar foto">
@@ -113,7 +114,7 @@
                     <button type="button" class="btn btn-success btn-block" title="Aprobar foto">
                         <i class="fa fa-plus"></i> &nbsp;Aprobar
                     </button>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>

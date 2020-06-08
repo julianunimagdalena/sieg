@@ -13,6 +13,8 @@ use App\Models\TipoGrado;
 class Variables
 {
     static $carpetaDocumentosEstudiantes = 'documentosEstudiantes/';
+    static $estadoNoAprobado = 'NO APROBADO';
+
     static public function roles()
     {
         return [

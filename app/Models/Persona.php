@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 class Persona extends Model
@@ -51,6 +52,16 @@ class Persona extends Model
         return $this->belongsTo('App\Models\TipoDocumento', 'tipodoc');
     }
 
+    public function genero()
+    {
+        return $this->belongsTo('App\Models\Genero', 'idGenero');
+    }
+
+    public function estadoCivil()
+    {
+        return $this->belongsTo('App\Models\EstadoCivil', 'idEstadoCivil');
+    }
+
     public function getProgresoFichaAttribute()
     {
         $progreso = 0;
@@ -90,5 +101,19 @@ class Persona extends Model
         $departamento = $municipio->departamento;
 
         return $municipio->nombre . ' - ' . $departamento->nombre . ', ' . $departamento->pais->nombre;
+    }
+
+    public function getFechaNacimientoFormatedAttribute()
+    {
+        $nacimiento = Carbon::parse($this->fechaNacimiento);
+        return $nacimiento->format('d/m/Y');
+    }
+
+    public function getEdadAttribute()
+    {
+        $nacimiento = Carbon::parse($this->fechaNacimiento);
+        $now = Carbon::now();
+
+        return $now->diffInYears($nacimiento);
     }
 }

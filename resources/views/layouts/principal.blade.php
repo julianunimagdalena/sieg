@@ -129,7 +129,7 @@
                         <span>Proceso de grado</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!--<li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/egresado/encuesta">
                         <i class="fas fa-file-invoice"></i>
                         <span>Encuesta momento de grado</span>
@@ -146,7 +146,7 @@
                         <i class="fas fa-fw fa-file-alt"></i>
                         <span>Carga de documentos</span>
                     </a>
-                </li>
+                </li>-->
                 @endif
 
                 @if (session('ur')->rol->nombre === 'Administrador Egresados')

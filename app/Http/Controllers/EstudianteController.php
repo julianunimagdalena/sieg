@@ -11,17 +11,13 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests\PersonaRequest;
 use App\Models\Asociacion;
-use App\Models\Concejo;
-use App\Models\Discapacidad;
 use App\Models\Distincion;
 use App\Models\Estudiante;
 use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
-use App\Models\HojaVida;
 use App\Models\HojaVidaIdioma;
 use App\Models\ProcesoGrado;
 use App\Tools\PersonaHelper;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
 class EstudianteController extends Controller
@@ -207,7 +203,14 @@ class EstudianteController extends Controller
                     'correo' => $exp->email,
                     'telefono' => $exp->telefono,
                     'contrato_activo' => $exp->contrato_activo,
-                    'funciones' => $exp->funcioneslogros
+                    'funciones' => $exp->funcioneslogros,
+                    'sector_id' => $exp->sector_empresa_id,
+                    'direccion' => $exp->direccion,
+                    'sector_economico_id' => $exp->sector_economico_id,
+                    'actividad_economica_id' => $exp->actividad_economica_id,
+                    'area_desempeno_id' => $exp->area_desempeno_id,
+                    'fecha_ingreso' => $exp->fecha_ingreso,
+                    'fecha_retiro' => $exp->fecha_retiro,
                 ]);
             }
         }
@@ -550,6 +553,13 @@ class EstudianteController extends Controller
         $experiencia->telefono = $request->telefono;
         $experiencia->funcioneslogros = $request->funciones;
         $experiencia->contrato_activo = $request->contrato_activo;
+        $experiencia->sector_empresa_id = $request->sector_id;
+        $experiencia->direccion = $request->direccion;
+        $experiencia->sector_economico_id = $request->sector_economico_id;
+        $experiencia->actividad_economica_id = $request->actividad_economica_id;
+        $experiencia->area_desempeno_id = $request->area_desempeno_id;
+        $experiencia->fecha_ingreso = $request->fecha_ingreso;
+        $experiencia->fecha_retiro = $request->fecha_retiro;
         $experiencia->save();
 
         return 'ok';
@@ -587,7 +597,7 @@ class EstudianteController extends Controller
             $dependencia = $ps->dependencia;
 
             array_push($paz_salvos, [
-                'nombre' => $ps->nombre,
+                'nombre' => strtolower($ps->nombre),
                 'dependencia' => $dependencia ? $dependencia->nombre : '-',
                 'comentario' => $eps->comentario,
                 'paz_salvo' => $eps->paz_salvo,
@@ -666,6 +676,7 @@ class EstudianteController extends Controller
         $estados = Variables::estados();
         $ed->estado_id = $estados['pendiente']->id;
         $ed->url_documento = $ed->path;
+        $ed->motivo_rechazo = null;
         $ed->save();
 
         return 'ok';

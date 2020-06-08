@@ -1,5 +1,6 @@
 import { getPaises, getMunicipios, getDepartamentos } from '../location.js';
 import http from '../http.js';
+import { initBootstrapSelect } from '../functions.js';
 import { resolveExperienciaLaboral } from '../resolvers.js';
 
 Vue.component('datos-laborales', {
@@ -13,7 +14,11 @@ Vue.component('datos-laborales', {
             niveles_cargo: [],
             duraciones: [],
             tipos_vinculacion: [],
-            rangos_salariales: []
+            rangos_salariales: [],
+            sectores_empresa: [],
+            sectores_economicos: [],
+            actividades_economicas: [],
+            areas_des: []
         },
         forms: {
             a_laboral: {},
@@ -26,6 +31,7 @@ Vue.component('datos-laborales', {
         }
     }),
     methods: {
+        initBootstrapSelect,
         init()
         {
             http.get('egresado/datos-laborales').then(
@@ -42,6 +48,11 @@ Vue.component('datos-laborales', {
                     this.forms.a_laboral            = Number(data.actualidad_laboral);
                 }
             )
+        },
+        initModalInformacionLaboral()
+        {
+            this.openModal('#modalInformacionLaboral');
+            this.initBootstrapSelect();
         },
         onChangeActualidadLaboral(laborando)
         {
@@ -72,7 +83,7 @@ Vue.component('datos-laborales', {
                 ( ) =>
                 {
                     this.forms.xp = { ...experiencia };
-                    $('#modalInformacionLaboral').modal('show');
+                    this.initModalInformacionLaboral();
                     cerrarCargando();
                 }
             );
@@ -105,7 +116,7 @@ Vue.component('datos-laborales', {
         onSubmitDatosLaborales()
         {
             cargando('Enviando experiencia laboral');
-            http.post('egresado/experiencia-laboral', this.forms.xp).then(
+            http.post('egresado/experiencia-laboral', {...this.forms.xp, contrato_activo: Boolean(this.forms.xp.contrato_activo === 'true')}).then(
                 ( ) =>
                 {
                     $('#modalInformacionLaboral').modal('hide');
@@ -145,5 +156,21 @@ Vue.component('datos-laborales', {
 
             }
         );
+
+
+        Promise.all([
+            http.get('recursos/sectores-empresa'),
+            http.get('recursos/sectores-economicos'),
+            http.get('recursos/actividades-economicas'),
+            http.get('recursos/areas-desempeno')
+        ]).then(
+            (response) =>
+            {
+                this.datos.sectores_empresa             = response[0].data;
+                this.datos.sectores_economicos          = response[1].data;
+                this.datos.actividades_economicas       = response[2].data;
+                this.datos.areas_des                    = response[3].data;
+            }
+        );
     }
-})
+});

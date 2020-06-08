@@ -12,9 +12,6 @@
     padding: 5px 15px;
 }
 
-
-
-
 @media screen and (min-width: 1280px)
 {
     .list-group-item-flex-md {
@@ -25,4 +22,13 @@
         height: 30px;
         padding: 5px 15px;
     }
+}
+
+
+.text-initial::first-letter{
+    text-transform: uppercase  !important;
+}
+
+.border-estado-radius {
+    border-radius: 5px !important;
 }

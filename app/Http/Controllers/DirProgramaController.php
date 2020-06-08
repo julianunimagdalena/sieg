@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ActivarEstudianteRequest;
+use App\Http\Requests\AprobarEstudianteRequest;
 use App\Models\Dependencia;
 use App\Models\Estudiante;
+use App\Models\EstudianteDocumento;
 use App\Models\Genero;
 use App\Models\HojaVida;
 use App\Models\Municipio;
@@ -14,6 +16,7 @@ use App\Models\SolicitudGrado;
 use App\Models\TipoDocumento;
 use App\Models\User;
 use App\Models\UsuarioRol;
+use App\Tools\DocumentoHelper;
 use App\Tools\PersonaHelper;
 use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
@@ -297,6 +300,7 @@ class DirProgramaController extends Controller
             $estudiante = Estudiante::find($est->id);
             $persona = $estudiante->persona;
             $pg = $estudiante->procesoGrado;
+            $no_aprobado = $estudiante->estado === Variables::$estadoNoAprobado;
 
             array_push($data, [
                 'DT_RowData' => [
@@ -306,11 +310,10 @@ class DirProgramaController extends Controller
                 'codigo' => $estudiante->codigo,
                 'nombres' => $persona->nombres,
                 'apellidos' => $persona->apellidos,
-                'identificacion' => $persona->identificacion,
-                'celular' => $persona->celular,
-                'estado_programa' => $pg->estadoPrograma->nombre,
-                'estado_secretaria' => $pg->estadoSecretaria->nombre,
-                'estado_secretaria' => $pg->estadoSecretaria->nombre,
+                'fecha_grado' => $pg->fechaGrado->fecha_grado,
+                'estado' => $estudiante->estado,
+                'estado_programa' => $no_aprobado ? Variables::$estadoNoAprobado : $pg->estadoPrograma->nombre,
+                'estado_secretaria' => $no_aprobado ? Variables::$estadoNoAprobado : $pg->estadoSecretaria->nombre,
                 'acciones' => ''
             ]);
         }
@@ -357,19 +360,19 @@ class DirProgramaController extends Controller
                 'responsable' => 'Estudiante',
                 'estado' => $pg->confirmacion_asistencia ? 'APROBADO' : 'PENDIENTE'
             ],
-            [
-                'proceso' => 'Aprobación del proceso de grado',
-                'responsable' => 'Dirección de programa',
-                'estado' => $pg->estadoPrograma->nombre
-            ]
+            // [
+            //     'proceso' => 'Aprobación del proceso de grado',
+            //     'responsable' => 'Dirección de programa',
+            //     'estado' => $pg->estadoPrograma->nombre
+            // ]
         ];
 
         foreach ($estudiante->estudiantePazSalvo as $eps) {
             $ps = $eps->pazSalvo;
 
             array_push($paz_salvos, [
-                'nombre' => $ps->nombre,
-                'dependencia' => $ps->dependencia ? $ps->dependencia->nombre : null,
+                'nombre' => strtolower($ps->nombre),
+                'dependencia' => $ps->dependencia ? strtolower($ps->dependencia->nombre) : null,
                 'comentario' => $eps->comentario,
                 'estado' => $eps->paz_salvo ? 'APROBADO' : 'PENDIENTE',
                 'fecha' => $eps->fecha,
@@ -431,5 +434,154 @@ class DirProgramaController extends Controller
         }
 
         return $res;
+    }
+
+    public function generarDocumento($ed_id)
+    {
+        $ed = EstudianteDocumento::find($ed_id);
+        if (!$ed->can_generar) return response('Este documento no se puede generar', 400);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante_ids = $ur->usuario->estudiantes_coordinados->get()->pluck('id')->toArray();
+
+        if (!in_array($ed->idEstudiante, $estudiante_ids)) return response('No permitido', 400);
+
+        $documentos = Variables::documentos();
+        $estados = Variables::estados();
+        $success = false;
+
+        switch ($ed->idDocumento) {
+            case $documentos['paz_salvos']->id:
+                $success = DocumentoHelper::generarPazSalvo($ed);
+                break;
+
+            case $documentos['ayre']->id:
+                $success = DocumentoHelper::generarAdmisiones($ed);
+                break;
+
+            case $documentos['ficha']->id:
+                $success = DocumentoHelper::generarFicha($ed);
+                break;
+        }
+
+        if ($success) {
+            $ed->estado_id = $estados['aprobado']->id;
+            $ed->url_documento = $ed->path;
+            $ed->motivo_rechazo = null;
+            $ed->user_update = $ur->usuario->identificacion;
+            $ed->fecha_update = Carbon::now();
+            $ed->save();
+        }
+
+
+        return 'ok';
+    }
+
+    public function aprobarDocumento(Request $request)
+    {
+        $this->validate($request, ['documento_id' => 'required|exists:estudiante_documento,id']);
+
+        $ed = EstudianteDocumento::find($request->documento_id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante_ids = $ur->usuario->estudiantes_coordinados->get()->pluck('id')->toArray();
+
+        if (!in_array($ed->idEstudiante, $estudiante_ids)) return response('No permitido', 400);
+
+        $estados = Variables::estados();
+        $ed->estado_id = $estados['aprobado']->id;
+        $ed->motivo_rechazo = null;
+        $ed->user_update = $ur->usuario->identificacion;
+        $ed->fecha_update = Carbon::now();
+
+        $ed->save();
+        return 'ok';
+    }
+
+    public function rechazarDocumento(Request $request)
+    {
+        $this->validate($request, [
+            'documento_id' => 'required|exists:estudiante_documento,id',
+            'motivo' => 'required'
+        ]);
+
+        $ed = EstudianteDocumento::find($request->documento_id);
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante_ids = $ur->usuario->estudiantes_coordinados->get()->pluck('id')->toArray();
+
+        if (!in_array($ed->idEstudiante, $estudiante_ids)) return response('No permitido', 400);
+
+        $estados = Variables::estados();
+        $ed->estado_id = $estados['rechazado']->id;
+        $ed->motivo_rechazo = $request->motivo;
+        $ed->user_update = null;
+        $ed->fecha_update = null;
+
+        $ed->save();
+        return 'ok';
+    }
+
+    public function aprobarEstudiante(AprobarEstudianteRequest $request)
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
+
+        if (!$estudiante) return response('No permitido', 400);
+        if (!$estudiante->can_aprobar) return response('El estudiante no está apto para aprobar', 400);
+
+        $estados = Variables::estados();
+        $pg = $estudiante->procesoGrado;
+
+        $pg->estado_programa_id = $estados['aprobado']->id;
+        $pg->fecha_programa = Carbon::now();
+        $pg->motivo_no_aprobado = null;
+        $pg->save();
+
+        return 'ok';
+    }
+
+    public function noAprobarEstudiante(AprobarEstudianteRequest $request)
+    {
+        $this->validate($request, [
+            'motivo' => 'required'
+        ], [
+            '*.required' => 'Obligatorio'
+        ]);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
+
+        if (!$estudiante) return response('No permitido', 400);
+
+        $pg = $estudiante->procesoGrado;
+        $pg->no_aprobado = true;
+        $pg->motivo_no_aprobado = $request->motivo;
+        $pg->save();
+
+        return 'ok';
+    }
+
+    public function actualizarEstudiante($estudiante_id)
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
+
+        if (!$estudiante) return response('No permitido', 400);
+
+        $ws = new WSAdmisiones();
+        $persona = $estudiante->persona;
+        $data = $ws->getInformacionGraduadoByDocumentoIdentidad($persona->identificacion)[0];
+        $tipoDoc = TipoDocumento::where('abrv', $data->tipoDocumento)->first();
+        $ciudadOrigen = Municipio::where('nombre', $data->ciudad)->first();
+
+        $persona->nombres = $data->nombres;
+        $persona->apellidos = $data->apellidos;
+        $persona->tipodoc = $tipoDoc->id;
+        $persona->identificacion = $data->numeroDocumento;
+        $persona->ciudadExpedicion = $data->ciudadCedula;
+        $persona->ciudadOrigen = $ciudadOrigen ? $ciudadOrigen->id : null;
+        $persona->fechaNacimiento = Carbon::createFromFormat('d/m/Y', $data->fechaNacimiento);
+        $persona->save();
+
+        return 'ok';
     }
 }

@@ -49,6 +49,7 @@
 @include('components.app.card')
 @include('components.app.card-action')
 @include('components.app.list-group')
+@include('components.ficha.user-avatar')
 @include('components.modals.Modal')
 @include('components.app.input')
 @include('components.app.select')
@@ -70,7 +71,9 @@
             Progreso
         </div>
         <div class="progress" style="height: 10px;">
-            <div class="progress-bar bg-success progress-bar-animated" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="progress-bar bg-success progress-bar-animated font-weight-bold" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+                @{{ progress }} %
+            </div>
           </div>
     </div>
 </div>

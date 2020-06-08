@@ -83,4 +83,24 @@ class Estudiante extends Model
 
         return $count === 0;
     }
+
+    public function getEstadoAttribute()
+    {
+        $pg = $this->procesoGrado;
+        if ($pg->no_aprobado) return Variables::$estadoNoAprobado;
+
+        $estados = Variables::estados();
+        $isOk = $pg->estado_encuesta
+            && $pg->estado_ficha
+            && $this->estado_documentos === $estados['aprobado']->nombre
+            && $pg->confirmacion_asistencia !== null;
+
+        return $isOk ? $estados['aprobado']->nombre : $estados['pendiente']->nombre;
+    }
+
+    public function scopeGraduados($query)
+    {
+        $tipos = Variables::tiposEstudiante();
+        return $query->where('idTipo', $tipos['graduado']->id);
+    }
 }

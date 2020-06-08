@@ -13,7 +13,8 @@ class ProcesoGrado extends Model
         'estado_secretaria' => 'boolean',
         'estado_programa' => 'boolean',
         'confirmacion_asistencia' => 'boolean',
-        'idEstudiante' => 'integer'
+        'idEstudiante' => 'integer',
+        'no_aprobado' => 'boolean',
     ];
 
     public function estudiante()

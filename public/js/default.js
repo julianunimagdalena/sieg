@@ -99,7 +99,7 @@ function getEstados (
         [class_sin_cargar]: estado === 'sin cargar' ,
         [class_pendiente]: estado === 'pendiente' || estado === 'por aprobar' || estado === 'no generado' || estado === 'generar',
         [class_aprobado]: estado === 'aprobado',
-        [class_rechazado]: estado === 'rechazado'
+        [class_rechazado]: estado === 'rechazado' || estado === 'no aprobado'
     }
 }
 
@@ -118,3 +118,19 @@ function getUrlData()
     return location.href.split('/').pop();
 }
 
+
+function getIconoEstado(estado)
+{
+    if(estado)
+    {
+        switch(estado.toLowerCase())
+        {
+            case "aprobado":
+                return'far fa-check-circle text-success';
+            case 'pendiente':
+                return 'far fa-clock text-warning';
+            case 'rechazado':
+                return 'far fa-times-circle text-danger';
+        }
+    }
+}

@@ -5,7 +5,7 @@
 @endcomponent
 <!-- d-flex justify-content-between align-items-center -->
 @component('component', ['id' => 'list-group-item-component'])
-<li class="list-group-item" :class="{'': actions, 'list-group-item-light': light, 'list-group-item-sm': sm}" >
+<li class="list-group-item" :class="{'': actions, 'list-group-item-light': light, 'list-group-item-sm': sm, ...c_estado}" >
     <span class="app-text-black-1 text-truncate" v-bind:class="{'font-weight-bold': bold}"><slot/></span>
     <span v-if="actions || !!$slots.actions" class="float-right">
         <slot name="actions"></slot>
@@ -46,14 +46,37 @@
             type: Boolean,
             default: true
         },
+        estado: String,
         sm: Boolean
     };
+
+    const list_group_item_data = () => ({
+        c_estado: {}
+    });
+
 
     Vue.component('list-group-item', {
         template: '#list-group-item-component',
         props: list_group_item_props,
+        data: list_group_item_data,
         methods: {
-
+            initEstado()
+            {
+                if(this.estado)
+                {
+                    this.c_estado = {'border-estado-radius': true ,...getEstados(this.estado, 'border-left-secondary', 'border-left-warning', 'border-left-success', 'border-left-danger')};
+                }
+            }
+        },
+        watch: {
+            estado()
+            {
+                this.initEstado();
+            }
+        },
+        mounted()
+        {
+            this.initEstado();
         }
     });
 

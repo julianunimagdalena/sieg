@@ -6,7 +6,7 @@
 @component('component', ['id' => 'sidebar-component'])
 <div>
     <div class="data-list-sidebar" :class="{'show': c_show}">
-        <div class="data-list-sidebar-header mt-3 d-flex justify-content-between app-text-black-1">
+        <div class="data-list-sidebar-header pt-3 d-flex justify-content-between app-text-black-1" :class="{'bg-primary text-white': primary}">
             <h4 class="px-3" v-if="title">@{{ title }}</h4>
             <slot name="header"></slot>
             <span @click="close()" class="action-btn">
@@ -35,7 +35,7 @@
         props: {
             show: Boolean,
             title: String,
-
+            primary: Boolean
         },
         watch:{
             show()
