@@ -8,6 +8,16 @@ Vue.component('login-form', {
         input: {},
         errors: {}
     }),
+    watch: {
+        'input.rol_id': function (n, o) {
+            const rol = this.roles.find(r => r.id === n);
+            console.log('hola', n, rol);
+
+            if (rol) {
+                this.input.estudiante_id = rol.estudiante_id;
+            }
+        }
+    },
     methods: {
         handleSubmit() {
             this.cargando = true;

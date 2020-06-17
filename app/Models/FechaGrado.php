@@ -25,4 +25,9 @@ class FechaGrado extends Model
         $fecha = Carbon::parse($this->fecha_grado);
         return $fecha->format('d/m/Y');
     }
+
+    public function procesosGrado()
+    {
+        return $this->hasMany('App\Models\ProcesoGrado', 'idFecha');
+    }
 }

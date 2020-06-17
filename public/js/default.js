@@ -134,3 +134,14 @@ function getIconoEstado(estado)
         }
     }
 }
+
+function getForm(obj, form = false)
+{
+    let data = form ? { form: { ...obj } } : { ...obj };
+    return {
+        ...data,
+        errors: {
+            ...obj
+        }
+    }
+}

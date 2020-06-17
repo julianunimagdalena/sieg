@@ -21,9 +21,9 @@
                 <icono-estado estado="rechazado"></icono-estado> Rechazado
             </span>
         </span>
-    </div>
-    <div class="mt-2" v-if="$slots.default">
-        <slot></slot>
+        <span class="ml-2" v-if="$slots.default">
+            <slot></slot>
+        </span>
     </div>
 </card-action>
 @endcomponent

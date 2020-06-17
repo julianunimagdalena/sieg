@@ -28,6 +28,9 @@
             <i class="upload fas fa-upload fa-lg text-gray-300" v-on:click="cargar" title="Cargar documento"></i>
         </div>
     </div>
+    <div class="text-danger mt-3" v-if="documento.motivo_rechazo">
+        <span class="font-weight-bold">Motivo Rechazo: </span> @{{ documento.motivo_rechazo }}
+    </div>
 </card>
 @endcomponent
 

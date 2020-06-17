@@ -163,6 +163,7 @@ class AdminController extends Controller
         return [
             'id' => $fecha->id,
             'fecha' => $fecha->fecha_grado,
+            'nombre' => $fecha->nombre,
             'inscripcion_fecha_inicio' => $fecha->inscripcion_fecha_inicio,
             'inscripcion_fecha_fin' => $fecha->inscripcion_fecha_fin,
             'doc_est_fecha_fin' => $fecha->inscripcion_fecha_fin,
@@ -186,6 +187,7 @@ class AdminController extends Controller
         } else $fecha = new FechaGrado();
 
         $fecha->fecha_grado = $request->fecha;
+        $fecha->nombre = $request->nombre;
         $fecha->inscripcion_fecha_inicio = $request->inscripcion_fecha_inicio;
         $fecha->inscripcion_fecha_fin = $request->inscripcion_fecha_fin;
         $fecha->doc_est_fecha_fin = $request->doc_est_fecha_fin;
@@ -195,8 +197,20 @@ class AdminController extends Controller
         $fecha->tipo_grado = $request->tipo_grado_id;
         $fecha->estado = $request->estado;
         $fecha->observacion = $request->observacion;
+        $fecha->anio = explode('-', $request->fecha)[0];
         $fecha->save();
 
+        return 'ok';
+    }
+
+    public function eliminarFechaGrado(Request $request)
+    {
+        $this->validate($request, ['fecha_id' => 'required|exists:fechas_de_grado,id']);
+
+        $fecha = FechaGrado::find($request->fecha_id);
+        if ($fecha->procesosGrado()->count() > 0) return response('No se puede eliminar, hay estudiantes asignados a esta fecha de grado.', 400);
+
+        $fecha->delete();
         return 'ok';
     }
 

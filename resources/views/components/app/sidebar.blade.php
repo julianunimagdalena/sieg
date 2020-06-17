@@ -13,7 +13,7 @@
                 <svg  xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-4 fonticon-wrap"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </span>
         </div>
-        <div class="scrollbar-container data-list-fields px-2 mt-3 ps ps--active-y" id="container-sidebar">
+        <div class="scrollbar-container data-list-fields px-2 mt-3 ps ps--active-y container-sidebar" :id="id">
             <slot></slot>
         </div>
         <div class="data-list-sidebar-footer px-4 d-flex justify-content-between align-items-center mt-3">
@@ -35,7 +35,8 @@
         props: {
             show: Boolean,
             title: String,
-            primary: Boolean
+            primary: Boolean,
+            id: String
         },
         watch:{
             show()
@@ -60,13 +61,10 @@
                 this.$emit('onhide');
             }
         },
-        mouted()
+        mounted()
         {
+            const ps = new PerfectScrollbar('#'+this.id);
         }
     });
-
-    $(function(){
-        const ps = new PerfectScrollbar('#container-sidebar');
-    })
 </script>
 @endpush

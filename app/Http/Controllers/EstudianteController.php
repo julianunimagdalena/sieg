@@ -642,7 +642,8 @@ class EstudianteController extends Controller
             array_push($documentos, [
                 'id' => $ed->id,
                 'nombre' => $ed->documento->nombre,
-                'estado' => $ed->estado->nombre
+                'estado' => $ed->estado->nombre,
+                'motivo_rechazo' => $ed->motivo_rechazo
             ]);
         }
 

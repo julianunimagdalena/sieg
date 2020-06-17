@@ -17,7 +17,17 @@ class DocumentoController extends Controller
         $this->datos = (object) ['roles' => $roles];
 
         $this->middleware('auth');
-        $this->middleware('rol:' . $roles['estudiante']->nombre . '|' . $roles['coordinador']->nombre);
+        $this->middleware('rol:' . $roles['estudiante']->nombre . '|' . $roles['coordinador']->nombre, ['except' => [
+            'ver'
+        ]]);
+        $this->middleware(
+            'rol:' . $roles['estudiante']->nombre
+                . '|' . $roles['coordinador']->nombre
+                . '|' . $roles['secretariaGeneral']->nombre,
+            ['only' => [
+                'ver'
+            ]]
+        );
     }
 
     public function getEstudianteDocumento($ed_id)
@@ -35,6 +45,10 @@ class DocumentoController extends Controller
                 $programa_ids = $ur->usuario->dependenciasModalidades->pluck('id');
                 $ed = EstudianteDocumento::whereHas('estudiante', fn ($e) => $e->whereIn('idPrograma', $programa_ids))
                     ->find($ed_id);
+                break;
+
+            case $this->datos->roles['secretariaGeneral']->id:
+                $ed = EstudianteDocumento::find($ed_id);
                 break;
         }
 

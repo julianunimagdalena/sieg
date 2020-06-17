@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\UsuarioRol;
 use Closure;
 
 class Rol
@@ -15,12 +16,13 @@ class Rol
      */
     public function handle($request, Closure $next, $params)
     {
-        $roles = explode('|', $params);
         $isValid = false;
+        $roles = explode('|', $params);
+        $ur = UsuarioRol::find(session('ur')->id);
 
         if ($request->ip() !== env('LOCAL_IP')) {
             foreach ($roles as $rol) {
-                if ($rol === session('ur')->rol->nombre) $isValid = true;
+                if ($rol === $ur->rol->nombre) $isValid = true;
             }
         } else $isValid = true;
 

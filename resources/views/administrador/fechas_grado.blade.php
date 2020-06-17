@@ -16,14 +16,17 @@
 
 @push('components')
 @include('components.app.Titulo')
-@include('components.modals.Modal')
+@include('components.app.modal')
 @include('components.app.card')
+@include('components.app.input')
+@include('components.app.select')
 @include('components.forms.FiltroFechaGrado')
+@include('components.modals.FechaGradoModal')
 @endpush
 
 @section('content')
 <titulo>Administrar fechas de grado</titulo>
-<button class="btn-primary btn">Nueva fecha de grado</button>
+<button class="btn-primary btn" v-on:click="fechaGradoModal">Nueva fecha de grado</button>
 <br><br>
 <card title="Filtrar fechas de grado" color="primary">
     <filtro-fecha-grado v-on:buscar="buscar"></filtro-fecha-grado>
@@ -53,6 +56,9 @@
     </table>
     <span class="text-danger" v-else>No se encontro ningun resultado</span>
 </card>
+<fecha-grado-modal id="fechaGradoModal" :fecha-id="selectedFechaId" @refresh="buscar({}, true)">
+
+</fecha-grado-modal>
 @endsection
 
 @push('scripts')

@@ -22,6 +22,11 @@ class Persona extends Model
         return $this->nombres . ' ' . $this->apellidos;
     }
 
+    public function getNombreInvertidoAttribute()
+    {
+        return $this->apellidos . ' ' . $this->nombres;
+    }
+
     public function usuario()
     {
         return $this->hasOne('App\Models\User', 'idPersona');

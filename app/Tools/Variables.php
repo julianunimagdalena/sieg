@@ -97,7 +97,8 @@ class Variables
         $documentos = Variables::documentos();
 
         return [
-            $documentos['ecaes']->id
+            $documentos['ecaes']->id,
+            $documentos['identificacion']->id,
         ];
     }
 

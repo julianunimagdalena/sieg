@@ -78,10 +78,27 @@ class Estudiante extends Model
 
     public function getCanAprobarAttribute()
     {
+        $can = false;
+        $roles = Variables::roles();
         $estados = Variables::estados();
-        $count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
+        $pg = $this->procesoGrado;
 
-        return $count === 0;
+        switch (session('ur')->rol_id) {
+            case $roles['coordinador']->id:
+                $count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
+                $can = $count === 0 &&
+                    $pg->resultado_ecaes &&
+                    $pg->titulo_memoria_grado &&
+                    $pg->codigo_ecaes;
+
+                break;
+
+            case $roles['secretariaGeneral']->id:
+                $can = $pg->estado_programa_id === $estados['aprobado']->id;
+                break;
+        }
+
+        return $can;
     }
 
     public function getEstadoAttribute()

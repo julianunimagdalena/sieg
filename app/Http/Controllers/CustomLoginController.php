@@ -98,13 +98,11 @@ class CustomLoginController extends Controller
         return compact('check', 'data');
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
         Auth::logout();
-        session(['ur' => null]);
-        session(['estudiante_id' => null]);
+        $request->session()->flush();
 
         return redirect('/');
-        return 'ok';
     }
 }

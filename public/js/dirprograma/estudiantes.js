@@ -18,7 +18,9 @@ let vue = new Vue({
         },
         errors: {
             documento: {},
-            estudiante: {}
+            estudiante: {
+                extra: {}
+            }
         },
         filter: {
 
@@ -29,8 +31,19 @@ let vue = new Vue({
     }),
     methods: {
         verDocumento,
+        initInfoExtraEstudiante()
+        {
+            http.get(`direccion/info-adicional-estudiante/${this.estudiante.id}`).then(
+                ({ data }) =>
+                {
+                    this.estudiante.extra = data;
+                }
+            );
+        },
         showSidebar(data, sidebar)
         {
+            this.estudiante = {id: data, info: {}, extra: {}};
+
             if(sidebar === 'est')
             {
                 this.show_est = true;
@@ -43,18 +56,8 @@ let vue = new Vue({
                     }
                 );
             }else {
-
-                http.get(`direccion/documentos-estudiante/${data}`).then(
-                    ({ data }) =>
-                    {
-                        this.datos.documentos = data.documentos;
-                        this.datos.can_aprobar = data.can_aprobar;
-                    }
-                );
-
                 this.show_dir = true;
             }
-            this.estudiante = {id: data, info: {}};
         },
         showEstudiante(id)
         {
@@ -83,134 +86,6 @@ let vue = new Vue({
                     alertErrorServidor();
                 }
             ).then(cerrarCargando);
-        },
-        onChangeTipoGrado()
-        {
-            if(this.filter.tipo_grado_id !== undefined)
-                http.get(`recursos/fechas-grado?tipo_grado_id=${this.filter.tipo_grado_id}`).then(
-                    ({ data }) =>
-                    {
-                        this.datos.fechas_grado = data;
-                        this.initDataTable();
-                    }
-                );
-        },
-        onDocumentoCargado()
-        {
-            this.showSidebar(this.estudiante.id, 'dir');
-        },
-        aprobarEstudiante()
-        {
-            alertConfirmar().then(
-                (ok) =>
-                {
-                    if(!ok)
-                        return;
-
-
-                        cargando();
-
-                        http.post('direccion/aprobar', {estudiante_id: this.estudiante.id}).then(
-                            () =>
-                            {
-                                this.show_dir = false;
-                                this.estudiante = undefined;
-                                alertTareaRealizada();
-                            },
-                            ({response}) =>
-                            {
-                                if(response.status === 400)
-                                    alertErrorServidor(response.data);
-                                else
-                                    alertErrorServidor();
-                            }
-                        ).then(cerrarCargando);
-                }
-            )
-        },
-        documentCanSomething(documento)
-        {
-            for(let key in documento)
-            {
-                if(key.includes('can') && documento[key])
-                {
-                    return true;
-                }
-            }
-            return false;
-        },
-        generar(documento)
-        {
-            cargando();
-            http.get(`direccion/generar/${documento.id}`).then(
-                ( ) =>
-                {
-                   alertTareaRealizada();
-                   this.showSidebar(this.estudiante.id, 'dir');
-                },
-                err =>
-                {
-                    alertErrorServidor();
-                }
-            ).then(cerrarCargando);
-        },
-        estadoDocumento(estado, documento_id, motivo)
-        {
-            cargando();
-            http.post(`direccion/${estado}-documento`, {documento_id, motivo}).then(
-                ( ) =>
-                {
-                    alertTareaRealizada();
-                    this.showSidebar(this.estudiante.id, 'dir');
-                    if(estado === 'rechazar')
-                        $('#modalRechazarDocumento').modal('hide');
-                },
-                ({ response }) =>
-                {
-                    if(response.status === 400)
-                        alertErrorServidor(response.data);
-                    else if (response.status === 422)
-                        this.errors.documento = response.data.errors;
-                    else
-                        alertErrorServidor();
-                }
-            ).then(cerrarCargando);
-        },
-        rechazarEstudiante()
-        {
-            alertConfirmar().then(
-                (ok) =>
-                {
-                    if(!ok)
-                        return;
-
-                    cargando();
-                    http.post('direccion/no-aprobar', { estudiante_id: this.estudiante.id, motivo: this.estudiante.motivo }).then(
-                        ( ) =>
-                        {
-                            this.show_dir = false;
-                            this.estudiante = undefined;
-                            $('#modalNoAprobarEstudiante').modal('hide');
-                            alertTareaRealizada();
-                        },
-                        ({ response }) =>
-                        {
-                            if(response.status === 422)
-                                this.errors.estudiante = response.data.errors;
-                            else
-                                alertErrorServidor();
-                        }
-                    ).then(cerrarCargando);
-                }
-            )
-        },
-        initFilter()
-        {
-            this.filter = {
-                programa_id: String(this.datos.programas[0].id)
-            };
-            this.datos.fechas_grado = [];
-            this.initDataTable();
         },
         initDataTable()
         {
@@ -280,26 +155,6 @@ let vue = new Vue({
     },
     mounted: function ()
     {
-        http.get('recursos/tipos-grado').then(
-            ({ data }) =>
-            {
-                this.datos.tipos_grado = data;
-            }
-        );
-
-        http.get('direccion/programas-coordinados').then(
-            ({ data }) =>
-            {
-                this.datos.programas  = data;
-
-
-
-                $(document).ready( () => {
-                    this.initFilter();
-                });
-            }
-        );
-
     }
 });
 

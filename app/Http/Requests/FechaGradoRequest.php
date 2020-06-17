@@ -26,7 +26,7 @@ class FechaGradoRequest extends FormRequest
         return [
             'id' => 'integer|exists:fechas_de_grado,id',
             'fecha' => 'required|date',
-            'inscripcion_fecha_inicio' => 'required|date',
+            'inscripcion_fecha_inicio' => 'required|date|before:fecha',
             'inscripcion_fecha_fin' => 'required|date|after:inscripcion_fecha_inicio',
             'doc_est_fecha_fin' => 'required|date|after:inscripcion_fecha_inicio',
             'paz_salvo_fecha_fin' => 'required|date|after:inscripcion_fecha_inicio',
@@ -34,6 +34,7 @@ class FechaGradoRequest extends FormRequest
             'secretaria_gen_fecha_fin' => 'required|date|after:direccion_prog_fecha_fin',
             'tipo_grado_id' => 'required|integer|exists:tipos_de_grados,id',
             'estado' => 'required|boolean',
+            'nombre' => 'required',
             'observacion' => ''
         ];
     }

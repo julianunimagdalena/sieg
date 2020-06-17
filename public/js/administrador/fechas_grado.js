@@ -8,11 +8,15 @@ new Vue({
     data: () => ({
         fechas: [],
         searched: false,
-        table: undefined
+        table: undefined,
+        selectedFechaId: null,
+        lastFilter: null
     }),
     methods: {
-        async buscar(filter) {
+        async buscar(filter, useLastFilter = false) {
             let query = '';
+
+            if (useLastFilter) filter = this.lastFilter
 
             for (const key in filter) {
                 if (filter[key] !== undefined && filter[key] !== '') {
@@ -20,13 +24,42 @@ new Vue({
                 }
             }
 
-            swal('Cargando...');
+            this.lastFilter = filter;
+
+            cargando();
             const res = await http.get('recursos/fechas-grado' + query);
-            swal.close();
+            cerrarCargando();
 
             this.fechas = res.data;
             this.searched = true;
             manager.reload();
+        },
+        fechaGradoModal(fecha = null) {
+            this.selectedFechaId = fecha ? fecha.id : null;
+            $('#fechaGradoModal').modal('show');
+        },
+        eliminarFecha(fecha)
+        {
+            alertConfirmar('¿Está seguro de eliminar la fecha de grado?').then(
+                (ok) =>
+                {
+                    if(!ok)
+                        return;
+
+                    cargando();
+                    http.post('administrador/eliminar-fecha-grado', { fecha_id: fecha.id } ).then(
+                        () =>
+                        {
+                            this.buscar({}, true);
+                            alertTareaRealizada();
+                        },
+                        err =>
+                        {
+                            alertErrorServidor();
+                        }
+                    ).then(cerrarCargando);
+                }
+            );
         }
     },
 });

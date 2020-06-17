@@ -71,7 +71,7 @@
             Progreso
         </div>
         <div class="progress" style="height: 10px;">
-            <div class="progress-bar bg-success progress-bar-animated font-weight-bold" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar progress-bar-animated font-weight-bold" :class="{'bg-success': progress == 100, 'bg-warning': progress < 100}" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
                 @{{ progress }} %
             </div>
           </div>

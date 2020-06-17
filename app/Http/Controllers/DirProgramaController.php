@@ -31,10 +31,44 @@ class DirProgramaController extends Controller
 
         // rpineda coordinador de programa
         session(['ur' => UsuarioRol::find(22)]);
+        // julianpitreap sec general
+        // session(['ur' => UsuarioRol::find(20029)]);
         \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
-        $this->middleware('rol:' . $roles['coordinador']->nombre);
+        $this->middleware('rol:' . $roles['coordinador']->nombre, ['except' => [
+            'getInfoAdicionalEstudiante',
+            'documentosEstudiante',
+            'rechazarDocumento',
+            'noAprobarEstudiante',
+            'aprobarEstudiante'
+        ]]);
+        $this->middleware('rol:' . $roles['coordinador']->nombre . '|' . $roles['secretariaGeneral']->nombre, ['only' => [
+            'getInfoAdicionalEstudiante',
+            'documentosEstudiante',
+            'rechazarDocumento',
+            'noAprobarEstudiante',
+            'aprobarEstudiante'
+        ]]);
+    }
+
+    private function getEstudiante($estudiante_id)
+    {
+        $estudiante = null;
+        $roles = Variables::roles();
+        $ur = UsuarioRol::find(session('ur')->id);
+
+        switch ($ur->rol_id) {
+            case $roles['coordinador']->id:
+                $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
+                break;
+
+            case $roles['secretariaGeneral']->id:
+                $estudiante = Estudiante::find($estudiante_id);
+                break;
+        }
+
+        return $estudiante;
     }
 
     public function index()
@@ -410,8 +444,9 @@ class DirProgramaController extends Controller
     public function documentosEstudiante($estudiante_id)
     {
         $documentos = Variables::documentos();
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
+        $estudiante = $this->getEstudiante($estudiante_id);
+
+        if (!$estudiante) return response('No permitido', 400);
 
         $res = [
             'can_aprobar' => $estudiante->can_aprobar,
@@ -425,6 +460,7 @@ class DirProgramaController extends Controller
                 'id' => $ed->id,
                 'nombre' => $ed->documento->nombre,
                 'estado' => $ed->estado->nombre,
+                'motivo_rechazo' => $ed->motivo_rechazo,
                 'can_generar' => $ed->can_generar,
                 'can_show' => $ed->can_show,
                 'can_aprobar' => $ed->can_aprobar,
@@ -504,26 +540,36 @@ class DirProgramaController extends Controller
             'motivo' => 'required'
         ]);
 
-        $ed = EstudianteDocumento::find($request->documento_id);
+        $roles = Variables::roles();
         $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante_ids = $ur->usuario->estudiantes_coordinados->get()->pluck('id')->toArray();
+        $ed = EstudianteDocumento::find($request->documento_id);
 
-        if (!in_array($ed->idEstudiante, $estudiante_ids)) return response('No permitido', 400);
+        if ($ur->rol_id === $roles['coordinador']->id) {
+            $estudiante_ids = $ur->usuario->estudiantes_coordinados->get()->pluck('id')->toArray();
+            if (!in_array($ed->idEstudiante, $estudiante_ids)) return response('No permitido', 400);
+        }
 
         $estados = Variables::estados();
         $ed->estado_id = $estados['rechazado']->id;
         $ed->motivo_rechazo = $request->motivo;
         $ed->user_update = null;
         $ed->fecha_update = null;
-
         $ed->save();
+
+        $pg = $ed->estudiante->procesoGrado;
+        $pg->estado_programa_id = $estados['pendiente']->id;
+        $pg->fecha_programa = null;
+        $pg->motivo_no_aprobado = null;
+        $pg->save();
+
         return 'ok';
     }
 
     public function aprobarEstudiante(AprobarEstudianteRequest $request)
     {
+        $roles = Variables::roles();
         $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
+        $estudiante = $this->getEstudiante($request->estudiante_id);
 
         if (!$estudiante) return response('No permitido', 400);
         if (!$estudiante->can_aprobar) return response('El estudiante no está apto para aprobar', 400);
@@ -531,8 +577,18 @@ class DirProgramaController extends Controller
         $estados = Variables::estados();
         $pg = $estudiante->procesoGrado;
 
-        $pg->estado_programa_id = $estados['aprobado']->id;
-        $pg->fecha_programa = Carbon::now();
+        switch ($ur->rol_id) {
+            case $roles['coordinador']->id:
+                $pg->estado_programa_id = $estados['aprobado']->id;
+                $pg->fecha_programa = Carbon::now();
+                break;
+
+            case $roles['secretariaGeneral']->id:
+                $pg->estado_secretaria_id = $estados['aprobado']->id;
+                $pg->fecha_secretaria = Carbon::now();
+                break;
+        }
+
         $pg->motivo_no_aprobado = null;
         $pg->save();
 
@@ -547,9 +603,7 @@ class DirProgramaController extends Controller
             '*.required' => 'Obligatorio'
         ]);
 
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
-
+        $estudiante = $this->getEstudiante($request->estudiante_id);
         if (!$estudiante) return response('No permitido', 400);
 
         $pg = $estudiante->procesoGrado;
@@ -581,6 +635,45 @@ class DirProgramaController extends Controller
         $persona->ciudadOrigen = $ciudadOrigen ? $ciudadOrigen->id : null;
         $persona->fechaNacimiento = Carbon::createFromFormat('d/m/Y', $data->fechaNacimiento);
         $persona->save();
+
+        return 'ok';
+    }
+
+    public function getInfoAdicionalEstudiante($estudiante_id)
+    {
+        $estudiante = $this->getEstudiante($estudiante_id);
+        if (!$estudiante) return response('No permitido', 400);
+
+        $pg = $estudiante->procesoGrado;
+        return [
+            'estudiante_id' => $estudiante->id,
+            'resultado_ecaes' => $pg->resultado_ecaes,
+            'titulo_memoria_grado' => $pg->titulo_memoria_grado,
+            'codigo_ecaes' => $pg->codigo_ecaes
+        ];
+    }
+
+    public function infoAdicionalEstudiante(Request $request)
+    {
+        $this->validate($request, [
+            'estudiante_id' => 'required|exists:estudiantes,id',
+            'resultado_ecaes' => 'required',
+            'titulo_memoria_grado' => 'required',
+            'codigo_ecaes' => 'required'
+        ], [
+            '*.required' => 'Obligatorio'
+        ]);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
+
+        if (!$estudiante) return response('No permitido', 400);
+
+        $pg = $estudiante->procesoGrado;
+        $pg->resultado_ecaes = $request->resultado_ecaes;
+        $pg->titulo_memoria_grado = $request->titulo_memoria_grado;
+        $pg->codigo_ecaes = $request->codigo_ecaes;
+        $pg->save();
 
         return 'ok';
     }

@@ -116,7 +116,7 @@ Vue.component('datos-laborales', {
         onSubmitDatosLaborales()
         {
             cargando('Enviando experiencia laboral');
-            http.post('egresado/experiencia-laboral', {...this.forms.xp, contrato_activo: Boolean(this.forms.xp.contrato_activo === 'true')}).then(
+            http.post('egresado/experiencia-laboral', this.forms.xp).then(
                 ( ) =>
                 {
                     $('#modalInformacionLaboral').modal('hide');

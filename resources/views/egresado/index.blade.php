@@ -46,7 +46,7 @@
                         </div>
                         <div class="col-md-6 col-sm-12 form-group">
                             <app-input
-                                label="Codigo"
+                                label="Código"
                                 disabled
                                 v-model="info.codigo"
                             />

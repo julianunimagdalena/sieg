@@ -38,18 +38,18 @@ class ExperienciaLaboralRequest extends FormRequest
             'contrato_activo' => 'required|boolean',
             'sector_id' => 'required|exists:sector_empresa,id',
             'direccion' => 'required',
-            'sector_economico_id' => 'required|sector_economico,id',
-            'actividad_economica_id' => 'required|actividades_economicas,id',
-            'area_desempeno_id' => 'required|area_desempeno,id',
+            'sector_economico_id' => 'required|exists:sector_economico,id',
+            'actividad_economica_id' => 'required|exists:actividades_economicas,id',
+            'area_desempeno_id' => 'required|exists:area_desempeno,id',
             'fecha_ingreso' => 'required',
-            'fecha_retiro' => 'required_if:contrato_activo,true',
+            'fecha_retiro' => 'required_if:contrato_activo,false',
         ];
     }
 
     public function messages()
     {
         return [
-            '*.required'
-        ]
+            '*.required' => 'Obligatorio'
+        ];
     }
 }

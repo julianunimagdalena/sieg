@@ -22,8 +22,9 @@ Route::get('/prueba-documento/{html?}', function ($html = false) {
     return App\Tools\DocumentoHelper::generarFicha($ed, true, $html);
 });
 
-Route::get('/prueba', function () {
-    return Carbon::now()->format('d/m/Y g:i:s A');
+Route::get('/prueba/{identificacion}', function ($identificacion) {
+    $ws = new App\Tools\WSAdmisiones();
+    return $ws->getInformacionGraduadoByDocumentoIdentidad($identificacion);
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -109,10 +110,15 @@ Route::post('/direccion/rechazar-documento', 'DirProgramaController@rechazarDocu
 Route::post('/direccion/aprobar', 'DirProgramaController@aprobarEstudiante');
 Route::post('/direccion/no-aprobar', 'DirProgramaController@noAprobarEstudiante');
 Route::post('/direccion/actualizar-estudiante/{estudiante_id}', 'DirProgramaController@actualizarEstudiante');
+Route::get('/direccion/info-adicional-estudiante/{estudiante_id}', 'DirProgramaController@getInfoAdicionalEstudiante');
+Route::post('/direccion/info-adicional-estudiante', 'DirProgramaController@infoAdicionalEstudiante');
 
 // PETICIONES DOCUMENTO
 Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
 Route::post('/documento/cargar', 'DocumentoController@cargar');
+
+// PETICIONES BACKUP
+Route::post('/backup/estudiantes', 'BackupController@estudiantes');
 
 // PETICIONES ADMIN
 Route::get('/administrador/usuarios', 'AdminController@usuarios');
@@ -121,6 +127,10 @@ Route::post('/administrador/eliminar-usuario', 'AdminController@eliminarUsuario'
 Route::get('/administrador/datos-usuario', 'AdminController@datosUsuario');
 Route::get('/administrador/fecha-grado/{fecha_grado_id}', 'AdminController@fechaGrado');
 Route::post('/administrador/fecha-grado', 'AdminController@editarFechaGrado');
+Route::post('/administrador/eliminar-fecha-grado', 'AdminController@eliminarFechaGrado');
+
+// PETICIONES SEC GENERAL
+Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');
 
 //RUTAS VISTAS DIRECCION DE PROGRAMA
 
@@ -140,6 +150,10 @@ Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos')
 Route::get('/administrador', 'AdminController@index');
 Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
 Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
+
+// RUTAS VISTA SECRETARIA GENERAL
+Route::get('/secgeneral', 'SecretariaGeneralController@index');
+Route::get('/secgeneral/estudiantes', 'SecretariaGeneralController@estudiantes');
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

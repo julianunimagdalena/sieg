@@ -11,8 +11,11 @@
     @include('components.app.icons-information')
     @include('components.app.modal')
     @include('components.app.select')
+    @include('components.modals.verdocumento')
+    @include('components.sidebars.documentos')
     @include('components.app.list-group')
     @include('components.inputs.InputFile')
+    @include('components.filter.estudiante')
     @include('components.modals.CargaDocumentoModal')
 @endpush
 
@@ -32,53 +35,37 @@
 @section('content')
     <titulo>Consultar Aspirantes a Grado</titulo>
     <div>
-        <div class="row mt-3">
-            <div class="col-md-3 form-group">
-                <label>Programa</label>
-                <select v-model="filter.programa_id" class="form-control" @change="initDataTable()">
-                    <option v-for="(programa) in datos.programas" :value="programa.id">@{{ programa.nombre }}</option>
-                </select>
-            </div>
-            <div class="col-md-2 form-group">
-                <label>Tipo de Grado</label>
-                <select v-model="filter.tipo_grado_id" class="form-control" @change="onChangeTipoGrado()">
-                    <option :value="undefined" disabled>Seleccione una opción</option>
-                    <option v-for="(t_grado) in datos.tipos_grado" :value="t_grado.id">@{{ t_grado.nombre }}</option>
-                </select>
-            </div>
-            <div class="col-md-2 form-group">
-                <label>Fecha de Grado</label>
-                <select v-model="filter.fecha_grado_id" class="form-control" @change="initDataTable()">
-                    <option :value="undefined" disabled>Seleccione una opción</option>
-                    <option v-for="(fecha) in datos.fechas_grado" :value="fecha.id">@{{ fecha.nombre }}</option>
-                </select>
-            </div>
-            <div class="col-md-2 form-group">
-                <label>Estado</label>
-                <select v-model="filter.estado" class="form-control" @change="initDataTable()">
-                    <option :value="undefined" disabled>Seleccione una opción</option>
-                    <option value="aprobado">Aprobado</option>
-                    <option value="no_aprobado">No Aprobado</option>
-                    <option value="pendiente">Pendiente</option>
-                </select>
-            </div>
-        </div>
-
-        <div class=" mb-3">
-            <button class="btn btn-primary btn-icon-split" @click="initFilter()">
-                <span class="icon text-white-50">
-                    <i class="fas fa-times"></i>
-                </span>
-                <span class="text">Limpiar Filtro</span>
-            </button>
+        <div class="mb-3">
+            <filter-estudiante v-model="filter" @initdtable="initDataTable()"></filter-estudiante>
         </div>
 
         <div class="mb-3">
-            <icons-information></icons-information>
+            <!--<icons-information>
+                <span class="ml-4 font-weight-bold">
+                    <span>
+                        Posibles Acciones:
+                    </span>
+                    <span class="text-primary action-btn ml-3 mr-3 text-left">
+                        <i class="fas fa-location-arrow"></i> Ver
+                    </span>
+                    <span class="text-secondary action-btn mr-3 text-center">
+                        <i class="fas fa-cog"></i> Generar
+                    </span>
+                    <span class="text-secondary action-btn mr-3">
+                        <i class="fas fa-upload"></i> Cargar
+                    </span>
+                    <span class="text-success action-btn mr-3 text-right">
+                        <i class="fas fa-check"></i> Aprobar
+                    </span>
+                    <span class="text-danger action-btn ">
+                        <i class="fas fa-times"></i> Rechazar
+                    </span>
+                </span>
+            </icons-information>-->
         </div>
 
         <table class="table dtable table-sm table-responsive-sm AppTable-Separated AppTable-List " id="tabla-estudiante" style="width:100%">
-            <thead >
+            <thead style="font-size: 13px;">
                 <tr>
                     <th>Foto</th>
                     <th>Código</th>
@@ -98,7 +85,7 @@
 
         </table>
     </div>
-    <sidebar title="ESTUDIANTE" :show="show_est" @onhide="show_est = false" primary>
+    <sidebar title="ESTUDIANTE" :show="show_est" @onhide="show_est = false" primary id="sidebar-estudiante">
         <div class="app-text-black-1" v-if="estudiante">
             <div class="text-center">
                 <img :src="estudiante.info.foto" alt="" class="img-fluid data-list-img">
@@ -121,7 +108,7 @@
                             </div>
                             <div class="ml-2">
                                 <icono-estado :estado="item.estado"></icono-estado>
-                                <!--<badge :estado="item.estado">@{{ item.estado }}</badge>-->
+
                             </div>
                         </list-group-item-flex>
                     </list-group>
@@ -138,7 +125,6 @@
                             <div class="text-initial">@{{ item.nombre }}</div>
                             <div>
                                 <icono-estado :estado="item.estado"></icono-estado>
-                                <!--<badge :estado="item.estado">@{{ item.estado }}</badge>-->
                             </div>
                         </list-group-item-flex>
                     </list-group>
@@ -146,7 +132,10 @@
             </div>
         </div>
     </sidebar>
-    <sidebar title="DIRECCIÓN" :show="show_dir" @onhide="show_dir = false" primary>
+    <sidebar-documentos :show="show_dir" @hide="show_dir = false" :estudiante_data="estudiante">
+
+    </sidebar-documentos>
+    <!--<sidebar title="DIRECCIÓN" :show="show_dir" @onhide="show_dir = false" primary id="sidebar-direccion">
         <div class="mb-3 font-weight-bold pl-2 pr-2">
             <span>
                 Posibles Acciones:
@@ -225,6 +214,55 @@
                     </list-group-item>
                 </list-group>
             </div>
+            <hr/>
+            <div>
+                <div class="font-weight-bold">
+                    Información Adicional del Estudiante
+                </div>
+                <div class="mt-2">
+                    <form @submit.prevent="onSubmitInfoExtra()" v-if="estudiante && estudiante.extra">
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-input
+                                    label="Código Pruebas Saber Pro"
+                                    placeholder="código"
+                                    v-model="estudiante.extra.codigo_ecaes"
+                                    required
+                                    :errors="errors.estudiante.extra.codigo_ecaes"
+                                    @input="errors.estudiante.extra.codigo_ecaes = undefined"
+                                />
+                            </div>
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-input
+                                    label="Resultado Pruebas Saber Pro"
+                                    placeholder="Resultado"
+                                    v-model="estudiante.extra.resultado_ecaes"
+                                    required
+                                    :errors="errors.estudiante.extra.resultado_ecaes"
+                                    @input="errors.estudiante.extra.resultado_ecaes = undefined"
+                                />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-input
+                                    label="Título de Memoria de Grado"
+                                    placeholder="Título"
+                                    v-model="estudiante.extra.titulo_memoria_grado"
+                                    required
+                                    :errors="errors.estudiante.extra.titulo_memoria_grado"
+                                    @input="errors.estudiante.extra.titulo_memoria_grado = undefined"
+                                />
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <button class="btn btn-primary" type="submit">Guardar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
         <template v-slot:footer class="p-3">
             <button type="button" class="btn btn-success btn-circle"
@@ -248,6 +286,23 @@
             @input="errors.estudiante.motivo = undefined"
         />
     </modal>
+    <modal
+        id="modalRechazarDocumento"
+        title="Rechazar Documento Estudiante"
+        @submit="estadoDocumento( 'rechazar' , forms.documento.id, forms.documento.motivo)"
+        large
+        buttontext="Enviar"
+    >
+        <div class="form-group">
+            <app-input
+                label="Motivo"
+                required
+                placeholder="Motivo"
+                v-model="forms.documento.motivo"
+                type="textarea"
+            />
+        </div>
+    </modal>-->
     <modal
         id="modalInformacionEstudiante"
         title="Información Estudiante"
@@ -342,26 +397,6 @@
             </div>
         </form>
     </modal>
-    <modal
-        id="modalRechazarDocumento"
-        title="Rechazar Documento Estudiante"
-        @submit="estadoDocumento( 'rechazar' , forms.documento.id, forms.documento.motivo)"
-        large
-        buttontext="Enviar">
-        <div class="form-group">
-            <app-input
-                label="Motivo"
-                required
-                placeholder="Motivo"
-                v-model="forms.documento.motivo"
-                type="textarea"
-            />
-        </div>
-    </modal>
-
-    <carga-documento-modal id="cargaDocumentoModal" :documento="forms.documento"
-        v-on:documento-cargado="onDocumentoCargado">
-    </carga-documento-modal>
 @endsection
 
 
