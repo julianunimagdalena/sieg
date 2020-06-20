@@ -23,9 +23,18 @@ const vue = new Vue({
         {
             cargando('Procesando...')
             http.post('backup/estudiantes', this.filter).then(
-                () =>
+                ({ data }) =>
                 {
-                    alertTareaRealizada('Copia de seguridad realizada con éxito');
+                    const a = document.createElement('a');
+
+                    data.forEach(file => {
+                        a.download = file;
+                        a.href = baseURL + '/backup/archivo/' + file;
+                        a.click();
+                    });
+
+
+                    alertTareaRealizada(data.length > 0 ? 'Copia de seguridad realizada con éxito' : 'No hay estudiantes para descargar');
                 },
                 err =>
                 {

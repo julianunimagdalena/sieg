@@ -39,7 +39,8 @@ Vue.component('sidebar-documentos', {
             type: Object,
             default: undefined
         },
-        show: Boolean
+        show: Boolean,
+        secretaria: Boolean
     },
     methods: {
         getDocumentoRoute,

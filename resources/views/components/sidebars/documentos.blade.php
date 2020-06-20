@@ -1,14 +1,14 @@
 @component('component', ['id' => 'sidebar-documentos-component'])
 <div>
-    <sidebar title="DIRECCIÓN" :show="show" @onhide="$emit('hide')" primary id="sidebar-direccion">
+    <sidebar :title="secretaria ? 'SECRETARÍA' : 'DIRECCIÓN'" :show="show" @onhide="$emit('hide')" primary id="sidebar-direccion">
         <div class="pl-2 pr-2">
             <div class="d-flex flex-row align-items-center justify-content-between">
                 <div class="font-weight-bold">
                     Documentos
                 </div>
             </div>
-            <div>
-                <list-group>
+            <div class="mt-2">
+                <list-group v-if="datos.documentos && datos.documentos.length > 0">
                     <list-group-item light :bold="false" v-for="(documento) in datos.documentos" :estado="documento.estado" :key="documento.id">
                         @{{ documento.nombre }}
 
@@ -52,9 +52,13 @@
                         </template>
                     </list-group-item>
                 </list-group>
+                <div v-else class="mt-2">
+                    No hay documentos para mostrar
+                </div>
             </div>
             <hr/>
             <div>
+
                 <div class="font-weight-bold">
                     Información Adicional del Estudiante
                 </div>
@@ -67,34 +71,102 @@
                                     placeholder="código"
                                     v-model="form.estudiante.extra.codigo_ecaes"
                                     required
+                                    :disabled="secretaria"
                                     :errors="errors.estudiante.extra.codigo_ecaes"
                                     @input="errors.estudiante.extra.codigo_ecaes = undefined"
                                 />
                             </div>
-                            <div class="col-md-12 col-sm-12 form-group">
+                            <!--<div class="col-md-12 col-sm-12 form-group">
                                 <app-input
                                     label="Resultado Pruebas Saber Pro"
                                     placeholder="Resultado"
                                     v-model="form.estudiante.extra.resultado_ecaes"
                                     required
+                                    disabled
                                     :errors="errors.estudiante.extra.resultado_ecaes"
                                     @input="errors.estudiante.extra.resultado_ecaes = undefined"
                                 />
-                            </div>
+                            </div>-->
                         </div>
-                        <div class="row">
+                        <!--<div class="row">
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-input
                                     label="Título de Memoria de Grado"
                                     placeholder="Título"
                                     v-model="form.estudiante.extra.titulo_memoria_grado"
                                     required
+                                    disabled
                                     :errors="errors.estudiante.extra.titulo_memoria_grado"
                                     @input="errors.estudiante.extra.titulo_memoria_grado = undefined"
                                 />
                             </div>
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-input
+                                    label="Nota de Memoria de Grado"
+                                    placeholder="Nota"
+                                    v-model="form.estudiante.extra.nota_memoria_grado"
+                                    required
+                                    disabled
+                                    :errors="errors.estudiante.extra.nota_memoria_grado"
+                                    @input="errors.estudiante.extra.nota_memoria_grado = undefined"
+                                />
+                            </div>
+                        </div>-->
+                        <div class="row">
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-select
+                                    label="Mejor Ecaes"
+                                    v-model="form.estudiante.extra.mejor_ecaes"
+                                    required
+                                    :errors="errors.estudiante.extra.mejor_ecaes"
+                                    @input="errors.estudiante.extra.mejor_ecaes = undefined"
+                                >
+                                    <option :value="true">SI</option>
+                                    <option :value="false">NO</option>
+                                </app-select>
+                            </div>
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-select
+                                    label="Mención de Honor"
+                                    v-model="form.estudiante.extra.mencion_honor"
+                                    required
+                                    :errors="errors.estudiante.extra.mencion_honor"
+                                    @input="errors.estudiante.extra.mencion_honor = undefined"
+                                >
+                                    <option :value="true">SI</option>
+                                    <option :value="false">NO</option>
+                                </app-select>
+                            </div>
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-select
+                                    label="Mención de Honor"
+                                    v-model="form.estudiante.extra.incentivo_nacional"
+                                    required
+                                    :errors="errors.estudiante.extra.incentivo_nacional"
+                                    @input="errors.estudiante.extra.incentivo_nacional = undefined"
+                                >
+                                    <option :value="true">SI APLICA</option>
+                                    <option :value="false">NO APLICA</option>
+                                </app-select>
+                            </div>
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-select
+                                    label="Mención de Honor"
+                                    v-model="form.estudiante.extra.incentivo_institucional"
+                                    required
+                                    :errors="errors.estudiante.extra.incentivo_institucional"
+                                    @input="errors.estudiante.extra.incentivo_institucional = undefined"
+                                >
+                                    <option :value="true">SI APLICA</option>
+                                    <option :value="false">NO APLICA</option>
+                                </app-select>
+                            </div>
                         </div>
-                        <div class="row mt-2">
+                        <div class="row mt-2" v-if="!secretaria">
                             <div class="col-md-12 col-sm-12 form-group">
                                 <button class="btn btn-primary" type="submit">Guardar</button>
                             </div>

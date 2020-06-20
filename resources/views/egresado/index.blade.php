@@ -22,8 +22,11 @@
 @include('components.app.badge')
 @include('components.app.select')
 @include('components.ficha.user-avatar')
-@include('components.modals.Modal')
+@include('components.app.modal')
+@include('components.modals.verdocumento')
 @include('components.modals.AsistenciaCeremoniaModal')
+@include('components.inputs.InputFile')
+@include('components.modals.CargaDocumentoModal')
 @endpush
 
 @section('content')
@@ -77,14 +80,16 @@
     </div>
     <hr/>
     <icons-information>
-        <span>Acciones: </span>
-        <span class="text-secondary">
-            <span class="ml-2">
-                <i class="fas fa-location-arrow"></i> Ir a la Pagina
-            </span>
-            <span class="ml-2"> - </span>
-            <span class="ml-2 text-primary">
-                <i class="fas fa-pencil-alt"></i> Editar Información
+        <span class="ml-4">
+            <span>Acciones: </span>
+            <span class="text-secondary">
+                <span class="ml-2">
+                    <i class="fas fa-location-arrow"></i> Ir a la Pagina
+                </span>
+                <span class="ml-2"> - </span>
+                <span class="ml-2 text-primary">
+                    <i class="fas fa-pencil-alt"></i> Editar Información
+                </span>
             </span>
         </span>
     </icons-information>
@@ -132,8 +137,11 @@
                                 <icono-estado :estado="info.estado_documentos"></icono-estado>
                             </td>
                             <td>
-                                <a href="egresado/carga-documentos" class="text-secondary">
+                                <!--<a href="egresado/carga-documentos" class="text-secondary">
                                     <i class="fas fa-location-arrow"></i>
+                                </a>-->
+                                <a href="#modalListaDocumentos" data-toggle="modal">
+                                    <i class="fas fa-pencil-alt"></i>
                                 </a>
                             </td>
                         </tr>
@@ -162,7 +170,7 @@
         <div class="col-md-4 col-sm-12">
             <card-action title="Listado de Paz y Salvos" fluid>
                 <list-group flush>
-                    <list-group-item-flex v-for="ps in info.paz_salvos" class="list-group-item-flex-md"
+                    <list-group-item-flex v-for="ps in info.paz_salvos" class="list-group-item-flex-md" :key="ps.id"
                     >
                         <div class="font-weight-bold text-initial">
                             @{{ ps.nombre }}
@@ -172,30 +180,71 @@
                         </div>
                     </list-group-item-flex>
                 </list-group>
-                <!--<table class="table table-sm">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>DEPENDENCIA</th>
-                            <th>COMENTARIO</th>
-                            <th>ESTADO</th>
-                        </tr>
-                    </thead>
-                    <tbody v-if="info" class="app-text-black-1">
-                        <tr class="TableRow" v-for="ps in info.paz_salvos">
-                            <td class="font-weight-bold">@{{ps.nombre}}</td>
-                            <td>@{{ps.comentario || '-'}}</td>
-                            <td>
-                                <estado-icono :estado="getEstado(ps.paz_salvo)"></estado-icono>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>-->
             </card-action>
         </div>
     </div>
 </div>
+
+<modal title="Documentos" id="modalListaDocumentos" large>
+    <div class="p-1">
+        <small class="text-secondary"><span class="font-weight-bold">Nota:</span>
+            si no puede ver su documento de identidad por favor acercarse a admisiones o su programa
+        </small>
+    </div>
+
+    <div class="font-weight-bold mt-2">
+        Lista
+    </div>
+    <div class="mt-3">
+        <list-group flush>
+            <list-group-item v-for="documento in datos.documentos" :key="documento.id"
+                :class="'border-estado-radius border-left-'+getClassEstado(documento.estado)">
+                <span>@{{ documento.nombre }}</span>
+                <template v-slot:actions>
+                    <i title="Cargar Documento" @click="onClickUploadDocumento(documento)"
+                        class="fas fa-upload mr-3 text-secondary action-btn" v-if="documento.can_upload"></i>
+                    <i title="Ver Documento" @click="onClickVerDocumento(documento)"
+                        class="far fa-eye text-primary action-btn" v-if="documento.can_show"></i>
+                </template>
+                <template v-slot:aditionals>
+                    <div class="font-weight-bold">
+                        <small class="text-danger" v-if="documento.motivo_rechazo">
+                            Motivo Rechazo: @{{ documento.motivo_rechazo }}
+                        </small>
+                    </div>
+                </template>
+            </list-group-item>
+        </list-group>
+    </div>
+</modal>
+
+<modal title="ECAES" id="modalFormularioEcaes" :onsubmit="onSubmitFormEcaes" :submit="onSubmitFormEcaes" :buttontext="'Enviar'" @onhide="toggleModals()">
+    <div class="form-group">
+        <app-input
+            label="Código de ECAES"
+            placeholder="Código"
+            v-model="forms.documento.codigo_ecaes"
+            required
+        />
+    </div>
+    <div class="form-group">
+        <p class="font-weight-bold">Documento <app-required></app-required></p>
+        <input-file v-model="forms.documento.file" label="Documento"></input-file>
+    </div>
+</modal>
+
+<carga-documento-modal id="cargaDocumentoModal" :documento="forms.documento"
+v-on:documento-cargado="toggleModals">
+</carga-documento-modal>
+
 <asistencia-ceremonia-modal id="asistenciaCeremoniaModal" v-if="info" :codigo="info.codigo" v-on:complete="fetchData">
 </asistencia-ceremonia-modal>
+
+<modal-ver-documento
+    @onhide="toggleModals(false)"
+    :documento="show_documento"
+    v-if="show_documento">
+</modal-ver-documento>
 @endsection
 
 @push('scripts')

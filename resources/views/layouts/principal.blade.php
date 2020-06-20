@@ -68,6 +68,19 @@
             color: var(--white);
             background-color: var(--secondary);
         }
+        .badge-wrapper {
+            position: relative;
+        }
+
+        .badge-icon-notify {
+            position: absolute !important;
+            top: -10px;
+            right: -5px;
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
     </style>
     @yield('css')
     @stack('csscomponent')
@@ -110,8 +123,12 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/direccion/solicitudes">
-                        <i class=" fas fa-fw fa-file-alt"></i>
-                        <span>Solicitudes de grado</span>
+                        <i class=" fas fa-fw fa-file-alt badge-wrapper">
+                            <span
+                                class="badge badge-danger font-weight-bold badge-icon-notify">{{session('ur')->solicitudes_grado_pendientes}}</span>
+                        </i>
+
+                        <span>Solicitudes de grado </span>
                     </a>
                 </li>
                 @endif

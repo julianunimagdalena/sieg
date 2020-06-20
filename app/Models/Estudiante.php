@@ -86,10 +86,15 @@ class Estudiante extends Model
         switch (session('ur')->rol_id) {
             case $roles['coordinador']->id:
                 $count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
-                $can = $count === 0 &&
-                    $pg->resultado_ecaes &&
-                    $pg->titulo_memoria_grado &&
-                    $pg->codigo_ecaes;
+                $can = $count === 0
+                    && ($pg->titulo_grado && trim($pg->titulo_grado) !== '-')
+                    && ($pg->modalidad_grado && trim($pg->modalidad_grado) !== '-')
+                    && ($pg->titulo_memoria_grado && trim($pg->titulo_memoria_grado) !== '-')
+                    && ($pg->nota && trim($pg->nota) !== '-')
+                    && $pg->codigo_ecaes !== null
+                    && $pg->mejor_ecaes !== null
+                    && $pg->incentivo_nacional !== null
+                    && $pg->inventivo_institucional !== null;
 
                 break;
 
@@ -119,5 +124,34 @@ class Estudiante extends Model
     {
         $tipos = Variables::tiposEstudiante();
         return $query->where('idTipo', $tipos['graduado']->id);
+    }
+
+    public function getCargaEcaesAttribute()
+    {
+        return true;
+    }
+
+    public function getCargaTituloGradoAttribute()
+    {
+        return true;
+    }
+
+    public function getDocumentosInicialesAttribute()
+    {
+        $estados = Variables::estados();
+        $documentos = Variables::documentos();
+        $docs = [
+            $documentos['identificacion']->id => ['estado_id' => $estados['sin_cargar']->id],
+            $documentos['paz_salvos']->id => ['estado_id' => $estados['sin_cargar']->id],
+            $documentos['ficha']->id => ['estado_id' => $estados['sin_cargar']->id],
+            $documentos['ayre']->id => ['estado_id' => $estados['sin_cargar']->id],
+            // $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id],
+            // $documentos['titulo_grado']->id => ['estado_id' => $estados['sin_cargar']->id],
+        ];
+
+        if ($this->carga_ecaes) $docs[$documentos['ecaes']->id] = ['estado_id' => $estados['sin_cargar']->id];
+        if ($this->carga_titulo_grado) $docs[$documentos['titulo_grado']->id] = ['estado_id' => $estados['sin_cargar']->id];
+
+        return $docs;
     }
 }

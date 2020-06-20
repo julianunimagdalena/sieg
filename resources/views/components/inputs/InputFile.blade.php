@@ -2,11 +2,11 @@
 <div class="input-group">
     <input class="d-none" type="file" :id="id" accept="application/pdf" v-on:change="selectFile">
     <div class="input-group-prepend">
-        <button class="btn btn-outline-primary" v-on:click="seleccionar">Seleccionar</button>
+        <button type="button" class="btn btn-outline-primary" v-on:click="seleccionar">Seleccionar</button>
     </div>
     <input type="text" class="form-control" :value="value ? value.name : 'Seleccione un archivo'" disabled>
-    <div class="input-group-append">
-        <button class="btn btn-success" :disabled="buttonDisabled" v-on:click="$emit('submit')">Enviar</button>
+    <div class="input-group-append" v-if="this.$listeners.submit">
+        <button  class="btn btn-success" :disabled="buttonDisabled" v-on:click="$emit('submit')">Enviar</button>
     </div>
 </div>
 @endcomponent
@@ -20,7 +20,8 @@
             buttonDisabled: {
                 type: Boolean,
                 default: false
-            }
+            },
+            label: String
         },
         data: () => ({
             id: Math.random().toString(36).substring(2)

@@ -1,5 +1,5 @@
 @component('component', ['id' => 'modal-ver-documento-component'])
-<modal :id="id || 'modalVerDocumento'" :title="documento.nombre" large>
+<modal :id="id || 'modalVerDocumento'" :title="documento.nombre" large @onhide="$emit('onhide')">
     <div class="pr-2 pl-2 mb-2" v-if="documento.can_aprobar || documento.can_rechazar">
         <span class="font-weight-bold">Acciones: </span>
 

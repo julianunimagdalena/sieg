@@ -139,7 +139,7 @@
         </div>
     </div>
 
-    <modal title="Añadir Idioma" id="modal-idioma" large :onSubmit="onSubmitLanguaje" @onHide="forms.idioma = {}">
+    <modal title="Añadir Idioma" id="modal-idioma" large :onSubmit="onSubmitLanguaje" @onhide="forms.idioma = {}">
         <div class="row">
             <div class="col col-md-6">
                 <div class="form-group">
@@ -187,9 +187,10 @@
         </div>
     </modal>
 
-    <modal title="Añadir Distinción" id="modal-distincion" :onSubmit="onSubmitDistincion" @onHide="forms.distincion = {}">
+    <modal title="Añadir Distinción" id="modal-distincion" :onSubmit="onSubmitDistincion" @onhide="forms.distincion = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
+                <small class="text-secondary"><app-required>Si usted no tiene por favor colocar "ninguna"</app-required></small>
                 <div class="form-group">
                     <app-input
                         label="Distinción"
@@ -201,9 +202,10 @@
         </div>
     </modal>
 
-    <modal title="Añadir Información de Asociación" id="modal-asociacion" :onSubmit="onSubmitAsociacion" @onHide="forms.asociacion = {}">
+    <modal title="Añadir Información de Asociación" id="modal-asociacion" :onSubmit="onSubmitAsociacion" @onhide="forms.asociacion = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
+                <small class="text-secondary"><app-required>Si usted no tiene por favor colocar "ninguna"</app-required></small>
                 <div class="form-group">
                     <app-input
                         label="Asociación"
@@ -215,7 +217,7 @@
         </div>
     </modal>
 
-    <modal title="Añadir Consejo Profesional" id="modal-consejo" :onSubmit="onSubmitConsejo" @onHide="forms.consejo = {}">
+    <modal title="Añadir Consejo Profesional" id="modal-consejo" :onSubmit="onSubmitConsejo" @onhide="forms.consejo = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
                 <div class="form-group">
@@ -227,7 +229,7 @@
         </div>
     </modal>
 
-        <modal title="Añadir Dispacidad" id="modal-discapacidad" :onSubmit="onSubmitDiscapacidad" @onHide="forms.discapacidad = {}">
+        <modal title="Añadir Dispacidad" id="modal-discapacidad" :onSubmit="onSubmitDiscapacidad" @onhide="forms.discapacidad = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
                 <div class="form-group">

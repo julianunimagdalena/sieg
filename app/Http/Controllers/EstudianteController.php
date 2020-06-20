@@ -13,6 +13,7 @@ use App\Http\Requests\PersonaRequest;
 use App\Models\Asociacion;
 use App\Models\Distincion;
 use App\Models\Estudiante;
+use App\Models\EstudianteDocumento;
 use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
 use App\Models\HojaVidaIdioma;
@@ -634,7 +635,7 @@ class EstudianteController extends Controller
         $documentosGrado = Variables::documentos();
         $estudiante = Estudiante::find(session('estudiante_id'));
 
-        $whitelist = [$documentosGrado['ecaes']->id];
+        $whitelist = [$documentosGrado['ecaes']->id, $documentosGrado['identificacion']->id];
 
         foreach ($whitelist as $doc_id) {
             $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc_id)->first();
@@ -643,7 +644,10 @@ class EstudianteController extends Controller
                 'id' => $ed->id,
                 'nombre' => $ed->documento->nombre,
                 'estado' => $ed->estado->nombre,
-                'motivo_rechazo' => $ed->motivo_rechazo
+                'motivo_rechazo' => $ed->motivo_rechazo,
+                'can_show' => $ed->can_show,
+                'can_upload' => $ed->can_cargar_estudiante,
+                'is_ecaes' => $ed->idDocumento === $documentosGrado['ecaes']->id
             ]);
         }
 
@@ -659,18 +663,18 @@ class EstudianteController extends Controller
 
     public function cargarDocumento(Request $request)
     {
-        $this->validate($request, [
-            'id' => 'required|integer|exists:estudiante_documento,id',
-            'file' => 'required|file|mimetypes:application/pdf',
-            'codigo' => 'required|exists:estudiantes,codigo'
-        ], [
-            'required' => 'Obligatorio'
-        ]);
+        $this->validate($request, ['id' => 'required|integer|exists:estudiante_documento,id']);
 
-        $estudiante = Estudiante::find(session('estudiante_id'));
+        $documentos = Variables::documentosGrado();
+        $ed = EstudianteDocumento::find($request->id);
 
-        $ed = $estudiante->estudianteDocumento()->find($request->id);
-        if (!$ed) return response('Este documento no pertenece a este estudiante', 400);
+        if (!$ed->idEstudiante == session('estudiante_id')) return response('Este documento no pertenece a este estudiante', 400);
+
+        $isEcaes = $ed->idDocumento === $documentos['ecaes']->id;
+        $rules = ['file' => 'required|file|mimetypes:application/pdf'];
+
+        if ($isEcaes) $rules['codigo_ecaes'] = 'required';
+        $this->validate($request, $rules, ['required' => 'Obligatorio']);
 
         Storage::put($ed->path, file_get_contents($request->file('file')->getRealPath()));
 
@@ -679,6 +683,10 @@ class EstudianteController extends Controller
         $ed->url_documento = $ed->path;
         $ed->motivo_rechazo = null;
         $ed->save();
+
+        $pg = $ed->estudiante->procesoGrado;
+        $pg->codigo_ecaes = $request->codigo_ecaes;
+        $pg->save();
 
         return 'ok';
     }

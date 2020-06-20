@@ -63,7 +63,8 @@
         {
             $('#'+this.id).on('show.bs.modal', () => this.$emit('show'));
             $('#'+this.id).on('hidden.bs.modal', function () {
-                this.$emit('onHide');
+                //this.$emit('onHide');
+                this.$emit('onhide');
             }.bind(this));
         }
     });

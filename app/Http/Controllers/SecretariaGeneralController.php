@@ -43,11 +43,11 @@ class SecretariaGeneralController extends Controller
 
                 switch ($params->estado) {
                     case 'aprobado':
-                        $pg->where('estado_secretaria_id', $estados['aprobado']->id);
+                        $pg->where('estado_secretaria_id', $estados['aprobado']->id)->where('no_aprobado', false);
                         break;
 
                     case 'pendiente':
-                        $pg->where('estado_secretaria_id', $estados['pendiente']->id);
+                        $pg->where('estado_secretaria_id', $estados['pendiente']->id)->where('no_aprobado', false);
                         break;
 
                     case 'no_aprobado':
@@ -56,10 +56,9 @@ class SecretariaGeneralController extends Controller
                 }
 
                 $pg->whereHas('fechaGrado', function ($fg) use ($params) {
-                    $fg->where('estado', true);
-
                     if ($params->tipo_grado_id) $fg->where('tipo_grado', $params->tipo_grado_id);
                     if ($params->fecha_grado_id) $fg->where('id', $params->fecha_grado_id);
+                    else $fg->where('estado', true);
                 });
             });
 

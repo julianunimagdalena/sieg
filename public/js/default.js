@@ -113,6 +113,16 @@ function getBadgeClass(estado)
     }
 }
 
+function getClassEstado(estado)
+{
+    let classes = getEstados(estado, 'secondary', 'warning', 'success', 'danger');
+    for (let key in classes)
+    {
+        if (classes[key] === true)
+            return key;
+    }
+}
+
 function getUrlData()
 {
     return location.href.split('/').pop();

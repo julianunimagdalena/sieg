@@ -145,9 +145,9 @@ let vue = new Vue({
                         tdEstadoSecretaria.innerHTML = `<i class="badge ${getBadgeClass(tdEstadoSecretaria.innerText)}">${tdEstadoSecretaria.innerText}</i>`;
 
                         tdAcciones.innerHTML = `
-                            <i class="fas fa-edit text-primary show-estudiante" data-id="${data.id}"></i>
+                            <i class="fas fa-info-circle text-primary show-estudiante" data-id="${data.id}"></i>
                             <i class="fas fa-user-graduate text-primary ml-3 show-info" data-id="${data.id}" sidebar="est"></i>
-                            <i class="fas fa-info-circle text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
+                            <i class="fas fa-edit text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
                         `;
                     }
             });

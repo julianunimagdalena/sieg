@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Http\Controllers\SolicitudGradoController;
+use App\Tools\Variables;
 use Illuminate\Database\Eloquent\Model;
 
 class UsuarioRol extends Model
@@ -29,5 +31,18 @@ class UsuarioRol extends Model
     public function getPersonaAttribute()
     {
         return $this->usuario->persona;
+    }
+
+    public function getSolicitudesGradoPendientesAttribute()
+    {
+        $count = 0;
+        $roles = Variables::roles();
+
+        if ($this->rol_id === $roles['coordinador']->id) {
+            $controller = new SolicitudGradoController();
+            $count = $controller->getPendientes()->count();
+        }
+
+        return $count;
     }
 }

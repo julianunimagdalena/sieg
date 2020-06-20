@@ -123,4 +123,13 @@ class EstudianteDocumento extends Model
 
         return $b;
     }
+
+    public function getCanCargarEstudianteAttribute()
+    {
+        $estados = Variables::Estados();
+        $can = Variables::documentosCanCargarEstudiante();
+
+        return in_array($this->idDocumento, $can);
+        // return in_array($this->idDocumento, $can) && $this->estado_id !== $estados['aprobado']->id;
+    }
 }

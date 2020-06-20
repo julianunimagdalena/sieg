@@ -51,4 +51,9 @@ class DocumentoHelper
     {
         return false;
     }
+
+    static public function actualizarDocumentoIdentidad()
+    {
+        return false;
+    }
 }

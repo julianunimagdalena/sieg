@@ -79,7 +79,8 @@ class Variables
         return [
             $documentos['paz_salvos']->id,
             $documentos['ficha']->id,
-            $documentos['ayre']->id
+            $documentos['ayre']->id,
+            $documentos['identificacion']->id
         ];
     }
 
@@ -89,6 +90,15 @@ class Variables
 
         return [
             $documentos['titulo_grado']->id
+        ];
+    }
+
+    static public function documentosCanCargarEstudiante()
+    {
+        $documentos = Variables::documentos();
+
+        return [
+            $documentos['ecaes']->id
         ];
     }
 

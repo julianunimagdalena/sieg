@@ -74,7 +74,7 @@
         </table>
     </div>
 
-    <sidebar-documentos :show="show_sidebar" @hide="show_sidebar = false" :estudiante_data="estudiante">
+    <sidebar-documentos :show="show_sidebar" @hide="show_sidebar = false" :estudiante_data="estudiante" :secretaria="true">
 
     </sidebar-documentos>
 @endsection

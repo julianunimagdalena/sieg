@@ -17,7 +17,6 @@ use App\Models\TipoDocumento;
 use App\Models\User;
 use App\Models\UsuarioRol;
 use App\Tools\DocumentoHelper;
-use App\Tools\PersonaHelper;
 use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
 use Carbon\Carbon;
@@ -41,14 +40,16 @@ class DirProgramaController extends Controller
             'documentosEstudiante',
             'rechazarDocumento',
             'noAprobarEstudiante',
-            'aprobarEstudiante'
+            'aprobarEstudiante',
+            'datosEstudiante'
         ]]);
         $this->middleware('rol:' . $roles['coordinador']->nombre . '|' . $roles['secretariaGeneral']->nombre, ['only' => [
             'getInfoAdicionalEstudiante',
             'documentosEstudiante',
             'rechazarDocumento',
             'noAprobarEstudiante',
-            'aprobarEstudiante'
+            'aprobarEstudiante',
+            'datosEstudiante'
         ]]);
     }
 
@@ -103,7 +104,7 @@ class DirProgramaController extends Controller
             ->where('codigo', $solicitud->codigo_estudiante)
             ->first();
 
-        if ($estudiante && $estudiante->procesoGrado->estado_programa_id !== $estados['rechazado']->id)
+        if ($estudiante && $estudiante->procesoGrado->no_aprobado)
             return response('El estudiante ya se encuentra en el sistema', 400);
 
         $roles = Variables::roles();
@@ -185,20 +186,21 @@ class DirProgramaController extends Controller
         ]);
 
         // DOCUMENTOS
-        $documentos = Variables::documentos();
 
-        foreach ($documentos as $doc) {
-            if ($doc->id !== $documentos['ecaes']->id) $estudiante->documentos()->detach($doc->id);
-        }
+        // foreach ($documentos as $doc) {
+        //     if ($doc->id !== $documentos['ecaes']->id) $estudiante->documentos()->detach($doc->id);
+        // }
 
-        $estudiante->documentos()->attach([
-            $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['identificacion']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['paz_salvos']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['ficha']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['titulo_grado']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['ayre']->id => ['estado_id' => $estados['sin_cargar']->id],
-        ]);
+        $estudiante->documentos()->detach();
+        $estudiante->documentos()->attach($estudiante->documentos_iniciales);
+        // $estudiante->documentos()->attach([
+        //     $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id],
+        //     $documentos['identificacion']->id => ['estado_id' => $estados['sin_cargar']->id],
+        //     $documentos['paz_salvos']->id => ['estado_id' => $estados['sin_cargar']->id],
+        //     $documentos['ficha']->id => ['estado_id' => $estados['sin_cargar']->id],
+        //     $documentos['titulo_grado']->id => ['estado_id' => $estados['sin_cargar']->id],
+        //     $documentos['ayre']->id => ['estado_id' => $estados['sin_cargar']->id],
+        // ]);
 
         $proceso = $estudiante->procesoGrado ?? new ProcesoGrado();
         $proceso->idEstudiante = $estudiante->id;
@@ -212,9 +214,10 @@ class DirProgramaController extends Controller
         $proceso->talla_camisa = null;
         $proceso->num_acompaniantes = null;
         $proceso->confirmacion_asistencia = null;
+        $proceso->titulo_grado = $data->tituloProfesional;
+        $proceso->titulo_memoria_grado = $data->descripcionOpcionGrado;
+        $proceso->nota = $data->notaOpcionGrado;
         $proceso->save();
-
-        // PersonaHelper::actualizarProgresoFicha($persona);
 
         if ($solicitud) {
             $solicitud->estado_id = $estados['aprobado']->id;
@@ -418,12 +421,12 @@ class DirProgramaController extends Controller
 
     public function datosEstudiante($estudiante_id)
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
-
+        $estudiante = $this->getEstudiante($estudiante_id);
         if (!$estudiante) return response('No permitido', 400);
 
         $persona = $estudiante->persona;
+        $pg = $estudiante->procesoGrado;
+
         return [
             'id' => $estudiante->id,
             'foto' => null,
@@ -434,10 +437,15 @@ class DirProgramaController extends Controller
             'municipio_expedicion' => $persona->ciudadExpedicion,
             'lugar_nacimiento' => $persona->lugar_nacimiento,
             'fecha_nacimiento' => $persona->fechaNacimiento,
+            'fecha_expedicion' => $persona->fecha_expedicion,
             'correo' => $persona->correo,
             'celular' => $persona->celular,
             'programa' => $estudiante->estudio->programa->nombre,
             'codigo' => $estudiante->codigo,
+            'titulo_grado' => $pg->titulo_grado,
+            'modalidad_grado' => $pg->modalidad_grado,
+            'descripcion_opcion_grado' => $pg->titulo_memoria_grado,
+            'nota_grado' => $pg->nota,
         ];
     }
 
@@ -497,6 +505,10 @@ class DirProgramaController extends Controller
 
             case $documentos['ficha']->id:
                 $success = DocumentoHelper::generarFicha($ed);
+                break;
+
+            case $documentos['identificacion']->id:
+                $success = DocumentoHelper::actualizarDocumentoIdentidad($ed);
                 break;
         }
 
@@ -636,6 +648,12 @@ class DirProgramaController extends Controller
         $persona->fechaNacimiento = Carbon::createFromFormat('d/m/Y', $data->fechaNacimiento);
         $persona->save();
 
+        $proceso = $estudiante->procesoGrado;
+        $proceso->titulo_grado = $data->tituloProfesional;
+        $proceso->titulo_memoria_grado = $data->descripcionOpcionGrado;
+        $proceso->nota = $data->notaOpcionGrado;
+        $proceso->save();
+
         return 'ok';
     }
 
@@ -647,9 +665,11 @@ class DirProgramaController extends Controller
         $pg = $estudiante->procesoGrado;
         return [
             'estudiante_id' => $estudiante->id,
-            'resultado_ecaes' => $pg->resultado_ecaes,
-            'titulo_memoria_grado' => $pg->titulo_memoria_grado,
-            'codigo_ecaes' => $pg->codigo_ecaes
+            'codigo_ecaes' => $pg->codigo_ecaes,
+            'mejor_ecaes' => $pg->mejor_ecaes,
+            'mencion_honor' => $pg->mencion_honor,
+            'incentivo_nacional' => $pg->incentivo_nacional,
+            'incentivo_institucional' => $pg->incentivo_institucional,
         ];
     }
 
@@ -657,9 +677,13 @@ class DirProgramaController extends Controller
     {
         $this->validate($request, [
             'estudiante_id' => 'required|exists:estudiantes,id',
-            'resultado_ecaes' => 'required',
-            'titulo_memoria_grado' => 'required',
-            'codigo_ecaes' => 'required'
+            // 'resultado_ecaes' => 'required',
+            // 'titulo_memoria_grado' => 'required',
+            'codigo_ecaes' => '',
+            'incentivo_institucional' => '',
+            'incentivo_nacional' => '',
+            'mejor_ecaes' => '',
+            'mencion_honor' => ''
         ], [
             '*.required' => 'Obligatorio'
         ]);
@@ -670,9 +694,14 @@ class DirProgramaController extends Controller
         if (!$estudiante) return response('No permitido', 400);
 
         $pg = $estudiante->procesoGrado;
-        $pg->resultado_ecaes = $request->resultado_ecaes;
-        $pg->titulo_memoria_grado = $request->titulo_memoria_grado;
-        $pg->codigo_ecaes = $request->codigo_ecaes;
+        // $pg->resultado_ecaes = $request->resultado_ecaes;
+        // $pg->titulo_memoria_grado = $request->titulo_memoria_grado;
+        if ($request->incentivo_institucional !== null) $pg->incentivo_institucional = $request->incentivo_institucional;
+        if ($request->incentivo_nacional !== null) $pg->incentivo_nacional = $request->incentivo_nacional;
+        if ($request->mejor_ecaes !== null) $pg->mejor_ecaes = $request->mejor_ecaes;
+        if ($request->mencion_honor !== null) $pg->mencion_honor = $request->mencion_honor;
+        if ($request->codigo_ecaes !== null) $pg->codigo_ecaes = $request->codigo_ecaes;
+
         $pg->save();
 
         return 'ok';

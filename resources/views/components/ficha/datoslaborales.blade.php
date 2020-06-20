@@ -61,9 +61,10 @@
         </card-action>
     </div>
 
-    <modal id="modalInformacionLaboral" title="Añadir Información Laboral" :onSubmit="onSubmitDatosLaborales" @onHide="forms.xp = {}" large>
+    <modal id="modalInformacionLaboral" title="Añadir Información Laboral" :onSubmit="onSubmitDatosLaborales" @onhide="forms.xp = {}" large>
         <div class="row">
             <div class="col-md-4 col-sm-12">
+
                 <div class="form-group">
                     <app-input
                         label ="Empresa"

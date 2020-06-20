@@ -89,16 +89,19 @@ class SolicitudGradoController extends Controller
         return 'ok';
     }
 
-    public function pendientes()
+    public function getPendientes()
     {
         $estados = Variables::estados();
         $programaIds = session('ur')->usuario->dependenciasModalidades->pluck('id');
-        $solicitudes = SolicitudGrado::with('fechaGrado')
-            ->whereIn('programa_id', $programaIds)
-            ->where('estado_id', $estados['pendiente']->id)
-            ->orderBy('fecha', 'desc')
-            ->get();
+        $solicitudes = SolicitudGrado::where('estado_id', $estados['pendiente']->id)
+            ->whereIn('programa_id', $programaIds);
 
+        return $solicitudes;
+    }
+
+    public function pendientes()
+    {
+        $solicitudes = $this->getPendientes()->with('fechaGrado')->orderBy('fecha', 'desc')->get();
         return $solicitudes;
     }
 }

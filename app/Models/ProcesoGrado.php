@@ -15,6 +15,10 @@ class ProcesoGrado extends Model
         'confirmacion_asistencia' => 'boolean',
         'idEstudiante' => 'integer',
         'no_aprobado' => 'boolean',
+        'mejor_ecaes' => 'boolean',
+        'mencion_honor' => 'boolean',
+        'incentivo_nacional' => 'boolean',
+        'incentivo_institucional' => 'boolean'
     ];
 
     public function estudiante()

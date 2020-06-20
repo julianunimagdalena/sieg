@@ -22,9 +22,20 @@ Route::get('/prueba-documento/{html?}', function ($html = false) {
     return App\Tools\DocumentoHelper::generarFicha($ed, true, $html);
 });
 
-Route::get('/prueba/{identificacion}', function ($identificacion) {
+Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
+    // $est = App\Models\Estudiante::find(27300);
+    // return $est->documentos_iniciales;
     $ws = new App\Tools\WSAdmisiones();
     return $ws->getInformacionGraduadoByDocumentoIdentidad($identificacion);
+});
+
+Route::get('/prueba', function () {
+    return [
+        "!!''" => !!'',
+        '!!null' => !!null,
+        "!!'-'" => !!'-',
+        "!!' '" => !!' ',
+    ];
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -109,7 +120,7 @@ Route::post('/direccion/aprobar-documento', 'DirProgramaController@aprobarDocume
 Route::post('/direccion/rechazar-documento', 'DirProgramaController@rechazarDocumento');
 Route::post('/direccion/aprobar', 'DirProgramaController@aprobarEstudiante');
 Route::post('/direccion/no-aprobar', 'DirProgramaController@noAprobarEstudiante');
-Route::post('/direccion/actualizar-estudiante/{estudiante_id}', 'DirProgramaController@actualizarEstudiante');
+Route::get('/direccion/actualizar-estudiante/{estudiante_id}', 'DirProgramaController@actualizarEstudiante');
 Route::get('/direccion/info-adicional-estudiante/{estudiante_id}', 'DirProgramaController@getInfoAdicionalEstudiante');
 Route::post('/direccion/info-adicional-estudiante', 'DirProgramaController@infoAdicionalEstudiante');
 
@@ -119,6 +130,7 @@ Route::post('/documento/cargar', 'DocumentoController@cargar');
 
 // PETICIONES BACKUP
 Route::post('/backup/estudiantes', 'BackupController@estudiantes');
+Route::get('/backup/archivo/{file}', 'BackupController@archivo');
 
 // PETICIONES ADMIN
 Route::get('/administrador/usuarios', 'AdminController@usuarios');

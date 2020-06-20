@@ -81,7 +81,7 @@
         </tbody>
     </table>
     <modal
-        @onHide="input = { graduado: false }"
+        @onhide="input = { graduado: false }"
         id="modalAddInfoAcademica"
         title="Agregar Estudio externo" buttonText="Añadir" :onSubmit="handleSubmitInfoAcademica" large>
         <div class="row">

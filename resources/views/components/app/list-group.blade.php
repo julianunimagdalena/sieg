@@ -18,6 +18,7 @@
             @click="$emit('onDelete')"
             class="fas fa-times-circle text-danger action-btn"></i>
     </span>
+    <slot name="aditionals"></slot>
 </li>
 @endcomponent
 @component('component', ['id' => 'list-group-item-flex-component'])

@@ -60,6 +60,10 @@ class DocumentoController extends Controller
         $ed = $this->getEstudianteDocumento($request->id);
         if (!$ed) return response('No permitido', 400);
 
+        $documentos = Variables::documentos();
+        $isEcaes = $ed->idDocumento === $documentos['ecaes']->id;
+
+        if ($isEcaes) $this->validate($request, ['codigo_ecaes' => 'required'], ['required' => 'Obligatorio']);
         Storage::put($ed->path, file_get_contents($request->file('file')->getRealPath()));
 
         $ur = UsuarioRol::find(session('ur')->id);
@@ -70,6 +74,11 @@ class DocumentoController extends Controller
         $ed->motivo_rechazo = null;
 
         if ($ur->rol_id === $this->datos->roles['coordinador']->id) $ed->estado_id = $estados['aprobado']->id;
+        if ($isEcaes) {
+            $pg = $ed->estudiante->procesoGrado;
+            $pg->codigo_ecaes = $request->codigo_ecaes;
+            $pg->save();
+        }
 
         $ed->save();
 
