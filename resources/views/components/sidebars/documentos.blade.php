@@ -142,7 +142,7 @@
 
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-select
-                                    label="Mención de Honor"
+                                    label="Incentivo Nacional"
                                     v-model="form.estudiante.extra.incentivo_nacional"
                                     required
                                     :errors="errors.estudiante.extra.incentivo_nacional"
@@ -155,7 +155,7 @@
 
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-select
-                                    label="Mención de Honor"
+                                    label="Incentivo Institucional"
                                     v-model="form.estudiante.extra.incentivo_institucional"
                                     required
                                     :errors="errors.estudiante.extra.incentivo_institucional"
