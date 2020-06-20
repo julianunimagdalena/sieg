@@ -128,12 +128,22 @@ class Estudiante extends Model
 
     public function getCargaEcaesAttribute()
     {
-        return true;
+        $res = true;
+        $niveles = Variables::nivelesEstudio();
+
+        if ($this->estudio->programa->idNivelestudio === $niveles['tecnico_laboral']->id) $res = false;
+
+        return $res;
     }
 
     public function getCargaTituloGradoAttribute()
     {
-        return true;
+        $res = true;
+        $niveles = Variables::nivelesEstudio();
+
+        if ($this->estudio->programa->idNivelestudio === $niveles['tecnico_laboral']->id) $res = false;
+
+        return $res;
     }
 
     public function getDocumentosInicialesAttribute()

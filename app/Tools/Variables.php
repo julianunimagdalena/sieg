@@ -4,6 +4,7 @@ namespace App\Tools;
 
 use App\Models\Documento;
 use App\Models\Estado;
+use App\Models\NivelEstudio;
 use App\Models\PazSalvo;
 use App\Models\Rol;
 use App\Models\TipoDependencia;
@@ -130,6 +131,20 @@ class Variables
             'ventanilla' => TipoGrado::where('nombre', 'Ventanilla')->first(),
             'extratemporaneo' => TipoGrado::where('nombre', 'Ventanilla extemporáneo')->first(),
             'no_reporta' => TipoGrado::where('nombre', 'NO REPORTA')->first()
+        ];
+    }
+
+    static public function nivelesEstudio()
+    {
+        return [
+            'tecnico_laboral' => NivelEstudio::where('nombre', 'TÉCNICO LABORAL')->first(),
+            'tecnico_profesional' => NivelEstudio::where('nombre', 'TÉCNICO PROFESIONAL')->first(),
+            'tecnologo' => NivelEstudio::where('nombre', 'TECNÓLOGO')->first(),
+            'profesional' => NivelEstudio::where('nombre', 'PROFESIONAL')->first(),
+            'especializacion' => NivelEstudio::where('nombre', 'ESPECIALIZACIÓN')->first(),
+            'maestria' => NivelEstudio::where('nombre', 'MAESTRÍA')->first(),
+            'doctorado' => NivelEstudio::where('nombre', 'DOCTORADO')->first(),
+            'otro' => NivelEstudio::where('nombre', 'OTRO')->first(),
         ];
     }
 }

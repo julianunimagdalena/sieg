@@ -92,6 +92,16 @@ class DirProgramaController extends Controller
         return view('dirprograma.estudiante');
     }
 
+    private function fetchPazSalvos($estudiante_id)
+    {
+        # code...
+    }
+
+    private function fetchDocumentoIdentidad($estudiante_id)
+    {
+        # code...
+    }
+
     public function activarEstudiante(ActivarEstudianteRequest $request)
     {
         $solicitud = null;
@@ -187,20 +197,8 @@ class DirProgramaController extends Controller
 
         // DOCUMENTOS
 
-        // foreach ($documentos as $doc) {
-        //     if ($doc->id !== $documentos['ecaes']->id) $estudiante->documentos()->detach($doc->id);
-        // }
-
         $estudiante->documentos()->detach();
         $estudiante->documentos()->attach($estudiante->documentos_iniciales);
-        // $estudiante->documentos()->attach([
-        //     $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id],
-        //     $documentos['identificacion']->id => ['estado_id' => $estados['sin_cargar']->id],
-        //     $documentos['paz_salvos']->id => ['estado_id' => $estados['sin_cargar']->id],
-        //     $documentos['ficha']->id => ['estado_id' => $estados['sin_cargar']->id],
-        //     $documentos['titulo_grado']->id => ['estado_id' => $estados['sin_cargar']->id],
-        //     $documentos['ayre']->id => ['estado_id' => $estados['sin_cargar']->id],
-        // ]);
 
         $proceso = $estudiante->procesoGrado ?? new ProcesoGrado();
         $proceso->idEstudiante = $estudiante->id;
@@ -215,9 +213,13 @@ class DirProgramaController extends Controller
         $proceso->num_acompaniantes = null;
         $proceso->confirmacion_asistencia = null;
         $proceso->titulo_grado = $data->tituloProfesional;
+        $proceso->modalidad_grado = $data->opcionGrado;
         $proceso->titulo_memoria_grado = $data->descripcionOpcionGrado;
         $proceso->nota = $data->notaOpcionGrado;
         $proceso->save();
+
+        $this->fetchPazSalvos($estudiante->id);
+        $this->fetchDocumentoIdentidad($estudiante->id);
 
         if ($solicitud) {
             $solicitud->estado_id = $estados['aprobado']->id;
@@ -652,6 +654,7 @@ class DirProgramaController extends Controller
         $proceso->titulo_grado = $data->tituloProfesional;
         $proceso->titulo_memoria_grado = $data->descripcionOpcionGrado;
         $proceso->nota = $data->notaOpcionGrado;
+        $proceso->modalidad_grado = $data->opcionGrado;
         $proceso->save();
 
         return 'ok';

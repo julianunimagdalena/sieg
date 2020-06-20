@@ -10,8 +10,13 @@ class Dependencia extends Model
     protected $table = 'dependencias';
     protected $casts = [
         'idTipo' => 'integer',
-        'idNivelEstudio' => 'integer'
+        'idNivelestudio' => 'integer'
     ];
+
+    public function nivelEstudio()
+    {
+        return $this->belongsTo('App\Models\NivelEstudio', 'idNivelestudio');
+    }
 
     public function getNombreUcwordsAttribute()
     {

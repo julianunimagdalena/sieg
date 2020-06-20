@@ -2,6 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\FechaGrado;
+use App\Models\ProcesoGrado;
+use App\Tools\Variables;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class DesactivarFechas extends Command
@@ -11,14 +15,14 @@ class DesactivarFechas extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'fechas:desactivar';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Desactivar viejas fechas de grado';
 
     /**
      * Create a new command instance.
@@ -37,6 +41,19 @@ class DesactivarFechas extends Command
      */
     public function handle()
     {
-        //
+        $estados = Variables::estados();
+        $fechas = FechaGrado::where('estado', true)
+            ->where('fecha_grado', '<', Carbon::now())
+            ->get();
+
+        foreach ($fechas as $fec) {
+            $pg_ids = $fec->procesosGrado()
+                ->where('estado_secretaria_id', '<>', $estados['aprobado']->id)
+                ->select('id')
+                ->get()
+                ->pluck('id');
+
+            ProcesoGrado::whereIn('id', $pg_ids)->update(['no_aprobado' => true]);
+        }
     }
 }
