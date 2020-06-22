@@ -46,7 +46,10 @@ Vue.component('solicitud-grado-modal', {
                         $("#" + this.id).modal("hide");
                         swal("Éxito", text, "success");
                     },
-                    err => (this.errors = err.response.data.errors)
+                    err => {
+                        if (err.response.status === 400) swal('Error', err.response.data, 'error');
+                        else this.errors = err.response.data.errors;
+                    }
                 )
                 .then(() => (this.cargando = false));
         }

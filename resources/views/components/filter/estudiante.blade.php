@@ -23,7 +23,7 @@
                     <option v-for="(fecha) in datos.fechas_grado" :value="fecha.id">@{{ fecha.nombre }}</option>
                 </select>
             </div>
-            <div class="col-md-2 col-sm-12 form-group">
+            <div class="col-md-2 col-sm-12 form-group" v-if="!isbackup">
                 <label>Estado</label>
                 <select v-model="filter.estado" class="form-control" @change="onChange()">
                     <option :value="undefined">Todos</option>

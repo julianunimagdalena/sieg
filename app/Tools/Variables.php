@@ -57,7 +57,7 @@ class Variables
             'biblioteca' => PazSalvo::where('nombre', 'BIBLIOTECA')->first(),
             'recursosEducativos' => PazSalvo::where('nombre', 'GRUPO DE RECURSOS EDUCATIVOS')->first(),
             'bienestar' => PazSalvo::where('nombre', 'BIENESTAR UNIVERSITARIO')->first(),
-            'pago' => PazSalvo::where('nombre', 'PAGO DERECHO A GRADO')->first(),
+            'pago' => PazSalvo::where('nombre', 'PAGO DERECHO GRADO')->first(),
         ];
     }
 

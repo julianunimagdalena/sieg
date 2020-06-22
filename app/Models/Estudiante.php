@@ -8,6 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Estudiante extends Model
 {
     protected $table = 'estudiantes';
+    protected $casts = [
+        'idTipo' => 'integer'
+    ];
 
     public function estudiantePazSalvo()
     {
@@ -163,5 +166,18 @@ class Estudiante extends Model
         if ($this->carga_titulo_grado) $docs[$documentos['titulo_grado']->id] = ['estado_id' => $estados['sin_cargar']->id];
 
         return $docs;
+    }
+
+    public function getPazSalvosInicialesAttribute()
+    {
+        $pazSalvos = Variables::defaultPazSalvos();
+        $ps = [
+            $pazSalvos['biblioteca']->id,
+            $pazSalvos['bienestar']->id,
+            $pazSalvos['recursosEducativos']->id,
+            $pazSalvos['pago']->id
+        ];
+
+        return $ps;
     }
 }

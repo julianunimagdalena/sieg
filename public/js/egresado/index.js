@@ -32,10 +32,10 @@ new Vue({
             return this.getEstado(this.info.estado_ficha);
         },
         estadoPrograma() {
-            return this.getEstado(this.info.estado_programa);
+            return this.info.estado_programa;
         },
         estadoSecretaria() {
-            return this.getEstado(this.info.estado_secretaria);
+            return this.info.estado_secretaria;
         },
         confirmacionCeremonia() {
             return this.getEstado(this.info.confirmacion_ceremonia !== null);
@@ -43,11 +43,9 @@ new Vue({
     },
     methods: {
         getClassEstado,
-        initDocumentos()
-        {
+        initDocumentos() {
             http.get('egresado/documentos-grado').then(
-                ({ data }) =>
-                {
+                ({ data }) => {
                     this.datos.documentos = data[0].documentos;
                 }
             );
@@ -69,9 +67,8 @@ new Vue({
         elegirPrograma(event) {
             console.log(event)
         },
-        toggleModals(init = true)
-        {
-            if(init)this.initDocumentos();
+        toggleModals(init = true) {
+            if (init) this.initDocumentos();
             this.forms.documento = {};
             $('#modalFormularioEcaes').modal('hide');
             $('#cargaDocumentoModal').modal('hide');
@@ -81,40 +78,35 @@ new Vue({
                 else
             */
         },
-        onClickUploadDocumento(documento)
-        {
+        onClickUploadDocumento(documento) {
             this.forms.documento = documento;
             $('#modalListaDocumentos').modal('hide');
-            if(documento.is_ecaes)
+            if (documento.is_ecaes)
                 $('#modalFormularioEcaes').modal('show');
             else
                 $('#cargaDocumentoModal').modal('show');
         },
-        onClickVerDocumento(documento)
-        {
+        onClickVerDocumento(documento) {
             this.show_documento = documento;
             $('#modalListaDocumentos').modal('hide');
             $('#modalVerDocumento').modal('show');
         },
-        onSubmitFormEcaes()
-        {
+        onSubmitFormEcaes() {
             cargando();
 
             let data = {
                 id: this.forms.documento.id,
-                codigo_ecaes: this.forms.documento.codigo_ecaes ,
+                codigo_ecaes: this.forms.documento.codigo_ecaes,
                 file: this.forms.documento.file,
             };
 
             http.post('documento/cargar', objectToFormData(data)).then(
-                () =>
-                {
+                () => {
                     alertTareaRealizada();
                     this.toggleModals();
                 },
-                ({ response }) =>
-                {
-                    if(response.status === 422 )
+                ({ response }) => {
+                    if (response.status === 422)
                         this.errors.documento = response.data.errors;
                     else
                         alertErrorServidor();

@@ -18,7 +18,8 @@ Vue.component('filter-estudiante', {
         },
         secretaria: Boolean,
         filter_class: String,
-        buttons_class: String
+        buttons_class: String,
+        isbackup: Boolean
     },
     watch: {
         value(new_v, old_v)
@@ -31,7 +32,9 @@ Vue.component('filter-estudiante', {
         {
             if(this.filter.tipo_grado_id !== undefined)
             {
-                http.get(`recursos/fechas-grado?tipo_grado_id=${this.filter.tipo_grado_id}`).then(
+                let aditions = this.isbackup ? '&activa=1' : '';
+
+                http.get(`recursos/fechas-grado?tipo_grado_id=${this.filter.tipo_grado_id}${aditions}`).then(
                     ({ data }) =>
                     {
                         this.datos.fechas_grado = data;
@@ -57,7 +60,13 @@ Vue.component('filter-estudiante', {
                 this.filter = {
                     programa_id: this.datos.programas.length > 0 ?  this.datos.programas[0].id : 0
                 };
-            }else this.filter = {};
+            }else if(this.isbackup)
+            {
+                this.filter = {
+                    estado: 'aprobado'
+                };
+            }
+            else this.filter = {};
             initBootstrapSelect('#fecha-grado-filter');
             initBootstrapSelect();
             this.datos.fechas_grado = [];

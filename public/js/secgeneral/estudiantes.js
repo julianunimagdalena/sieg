@@ -10,6 +10,7 @@ const vue = new Vue({
         estudiante: {
 
         },
+        isBackup: false,
         show_sidebar: false,
         dataTable: undefined
     }),
@@ -86,13 +87,18 @@ const vue = new Vue({
                         tdEstadoEst.innerHTML = `<i class="badge ${getBadgeClass(tdEstadoEst.innerText)}">${tdEstadoEst.innerText}</i>`;
                         tdEstadoPrograma.innerHTML = `<i class="badge ${getBadgeClass(tdEstadoPrograma.innerText)}">${tdEstadoPrograma.innerText}</i>`;
 
-                        tdAcciones.innerHTML = `
+                        if(!this.isBackup)
+                            tdAcciones.innerHTML = `
                             <i class="fas fa-info-circle text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
                         `;
                     }
                 }
             );
         }
+    },
+    mounted()
+    {
+        this.isBackup = Boolean(Number($('#input-isBackup').val()));
     }
 });
 

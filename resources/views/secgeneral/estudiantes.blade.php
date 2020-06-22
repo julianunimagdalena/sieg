@@ -34,22 +34,28 @@
 @section('content')
     <titulo>ESTUDIANTES</titulo>
 
+
+
     <card-action title="FILTROS">
         <filter-estudiante v-model="filter"
         @initdtable="initDataTable()"
-        filter_class="col-md-11 offset-md-2"
+        filter_class="col-md-11 offset-md-{{ isset($backup) ? '3' : '2' }}"
         buttons_class="mt-3"
         :secretaria="true"
+        :isbackup="isBackup"
         customcolumn>
 
-            <template v-slot:buttons>
-                <button class="btn btn-sm btn-success btn-icon-split ml-2" @click="downloadBackup()">
-                    <span class="icon text-white-50">
-                        <i class="fas fa-cloud-download-alt"></i>
-                    </span>
-                    <span class="text">Descargar Backup</span>
-                </button>
-            </template>
+            @if (isset($backup) && $backup)
+                <template v-slot:buttons>
+                    <input type="hidden" id="input-isBackup" value="{{$backup}}"/>
+                    <button class="btn btn-sm btn-success btn-icon-split ml-2" @click="downloadBackup()">
+                        <span class="icon text-white-50">
+                            <i class="fas fa-cloud-download-alt"></i>
+                        </span>
+                        <span class="text">Descargar Backup</span>
+                    </button>
+                </template>
+            @endif
         </filter-estudiante>
     </card-action>
 

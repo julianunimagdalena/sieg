@@ -68,6 +68,7 @@
             color: var(--white);
             background-color: var(--secondary);
         }
+
         .badge-wrapper {
             position: relative;
         }
@@ -182,6 +183,26 @@
                     <a class="nav-link" href="{{Request::root()}}/administrador/fechas-grado">
                         <i class="fas fa-fw fa-calendar-day"></i>
                         <span>Administrar fechas de grado</span>
+                    </a>
+                </li>
+                @endif
+
+                @if (session('ur')->rol->nombre === 'Secretaría General')
+                <style>
+                    .nav-item span {
+                        font-size: .8rem !important;
+                    }
+                </style>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/secgeneral/estudiantes">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Estudiantes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/secgeneral/aprobados">
+                        <i class="fas fa-fw fa-calendar-day"></i>
+                        <span>Estudiantes aprobados</span>
                     </a>
                 </li>
                 @endif

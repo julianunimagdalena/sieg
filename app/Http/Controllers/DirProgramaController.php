@@ -21,6 +21,7 @@ use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class DirProgramaController extends Controller
 {
@@ -102,6 +103,38 @@ class DirProgramaController extends Controller
         # code...
     }
 
+    public function moverDocumentos($eds, $old_folder)
+    {
+        $ed_ecaes_old = null;
+        $same_folder = false;
+        $documentos = Variables::documentos();
+        $estados = Variables::estados();
+        $estudiante = Estudiante::find($eds[0]->idEstudiante);
+        $ed_ecaes = $estudiante->estudianteDocumento->where('idDocumento', $documentos['ecaes']->id)->first();
+
+        foreach ($eds as $ed) {
+            if ($ed->idDocumento === $documentos['ecaes']->id) $ed_ecaes_old = $ed;
+        }
+
+        // dd($ed_ecaes_old,  $old_folder, $ed_ecaes);
+
+        if ($ed_ecaes_old && $ed_ecaes_old->estado_id === $estados['aprobado']->id) {
+            if ($ed_ecaes_old->url_documento !== $ed_ecaes->path) {
+                Storage::move($ed_ecaes_old->url_documento, $ed_ecaes->path);
+                Storage::delete($ed_ecaes_old->url_documento);
+            } else $same_folder = true;
+
+            $ed_ecaes->url_documento = $ed_ecaes->path;
+            $ed_ecaes->estado_id = $estados['pendiente']->id;
+            $ed_ecaes->save();
+        }
+
+        $files = Storage::files($old_folder);
+        foreach ($files as $file) {
+            if (!($same_folder && stristr($file, $ed_ecaes->filename))) Storage::delete($file);
+        }
+    }
+
     public function activarEstudiante(ActivarEstudianteRequest $request)
     {
         $solicitud = null;
@@ -114,11 +147,10 @@ class DirProgramaController extends Controller
             ->where('codigo', $solicitud->codigo_estudiante)
             ->first();
 
-        if ($estudiante && $estudiante->procesoGrado->no_aprobado)
+        if ($estudiante && !$estudiante->procesoGrado->no_aprobado)
             return response('El estudiante ya se encuentra en el sistema', 400);
 
         $roles = Variables::roles();
-        $pazSalvos = Variables::defaultPazSalvos();
         $tiposEstudiante = Variables::tiposEstudiante();
         $ws = new WSAdmisiones();
         $data = $ws->getInformacionGraduadoByDocumentoIdentidad($solicitud->identificacion_estudiante)[0];
@@ -188,14 +220,11 @@ class DirProgramaController extends Controller
 
         // PAZ Y SALVOS
         $estudiante->pazSalvos()->detach();
-        $estudiante->pazSalvos()->attach([
-            $pazSalvos['biblioteca']->id,
-            $pazSalvos['bienestar']->id,
-            $pazSalvos['recursosEducativos']->id,
-            $pazSalvos['pago']->id
-        ]);
+        $estudiante->pazSalvos()->attach($estudiante->paz_salvos_iniciales);
 
         // DOCUMENTOS
+        $eds = $estudiante->estudianteDocumento;
+        $old_folder = $eds[0]->folder;
 
         $estudiante->documentos()->detach();
         $estudiante->documentos()->attach($estudiante->documentos_iniciales);
@@ -208,6 +237,10 @@ class DirProgramaController extends Controller
         $proceso->fecha_secretaria = null;
         $proceso->estado_programa_id = $estados['pendiente']->id;
         $proceso->fecha_programa = null;
+        $proceso->estado_ficha = 0;
+        $proceso->fecha_ficha = null;
+        $proceso->estado_encuesta = 0;
+        $proceso->fecha_encuesta = null;
         $proceso->estatura = null;
         $proceso->talla_camisa = null;
         $proceso->num_acompaniantes = null;
@@ -216,8 +249,11 @@ class DirProgramaController extends Controller
         $proceso->modalidad_grado = $data->opcionGrado;
         $proceso->titulo_memoria_grado = $data->descripcionOpcionGrado;
         $proceso->nota = $data->notaOpcionGrado;
+        $proceso->no_aprobado = false;
+        // $proceso->motivo_no_aprobado = null;
         $proceso->save();
 
+        $this->moverDocumentos($eds, $old_folder);
         $this->fetchPazSalvos($estudiante->id);
         $this->fetchDocumentoIdentidad($estudiante->id);
 

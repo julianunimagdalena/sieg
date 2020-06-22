@@ -198,4 +198,9 @@ class SecretariaGeneralController extends Controller
         array_push($downloadFiles, $filename);
         session(['downloadFiles' => $downloadFiles]);
     }
+
+    public function vistaAprobados()
+    {
+        return view('secgeneral.estudiantes', ['backup' => true]);
+    }
 }

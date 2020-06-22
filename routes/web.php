@@ -30,12 +30,6 @@ Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
 });
 
 Route::get('/prueba', function () {
-    return [
-        "!!''" => !!'',
-        '!!null' => !!null,
-        "!!'-'" => !!'-',
-        "!!' '" => !!' ',
-    ];
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -45,6 +39,7 @@ Route::post('/autenticar', 'CustomLoginController@autenticar');
 Route::get('/programas-por-identificacion/{identificacion}', 'SolicitudGradoController@programasPorIdentificacion');
 Route::post('/solicitar-grado', 'SolicitudGradoController@solicitar');
 Route::get('/solicitud-grado/pendientes', 'SolicitudGradoController@pendientes');
+Route::post('/solicitud-grado/eliminar', 'SolicitudGradoController@eliminar');
 
 Route::get('/fechas-grado/activas', 'FechaGradoController@getFechasActivas');
 
@@ -166,6 +161,7 @@ Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
 // RUTAS VISTA SECRETARIA GENERAL
 Route::get('/secgeneral', 'SecretariaGeneralController@index');
 Route::get('/secgeneral/estudiantes', 'SecretariaGeneralController@estudiantes');
+Route::get('/secgeneral/aprobados', 'SecretariaGeneralController@vistaAprobados');
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

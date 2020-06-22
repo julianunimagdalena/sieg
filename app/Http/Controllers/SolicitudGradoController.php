@@ -59,21 +59,24 @@ class SolicitudGradoController extends Controller
             ->whereHas('jornada', fn ($jor) => $jor->where('nombre', $jornada))
             ->first();
 
-        if (!$dm) return response('No se encuentra la dependencia correspondiente, favor notificar e intentar más tarde', 500);
+        if (!$dm) return response('No se encuentra la dependencia correspondiente, favor notificar e intentar más tarde', 400);
 
+        $estados = Variables::estados();
         $solicitud = SolicitudGrado::where('identificacion_estudiante', $datarow->numeroDocumento)
             ->where('programa_id', $dm->id)
+            ->where('estado_id', $estados['pendiente']->id)
             ->first();
-        if ($solicitud) return response('Ya hay una solicitud para este programa', 401);
+        if ($solicitud) return response('Ya hay una solicitud para este programa', 400);
 
         $persona = Persona::where('identificacion', $datarow->numeroDocumento)->first();
 
         if ($persona) {
-            $estados = Variables::estados();
-            $estudiante = Estudiante::where('idPrograma', $dm->id)->first();
+            $tipos = Variables::tiposEstudiante();
+            $estudiante = $persona->estudiantes()->where('idPrograma', $dm->id)->first();
 
-            if ($estudiante->procesoGrado->estado_programa_id !== $estados['rechazado']->id)
-                return response('Ya se encuentra registrado en el sistema con este programa', 401);
+            if ($estudiante->idTipo === $tipos['graduado']->id) return response('Estudiante ya graduado', 400);
+            if (!$estudiante->procesoGrado->no_aprobado)
+                return response('Ya se encuentra registrado en el sistema con este programa', 400);
         }
 
         $solicitud = new SolicitudGrado();
@@ -103,5 +106,21 @@ class SolicitudGradoController extends Controller
     {
         $solicitudes = $this->getPendientes()->with('fechaGrado')->orderBy('fecha', 'desc')->get();
         return $solicitudes;
+    }
+
+    public function eliminar(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'integer|required|exists:solicitud_grado,id',
+            'motivo' => 'required',
+        ], ['*.required' => 'Obligatorio']);
+
+        $estados = Variables::estados();
+        $solicitud = SolicitudGrado::find($request->id);
+        $solicitud->estado_id = $estados['rechazado']->id;
+        $solicitud->motivo_rechazo = $request->motivo;
+        $solicitud->save();
+
+        return 'ok';
     }
 }

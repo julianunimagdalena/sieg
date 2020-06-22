@@ -614,7 +614,7 @@ class EstudianteController extends Controller
             'estado_encuesta' => $estudiante->procesoGrado->estado_encuesta,
             'estado_ficha' => $estudiante->procesoGrado->estado_ficha,
             'estado_programa' => $estudiante->procesoGrado->estadoPrograma->nombre,
-            'estado_secretaria' => $estudiante->procesoGrado->estado_secretaria,
+            'estado_secretaria' => $estudiante->procesoGrado->estadoSecretaria->nombre,
             'confirmacion_ceremonia' => $estudiante->procesoGrado->confirmacion_asistencia,
             'estado_documentos' => $estudiante->estado_documentos,
             'paz_salvos' => $paz_salvos
