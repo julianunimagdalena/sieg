@@ -32,10 +32,13 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    $ctrl = new App\Http\Controllers\DirProgramaController();
-    $estudiante = App\Models\Estudiante::find(27300);
+    $obj = [
+        'a' => (object) ['id' => 4],
+        'b' => (object) ['id' => 2],
+        'c' => (object) ['id' => 7],
+    ];
 
-    return $ctrl->updatePazSalvos($estudiante);
+    return array_values(array_map(fn ($ps) => $ps->id, $obj));
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');

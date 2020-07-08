@@ -338,9 +338,16 @@ class AdminController extends Controller
         $programa->carga_titulo_grado = true;
         $programa->save();
 
-        // $ps_ids = array_map(function () {
+        $ps_ids = array_values(array_map(fn ($ps) => $ps->id, Variables::defaultPazSalvos()));
+        $programa->pazSalvosNecesarios()->attach($ps_ids);
 
-        // }, Variables::defaultPazSalvos());
-        $programa->pazSalvosNecesarios()->attach(array_values($dps->all));
+        $dm = new DependenciaModalidad();
+        $dm->idPrograma = $programa->id;
+        $dm->idFacultad = $request->facultad_id;
+        $dm->idModalidad = $request->modalidad_id;
+        $dm->idJornada = $request->jornada_id;
+        $dm->save();
+
+        return 'ok';
     }
 }
