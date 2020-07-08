@@ -55,6 +55,7 @@ new Vue({
 
                     swal("Exito", "Estudiante aprobado con éxito", "success");
                     this.fetchSolicitudes();
+                    actualizarNumeroSolicitudes();
                 }
             });
         },

@@ -1,5 +1,5 @@
 @component('component', ['id' => 'asistencia-ceremonia-modal-component'])
-<modal :id="id" title="Confirmar asistencia a ceremonia" v-on:show="fetchData" :onSubmit="submit" buttonText="Confirmar"
+<modal :id="id" title="Confirmar asistencia a ceremonia" v-on:show="fetchData" :onsubmit="submit" buttonText="Confirmar"
     :buttonDisabled="cargando">
     <div class="form-group">
         <div class="d-inline-block">

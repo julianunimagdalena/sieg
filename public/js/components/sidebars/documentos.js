@@ -21,6 +21,7 @@ Vue.component('sidebar-documentos', {
         datos: {
             documentos: [],
             can_aprobar: undefined,
+            tipos_vinculacion: []
         }
     }),
     watch: {
@@ -217,5 +218,14 @@ Vue.component('sidebar-documentos', {
             }
             return false;
         }
+    },
+    mounted()
+    {
+        http.get('recursos/tipos-vinculacion').then(
+            ({ data }) =>
+            {
+                this.datos.tipos_vinculacion = data;
+            }
+        );
     }
 });

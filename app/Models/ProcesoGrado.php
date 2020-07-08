@@ -14,6 +14,7 @@ class ProcesoGrado extends Model
         'estado_programa' => 'boolean',
         'confirmacion_asistencia' => 'boolean',
         'idEstudiante' => 'integer',
+        'tipo_vinculacion_tutor_id' => 'integer',
         'no_aprobado' => 'boolean',
         'mejor_ecaes' => 'boolean',
         'mencion_honor' => 'boolean',
@@ -39,5 +40,10 @@ class ProcesoGrado extends Model
     public function estadoSecretaria()
     {
         return $this->belongsTo('App\Models\Estado', 'estado_secretaria_id');
+    }
+
+    public function tipoVinculacionTutor()
+    {
+        return $this->belongsTo('App\Models\TipoVinculacion', 'tipo_vinculacion_tutor_id');
     }
 }

@@ -21,7 +21,7 @@ function cargando(text = 'Cargando...') {
         closeOnClickOutside: false,
         closeOnEsc: false,
         showLoaderOnConfirm: true
-    })
+    });
 }
 
 function cerrarCargando() {

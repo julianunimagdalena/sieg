@@ -15,11 +15,13 @@ use App\Models\EstadoCivil;
 use App\Models\FechaGrado;
 use App\Models\Genero;
 use App\Models\Idioma;
+use App\Models\ModalidadEstudio;
 use App\Models\Municipio;
 use App\Models\NivelCargo;
 use App\Models\NivelEstudio;
 use App\Models\NivelIdioma;
 use App\Models\Pais;
+use App\Models\PazSalvo;
 use App\Models\Salario;
 use App\Models\SectorEconomico;
 use App\Models\SectorEmpresa;
@@ -204,5 +206,23 @@ class RecursosController extends Controller
     public function areasDesempeno()
     {
         return AreaDesempeno::all();
+    }
+
+    public function pazSalvos()
+    {
+        return PazSalvo::select('id', 'nombre')->get();
+    }
+
+    public function facultades()
+    {
+        $tipos = Variables::tiposDependencia();
+        return Dependencia::where('idTipo', $tipos['facultad']->id)
+            ->select('id', 'nombre')
+            ->get();
+    }
+
+    public function modalidadesEstudio()
+    {
+        return ModalidadEstudio::all();
     }
 }

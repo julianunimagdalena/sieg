@@ -10,12 +10,12 @@
     <span v-if="actions || !!$slots.actions" class="float-right">
         <slot name="actions"></slot>
         <i
-            v-if="this.$listeners.onEdit"
-            @click="$emit('onEdit')"
+            v-if="this.$listeners.onedit"
+            @click="$emit('onedit')"
             class="fas fa-pencil-alt icon-escritura mr-1 action-btn" />
         <i
-            v-if="this.$listeners.onDelete"
-            @click="$emit('onDelete')"
+            v-if="this.$listeners.ondelete"
+            @click="$emit('ondelete')"
             class="fas fa-times-circle text-danger action-btn"></i>
     </span>
     <slot name="aditionals"></slot>

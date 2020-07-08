@@ -56,10 +56,10 @@
             </card>
         </div>
         <div class="col col-md-4 col-sm-12" >
-            <card-action title="Información de Idiomas" id="info-idiomas-form" @onAdd="openModal('modal-idioma')" fluid>
+            <card-action title="Información de Idiomas" id="info-idiomas-form" @onadd="openModal('modal-idioma')" fluid>
                 <list-group flush>
                     <list-group-item v-for="(idioma) in datos.user_idiomas" actions light v-bind:key="idioma.id"
-                        @onEdit="editItem('idioma',idioma)" @onDelete="deleteItem('eliminar-idioma',idioma, initUserIdiomas)">
+                        @onedit="editItem('idioma',idioma)" @ondelete="deleteItem('eliminar-idioma',idioma, initUserIdiomas)">
                         <span class="app-text-md">
                             <span class="mr-3 font-weight-bold">
                                 @{{ idioma.resolve.idioma }}
@@ -86,50 +86,50 @@
     <div class="mb-4 mt-4">
         <div class="row">
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Distinciones" @onAdd="openModal('modal-distincion')" fluid id="distinciones-form">
+                <card-action title="Distinciones" @onadd="openModal('modal-distincion')" fluid id="distinciones-form">
                     <list-group flush>
                         <list-group-item v-for="(dist) in datos.distinciones" :key="dist.id"
                             actions
                             light
-                            @onEdit="editItem('distincion',dist)"
-                            @onDelete="deleteItem('eliminar-distincion',dist, initDistinciones)">
+                            @onedit="editItem('distincion',dist)"
+                            @ondelete="deleteItem('eliminar-distincion',dist, initDistinciones)">
                             @{{ dist.nombre }}
                         </list-group-item>
                     </list-group>
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Información de Asociaciones" @onAdd="openModal('modal-asociacion')" fluid id="asociaciones-form">
+                <card-action title="Información de Asociaciones" @onadd="openModal('modal-asociacion')" fluid id="asociaciones-form">
                     <list-group flush>
                         <list-group-item v-for="(aso) in datos.asociaciones" :key="aso.id"
                             actions
                             light
-                            @onEdit="editItem('asociacion',aso)"
-                            @onDelete="deleteItem('eliminar-asociacion',aso, initAsociaciones)">
+                            @onedit="editItem('asociacion',aso)"
+                            @ondelete="deleteItem('eliminar-asociacion',aso, initAsociaciones)">
                             @{{ aso.nombre }}
                         </list-group-item>
                     </list-group>
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Consejos Profesionales" @onAdd="openModal('modal-consejo')" fluid id="consejos-form">
+                <card-action title="Consejos Profesionales" @onadd="openModal('modal-consejo')" fluid id="consejos-form">
                     <list-group flush>
                         <list-group-item v-for="(con) in datos.consejos" :key="con.id"
                             actions
                             light
-                            @onDelete="deleteItem('eliminar-concejo',con, initConsejos)">
+                            @ondelete="deleteItem('eliminar-concejo',con, initConsejos)">
                             @{{ con.nombre }}
                         </list-group-item>
                     </list-group>
                 </card-action>
             </div>
             <div class="col col-md-3 col-sm-12">
-                <card-action title="Información de discapacidades" @onAdd="openModal('modal-discapacidad')" fluid id="discapacidad-form">
+                <card-action title="Información de discapacidades" @onadd="openModal('modal-discapacidad')" fluid id="discapacidad-form">
                     <list-group flush>
                         <list-group-item v-for="(disc) in datos.discapacidades" :key="disc.id"
                             actions
                             light
-                            @onDelete="deleteItem('eliminar-discapacidad',disc, initDiscapacidades)">
+                            @ondelete="deleteItem('eliminar-discapacidad',disc, initDiscapacidades)">
                             @{{ disc.nombre }}
                         </list-group-item>
                     </list-group>

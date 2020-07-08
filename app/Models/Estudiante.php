@@ -88,8 +88,10 @@ class Estudiante extends Model
 
         switch (session('ur')->rol_id) {
             case $roles['coordinador']->id:
-                $count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
-                $can = $count === 0
+                $doc_count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
+                $ps_count = $this->estudiantePazSalvo()->where('paz_salvo', false)->count();
+                $can = $doc_count === 0
+                    && $ps_count === 0
                     && ($pg->titulo_grado && trim($pg->titulo_grado) !== '-')
                     && ($pg->modalidad_grado && trim($pg->modalidad_grado) !== '-')
                     && ($pg->titulo_memoria_grado && trim($pg->titulo_memoria_grado) !== '-')

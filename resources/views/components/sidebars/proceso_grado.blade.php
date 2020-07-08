@@ -43,6 +43,14 @@
                     </list-group-item-flex>
                 </list-group>
             </div>
+            <div class="text-center mt-3 mb-3">
+                <button class="btn btn-icon-split btn-primary btn-sm" title="Actualizar Paz y Salvos" @click="updatePazSalvos()">
+                    <span class="icon text-white-50">
+                        <i class="fas fa-sync-alt"></i>
+                    </span>
+                    <span class="text">Actualizar Paz y Salvos</span>
+                </button>
+            </div>
         </div>
     </div>
 </sidebar>

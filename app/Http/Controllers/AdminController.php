@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CargaRequest;
 use App\Http\Requests\FechaGradoRequest;
 use App\Models\DependenciaModalidad;
 use App\Models\Persona;
@@ -10,7 +11,10 @@ use App\Models\UsuarioRol;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
 use App\Http\Requests\UsuarioRequest;
+use App\Models\Dependencia;
+use App\Models\DependenciaPazSalvo;
 use App\Models\FechaGrado;
+use App\Models\PazSalvo;
 
 class AdminController extends Controller
 {
@@ -222,5 +226,121 @@ class AdminController extends Controller
     public function estudiantes()
     {
         return view('secgeneral.estudiantes');
+    }
+
+    public function infoPrograma($programa_id)
+    {
+        $dependencia = Dependencia::find($programa_id);
+        if (!$dependencia) return response('No valido', 400);
+
+        $paz_salvos = $dependencia->dependenciaPazSalvo
+            ->map(fn ($dps) => ['id' => $dps->id, 'nombre' => $dps->pazSalvo->nombre])
+            ->all();
+
+        return [
+            'paz_salvos' => $paz_salvos,
+            'carga_ecaes' => $dependencia->carga_ecaes,
+            'carga_titulo_grado' => $dependencia->carga_titulo_grado
+        ];
+    }
+
+
+    public function configuracionProgramas()
+    {
+        return view('administrador.programas');
+    }
+
+    public function cargaEcaes(CargaRequest $request)
+    {
+        $tipos = Variables::tiposDependencia();
+        $dependencia = Dependencia::where('idTipo', $tipos['dir_programa']->id)->find($request->programa_id);
+
+        if (!$dependencia) return response('No valido', 400);
+
+        $dependencia->carga_ecaes = $request->value;
+        $dependencia->save();
+
+        return 'ok';
+    }
+
+    public function cargaTituloGrado(CargaRequest $request)
+    {
+        $tipos = Variables::tiposDependencia();
+        $dependencia = Dependencia::where('idTipo', $tipos['dir_programa']->id)->find($request->programa_id);
+
+        if (!$dependencia) return response('No valido', 400);
+
+        $dependencia->carga_titulo_grado = $request->value;
+        $dependencia->save();
+
+        return 'ok';
+    }
+
+    public function nuevoPazSalvo(Request $request)
+    {
+        $this->validate($request, [
+            'programa_id' => 'integer|required|exists:dependencias,id',
+            'paz_salvo_id' => 'integer|exists:paz_salvos,id',
+            'paz_salvo_nombre' => 'required_without:paz_salvo_id'
+        ]);
+
+        $tipos = Variables::tiposDependencia();
+        $dependencia = Dependencia::where('idTipo', $tipos['dir_programa']->id)->find($request->programa_id);
+
+        if (!$dependencia) return response('No valido', 400);
+
+        $paz_salvo = null;
+
+        if ($request->paz_salvo_id) $paz_salvo = PazSalvo::find($request->paz_salvo_id);
+        else {
+            $paz_salvo = new PazSalvo();
+            $paz_salvo->nombre = $request->paz_salvo_nombre;
+            $paz_salvo->save();
+        }
+
+        $dps = new DependenciaPazSalvo();
+        $dps->dependencia_id = $dependencia->id;
+        $dps->paz_salvo_id = $paz_salvo->id;
+        $dps->save();
+
+        return 'ok';
+    }
+
+    public function borrarPazSalvo(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'integer|required|exists:dependencia_paz_salvo,id'
+        ]);
+
+        DependenciaPazSalvo::destroy($request->id);
+
+        return 'ok';
+    }
+
+    public function registrarPrograma(Request $request)
+    {
+        $this->validate($request, [
+            'nombre' => 'required|unique:dependencias,nombre',
+            'codigo' => 'required',
+            'nivel_estudio_id' => 'required|exists:nivel_estudio,id',
+            'facultad_id' => 'required|exists:dependencias,id',
+            'modalidad_id' => 'required|exists:modalidades_estudio,id',
+            'jornada_id' => 'required|exists:jornadas,id'
+        ]);
+
+        $tipos = Variables::tiposDependencia();
+        $programa = new Dependencia();
+        $programa->nombre = $request->nombre;
+        $programa->idTipo = $tipos['dir_programa']->id;
+        $programa->codigoPrograma = $request->codigo;
+        $programa->idNivelestudio = $request->nivel_estudio_id;
+        $programa->carga_ecaes = true;
+        $programa->carga_titulo_grado = true;
+        $programa->save();
+
+        // $ps_ids = array_map(function () {
+
+        // }, Variables::defaultPazSalvos());
+        $programa->pazSalvosNecesarios()->attach(array_values($dps->all));
     }
 }

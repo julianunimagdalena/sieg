@@ -70,12 +70,12 @@ class SNIESExport implements FromArray, WithHeadings, ShouldAutoSize, WithEvents
                 $pg->modalidad_grado,
                 $pg->titulo_memoria_grado,
                 $pg->nota,
-                '',
-                '',
+                $pg->tutor_grado,
+                $pg->tipoVinculacionTutor->nombre,
                 $persona->direccion,
                 $persona->telefono_fijo,
                 $persona->celular,
-                $persona->correo,
+                $persona->correo
             ]);
         }
 

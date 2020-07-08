@@ -21,6 +21,53 @@ Vue.component('sidebar-proceso-grado', {
                     this.estudiante.info.foto = data.info.foto || defaultUserAvatar;
                 }
             );
+        },
+        updatePazSalvos()
+        {
+            cargando();
+            http.post('direccion/actualizar-paz-salvos', { estudiante_id: this.estudiante_data.id }).then(
+                ({ data }) =>
+                {
+                    if(data.success)
+                    {
+                        alertTareaRealizada();
+                        this.initData();
+                    }
+                    else
+                    {
+                        let elements ='';
+
+                        data.errors.forEach((element) => {
+                            elements += `<li class="list-group-item font-weight-bold">${element}</li>`;
+                        });
+
+                        swalHtml.innerHTML = `
+                        <div class="app-text-black-1">
+                            <div class="p-2">
+                                <small class="font-weight-bold">
+                                    Paz y salvos actualizados, los siguientes presentaron errores:
+                                </small>
+                            </div>
+                            <div class="mt-3">
+                                <ul class="list-group list-group-flush">
+                                    ${elements}
+                                </ul>
+                            </div>
+                        </div>
+                        `;
+
+                        swal({
+                            title:"Información",
+                            content: swalHtml,
+                            icon: "warning"
+                        });
+                    }
+                },
+                error =>
+                {
+                    alertErrorServidor();
+                }
+            ).then(cerrarCargando);
         }
     },
     watch: {

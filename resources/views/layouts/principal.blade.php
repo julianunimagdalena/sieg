@@ -190,7 +190,13 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/administrador/estudiantes">
                         <i class="fas fa-fw fa-users"></i>
-                        <span>Ver estudiantes</span>
+                        <span>Ver Estudiantes</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/administrador/programas">
+                        <i class="fas fa-university"></i>
+                        <span>Configuración de Programas</span>
                     </a>
                 </li>
                 @endif

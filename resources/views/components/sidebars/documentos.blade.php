@@ -165,6 +165,27 @@
                                     <option :value="false">NO APLICA</option>
                                 </app-select>
                             </div>
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-input
+                                    label="Nombre del Tutor de Grado"
+                                    placeholder="Nombre"
+                                    v-model="form.estudiante.extra.tutor_grado"
+                                    :errors="errors.estudiante.extra.tutor_grado"
+                                    @input="errors.estudiante.extra.tutor_grado"
+                                />
+                            </div>
+
+                            <div class="col-md-12 col-sm-12 form-group">
+                                <app-select
+                                    label="Tipo Vinculación del Tutor de Grado"
+                                    v-model="form.estudiante.extra.tipo_vinculacion_tutor_id"
+                                    :errors="errors.estudiante.extra.tipo_vinculacion_tutor_id"
+                                    @input="errors.estudiante.extra.tipo_vinculacion_tutor_id  = undefined"
+                                >
+                                    <option v-for="tipo in datos.tipos_vinculacion" :value="tipo.id">@{{ tipo.nombre }}</option>
+                                </app-select>
+                            </div>
                         </div>
                         <div class="row mt-2" v-if="!secretaria">
                             <div class="col-md-12 col-sm-12 form-group">

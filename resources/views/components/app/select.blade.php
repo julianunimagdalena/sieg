@@ -2,7 +2,7 @@
 <span>
     <label>@{{ label }} </label><small class="text-danger ml-1" v-if="required">*</small>
     <select class="form-control" :class="input_class" :placeholder="placeholder" v-model="c_value" v-on:change="$emit('input', c_value)">
-        <option :value="undefined || null" selected hidden>@{{ default_text || "Seleccione una opción"}}</option>
+        <option :value="c_value === null ? null : undefined" selected disabled>@{{ default_text || "Seleccione una opción"}}</option>
         <slot />
     </select>
     <small class="text-danger" v-if="errors">@{{errors[0]}}</small>

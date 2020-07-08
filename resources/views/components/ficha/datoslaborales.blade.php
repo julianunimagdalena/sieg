@@ -31,7 +31,7 @@
     </card>-->
 
     <div class="">
-        <card-action title="Información de Experiencias Laborales" fluid @onAdd="initModalInformacionLaboral()" id="xp-laboral-form">
+        <card-action title="Información de Experiencias Laborales" fluid @onadd="initModalInformacionLaboral()" id="xp-laboral-form">
             <table class="table table-sm">
                 <thead class="thead-light">
                   <tr>

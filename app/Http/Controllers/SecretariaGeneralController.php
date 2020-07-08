@@ -25,7 +25,10 @@ class SecretariaGeneralController extends Controller
             'generarSnies'
         ]]);
         $this->middleware(
-            'rol:' . $roles['secretariaGeneral']->nombre . '|' . $roles['administrador']->nombre,
+            'rol:'
+                . $roles['secretariaGeneral']->nombre
+                . '|' . $roles['administrador']->nombre
+                . '|' . $roles['coordinador']->nombre,
             ['only' => [
                 'obtenerEstudiantes',
             ]]
@@ -33,7 +36,6 @@ class SecretariaGeneralController extends Controller
         $this->middleware(
             'rol:' . $roles['secretariaGeneral']->nombre . '|' . $roles['coordinador']->nombre,
             ['only' => [
-                'obtenerEstudiantes',
                 'generarSnies'
             ]]
         );

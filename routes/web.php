@@ -26,12 +26,16 @@ Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
     return $ws->getInformacionGraduadoByDocumentoIdentidad($identificacion);
 });
 
-Route::get('/prueba', function () {
-    $tipos = App\Tools\Variables::tiposEstudiante();
-    $estudiantes = App\Models\Estudiante::where('idTipo', $tipos['egresado']->id)->get();
+Route::get('/prueba-siare/{codigo}', function ($codigo) {
+    $ws = new App\Tools\WSSiare();
+    return [$ws->ConsultarPazySalvo($codigo)];
+});
 
-    return (new App\Exports\SNIESExport($estudiantes))->download('prueba.xlsx');
-    // return \Maatwebsite\Excel\Facades\Excel::download(new App\Exports\SNIESExport, 'prueba.xlsx');
+Route::get('/prueba', function () {
+    $ctrl = new App\Http\Controllers\DirProgramaController();
+    $estudiante = App\Models\Estudiante::find(27300);
+
+    return $ctrl->updatePazSalvos($estudiante);
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -71,6 +75,9 @@ Route::get('/recursos/sectores-empresa', 'RecursosController@sectoresEmpresa');
 Route::get('/recursos/sectores-economicos', 'RecursosController@sectoresEconomicos');
 Route::get('/recursos/actividades-economicas', 'RecursosController@actividadesEconomicas');
 Route::get('/recursos/areas-desempeno', 'RecursosController@areasDesempeno');
+Route::get('/recursos/paz-salvos', 'RecursosController@pazSalvos');
+Route::get('/recursos/facultades', 'RecursosController@facultades');
+Route::get('/recursos/modalidades-estudio', 'RecursosController@modalidadesEstudio');
 
 // PETICIONES DEL EGRESADO
 Route::get('/egresado/datos', 'EstudianteController@datos');
@@ -121,6 +128,7 @@ Route::post('/direccion/no-aprobar', 'DirProgramaController@noAprobarEstudiante'
 Route::get('/direccion/actualizar-estudiante/{estudiante_id}', 'DirProgramaController@actualizarEstudiante');
 Route::get('/direccion/info-adicional-estudiante/{estudiante_id}', 'DirProgramaController@getInfoAdicionalEstudiante');
 Route::post('/direccion/info-adicional-estudiante', 'DirProgramaController@infoAdicionalEstudiante');
+Route::post('/direccion/actualizar-paz-salvos', 'DirProgramaController@actualizarPazSalvos');
 
 // PETICIONES DOCUMENTO
 Route::get('/documento/ver/{ed_id}', 'DocumentoController@ver');
@@ -138,6 +146,12 @@ Route::get('/administrador/datos-usuario', 'AdminController@datosUsuario');
 Route::get('/administrador/fecha-grado/{fecha_grado_id}', 'AdminController@fechaGrado');
 Route::post('/administrador/fecha-grado', 'AdminController@editarFechaGrado');
 Route::post('/administrador/eliminar-fecha-grado', 'AdminController@eliminarFechaGrado');
+Route::get('/administrador/info-programa/{programa_id}', 'AdminController@infoPrograma');
+Route::post('/administrador/carga-ecaes', 'AdminController@cargaEcaes');
+Route::post('/administrador/carga-titulo-grado', 'AdminController@cargaTituloGrado');
+Route::post('/administrador/paz-salvo', 'AdminController@nuevoPazSalvo');
+Route::post('/administrador/borrar-paz-salvo', 'AdminController@borrarPazSalvo');
+Route::post('/administrador/registrar-programa', 'AdminController@registrarPrograma');
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');
@@ -162,6 +176,7 @@ Route::get('/administrador', 'AdminController@index');
 Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
 Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
 Route::get('/administrador/estudiantes', 'AdminController@estudiantes');
+Route::get('/administrador/programas', 'AdminController@configuracionProgramas');
 
 // RUTAS VISTA SECRETARIA GENERAL
 Route::get('/secgeneral', 'SecretariaGeneralController@index');

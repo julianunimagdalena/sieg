@@ -19,6 +19,7 @@ use App\Models\UsuarioRol;
 use App\Tools\DocumentoHelper;
 use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
+use App\Tools\WSSiare;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -44,7 +45,9 @@ class DirProgramaController extends Controller
             'aprobarEstudiante',
             'datosEstudiante',
             'procesoGrado',
-            'actualizarEstudiante'
+            'actualizarEstudiante',
+            'actualizarPazSalvos',
+            'infoAdicionalEstudiante'
         ]]);
         $this->middleware(
             'rol:' . $roles['coordinador']->nombre
@@ -64,7 +67,9 @@ class DirProgramaController extends Controller
                 'documentosEstudiante',
                 'datosEstudiante',
                 'procesoGrado',
-                'actualizarEstudiante'
+                'actualizarEstudiante',
+                'actualizarPazSalvos',
+                'infoAdicionalEstudiante'
             ]]
         );
     }
@@ -112,9 +117,45 @@ class DirProgramaController extends Controller
         return view('dirprograma.estudiante');
     }
 
-    private function fetchPazSalvos($estudiante_id)
+    public function getPazSalvoRecursosEducativos($estudiante)
     {
-        # code...
+        $ws = new WSSiare();
+        return $ws->ConsultarPazySalvo($estudiante->codigo);
+    }
+
+    private function updatePazSalvos($estudiante)
+    {
+        $witherrors = [];
+        $dpss = Variables::defaultPazSalvos();
+        $pss = [
+            'recursosEducativos' => false,
+            'biblioteca' => false,
+            'bienestar' => false,
+            'pago' => false
+        ];
+
+        try {
+            $pss['recursosEducativos'] = $this->getPazSalvoRecursosEducativos($estudiante);
+        } catch (\Throwable $th) {
+            $pss['recursosEducativos'] = null;
+        }
+
+        foreach ($pss as $key => $value) {
+            $ps = $dpss[$key];
+
+            if ($value !== null) {
+                $eps = $estudiante->estudiantePazSalvo()->where('idPazsalvo', $ps->id)->first();
+
+                if ($eps) {
+                    $eps->paz_salvo = $value;
+                    $eps->save();
+                }
+            } else {
+                array_push($witherrors, $ps->nombre);
+            }
+        }
+
+        return $witherrors;
     }
 
     private function fetchDocumentoIdentidad($estudiante_id)
@@ -273,8 +314,8 @@ class DirProgramaController extends Controller
         $proceso->save();
 
         $this->moverDocumentos($eds, $old_folder);
-        $this->fetchPazSalvos($estudiante->id);
         $this->fetchDocumentoIdentidad($estudiante->id);
+        $this->updatePazSalvos($estudiante);
 
         if ($solicitud) {
             $solicitud->estado_id = $estados['aprobado']->id;
@@ -726,6 +767,8 @@ class DirProgramaController extends Controller
             'mencion_honor' => $pg->mencion_honor,
             'incentivo_nacional' => $pg->incentivo_nacional,
             'incentivo_institucional' => $pg->incentivo_institucional,
+            'tutor_grado' => $pg->tutor_grado,
+            'tipo_vinculacion_tutor_id' => $pg->tipo_vinculacion_tutor_id,
         ];
     }
 
@@ -739,7 +782,9 @@ class DirProgramaController extends Controller
             'incentivo_institucional' => '',
             'incentivo_nacional' => '',
             'mejor_ecaes' => '',
-            'mencion_honor' => ''
+            'mencion_honor' => '',
+            'tutor_grado' => '',
+            'tipo_vinculacion_tutor_id' => 'exists:tipos_vinculacion,id',
         ], [
             '*.required' => 'Obligatorio'
         ]);
@@ -757,9 +802,26 @@ class DirProgramaController extends Controller
         if ($request->mejor_ecaes !== null) $pg->mejor_ecaes = $request->mejor_ecaes;
         if ($request->mencion_honor !== null) $pg->mencion_honor = $request->mencion_honor;
         if ($request->codigo_ecaes !== null) $pg->codigo_ecaes = $request->codigo_ecaes;
+        if ($request->tutor_grado !== null) $pg->tutor_grado = $request->tutor_grado;
+        if ($request->tipo_vinculacion_tutor_id !== null) $pg->tipo_vinculacion_tutor_id = $request->tipo_vinculacion_tutor_id;
 
         $pg->save();
 
         return 'ok';
+    }
+
+    public function actualizarPazSalvos(Request $request)
+    {
+        $this->validate($request, ['estudiante_id' => 'integer|required|exists:estudiantes,id']);
+
+        $estudiante = $this->getEstudiante($request->estudiante_id);
+        if (!$estudiante) return response('no permitido', 400);
+
+        $errors = $this->updatePazSalvos($estudiante);
+
+        return [
+            'success' => count($errors) === 0,
+            'errors' => $errors
+        ];
     }
 }

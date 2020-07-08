@@ -10,9 +10,9 @@
         <slot name="actions" />
         <div v-if="!$slots.actions">
             <i
-            v-if="this.$listeners.onAdd"
+            v-if="this.$listeners.onadd"
             class="text-primary fas fa-plus-circle mr-1 action-btn"
-            title="Añadir" @click="$emit('onAdd')"></i>
+            title="Añadir" @click="$emit('onadd')"></i>
         </div>
         <slot name="head"></slot>
     </div>
