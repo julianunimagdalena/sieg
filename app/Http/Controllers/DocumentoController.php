@@ -23,7 +23,8 @@ class DocumentoController extends Controller
         $this->middleware(
             'rol:' . $roles['estudiante']->nombre
                 . '|' . $roles['coordinador']->nombre
-                . '|' . $roles['secretariaGeneral']->nombre,
+                . '|' . $roles['secretariaGeneral']->nombre
+                . '|' . $roles['administrador']->nombre,
             ['only' => [
                 'ver'
             ]]
@@ -48,6 +49,10 @@ class DocumentoController extends Controller
                 break;
 
             case $this->datos->roles['secretariaGeneral']->id:
+                $ed = EstudianteDocumento::find($ed_id);
+                break;
+
+            case $this->datos->roles['administrador']->id:
                 $ed = EstudianteDocumento::find($ed_id);
                 break;
         }

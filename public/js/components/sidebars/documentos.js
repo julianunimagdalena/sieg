@@ -24,9 +24,19 @@ Vue.component('sidebar-documentos', {
         }
     }),
     watch: {
-        estudiante_data(new_v, old_v)
+        /*estudiante_data(new_v, old_v)
         {
-            if(!old_v || new_v.id !== old_v.id){
+            if((!old_v || new_v.id !== old_v.id)){
+                this.datos.documentos = [];
+                this.form.estudiante.extra = {};
+                this.initInfoExtraEstudiante();
+                this.initDocumentos();
+            }
+        }*/
+        show(n_value)
+        {
+            if(n_value)
+            {
                 this.datos.documentos = [];
                 this.form.estudiante.extra = {};
                 this.initInfoExtraEstudiante();
@@ -159,10 +169,10 @@ Vue.component('sidebar-documentos', {
                     }).then(
                         ( ) =>
                         {
-                            /*this.show_dir = false;
-                            this.estudiante = undefined;
                             $('#modalNoAprobarEstudiante').modal('hide');
-                            alertTareaRealizada();*/
+                            alertTareaRealizada();
+                            this.$emit('hide');
+                            this.$emit('refreshdata');
                         },
                         ({ response }) =>
                         {

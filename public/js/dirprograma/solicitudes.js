@@ -1,9 +1,27 @@
 import http from '../http.js';
 
+
+const actualizarNumeroSolicitudes = () =>
+{
+    http.get('solicitud-grado/numero-solicitudes').then(
+        ({ data }) =>
+        {
+            $('#numero-de-solicitudes').text(data);
+        }
+    )
+}
+
+
 new Vue({
     el: '#app',
     data: () => ({
-        solicitudes: []
+        solicitudes: [],
+        form: {
+            solicitud: {}
+        },
+        errors: {
+            solicitud: {}
+        }
     }),
     created() {
         this.fetchSolicitudes();
@@ -39,6 +57,36 @@ new Vue({
                     this.fetchSolicitudes();
                 }
             });
+        },
+        rechazarSolicitud()
+        {
+
+            alertConfirmar().then(
+                (ok) =>
+                {
+                    if(!ok)
+                        return;
+
+                    cargando();
+                    http.post('solicitud-grado/eliminar', this.form.solicitud).then(
+                        ( ) =>
+                        {
+                            alertTareaRealizada();
+                            $('#modalRechazarSolicitud').modal('hide');
+                            this.form.solicitud = {};
+                            this.fetchSolicitudes();
+                            actualizarNumeroSolicitudes();
+                        },
+                        ({ response }) =>
+                        {
+                            if(response.status === 422)
+                                this.errors.solicitud = response.data.errors;
+                            else
+                                alertErrorServidor();
+                        }
+                    ).then(cerrarCargando);
+                }
+            );
         }
     }
 });

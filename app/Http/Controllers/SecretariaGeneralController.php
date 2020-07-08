@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SNIESExport;
+use App\Http\Requests\FiltroEstudiantesRequest;
 use App\Models\Estudiante;
 use App\Models\UsuarioRol;
 use App\Tools\Variables;
@@ -14,11 +16,27 @@ class SecretariaGeneralController extends Controller
         $roles = Variables::roles();
 
         // julianpitreap sec general
-        // session(['ur' => UsuarioRol::find(20029)]);
-        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        session(['ur' => UsuarioRol::find(20029)]);
+        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
-        $this->middleware('rol:' . $roles['secretariaGeneral']->nombre);
+        $this->middleware('rol:' . $roles['secretariaGeneral']->nombre, ['except' => [
+            'obtenerEstudiantes',
+            'generarSnies'
+        ]]);
+        $this->middleware(
+            'rol:' . $roles['secretariaGeneral']->nombre . '|' . $roles['administrador']->nombre,
+            ['only' => [
+                'obtenerEstudiantes',
+            ]]
+        );
+        $this->middleware(
+            'rol:' . $roles['secretariaGeneral']->nombre . '|' . $roles['coordinador']->nombre,
+            ['only' => [
+                'obtenerEstudiantes',
+                'generarSnies'
+            ]]
+        );
     }
 
     public function index()
@@ -65,15 +83,8 @@ class SecretariaGeneralController extends Controller
         return $estudiantes;
     }
 
-    public function obtenerEstudiantes(Request $req)
+    public function obtenerEstudiantes(FiltroEstudiantesRequest $req)
     {
-        $this->validate($req, [
-            'programa_id' => 'exists:dependencias,id',
-            'tipo_grado_id' => 'exists:tipos_de_grados,id',
-            'fecha_grado_id' => 'exists:fechas_de_grado,id',
-            'estado' => 'in:aprobado,no_aprobado,pendiente'
-        ]);
-
         $data = [];
         $search = $req->search['value'];
         $searchBy = [
@@ -155,52 +166,16 @@ class SecretariaGeneralController extends Controller
         return compact('data', 'draw', 'recordsTotal', 'recordsFiltered');
     }
 
-    public function backup(Request $request)
-    {
-        $part = 1;
-        $downloadFiles = [];
-        $filename = $this->filename . '.part' . $part . '.zip';
-        $zip = new \ZipArchive();
-        $zip->open(storage_path() . '/app/' . $filename, \ZipArchive::CREATE);
-
-        foreach ($this->urs as $kur => $ur) {
-
-            if ($kur !== 0 && $kur % $this->PERSONS_BY_PACKAGE === 0) {
-                $zip->close();
-                array_push($downloadFiles, $filename);
-
-                $filename = str_replace('part' . $part, 'part' . ($part + 1), $filename);
-                $part++;
-
-                $zip->open(storage_path() . '/app/' . $filename, \ZipArchive::CREATE);
-            }
-
-            $nombres = $ur->usuario->persona->nombres . ' ' . $ur->usuario->persona->apellidos;
-            $nombres_inv = $ur->usuario->persona->apellidos . ' ' . $ur->usuario->persona->nombres;
-            $carpeta = $ur->tipoVinculacion->carpeta;
-            $periodo = $ur->periodo_actual;
-
-            $url = storage_path() . '/app/' . $carpeta . '/' . $periodo;
-            $options = array('add_path' => $carpeta . '/' . $periodo . '/' . $nombres_inv . '/', 'remove_all_path' => TRUE);
-
-            $zip->addGlob($url . '/' . $nombres . '/*', GLOB_BRACE, $options);
-        }
-
-        $zip->close();
-
-        if ($part === 1) {
-            $newfilename = str_replace('.part' . $part, '', $filename);
-            \Storage::move($filename, $newfilename);
-
-            $filename = $newfilename;
-        }
-
-        array_push($downloadFiles, $filename);
-        session(['downloadFiles' => $downloadFiles]);
-    }
-
     public function vistaAprobados()
     {
         return view('secgeneral.estudiantes', ['backup' => true]);
+    }
+
+    public function generarSnies(FiltroEstudiantesRequest $request)
+    {
+        $estudiantes = $this->getEstudiantes($request)->get();
+        $export = new SNIESExport($estudiantes);
+
+        return $export->download('estudiantes.xlsx');
     }
 }

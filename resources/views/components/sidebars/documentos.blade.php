@@ -204,11 +204,12 @@
         </div>
     </modal>
 
-    <modal id="modalNoAprobarEstudiante" title="Motivo de Rechazo" :onsubmit="rechazarEstudiante" >
+    <modal id="modalNoAprobarEstudiante" title="Motivo de No Aprobación" :onsubmit="rechazarEstudiante" >
         <app-input
             label="Motivo"
             required
             class="form-group"
+            placeholder="Motivo"
             type="textarea"
             v-model="form.estudiante.motivo"
             :errors="errors.estudiante.motivo"

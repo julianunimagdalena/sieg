@@ -105,6 +105,10 @@ class EstudianteDocumento extends Model
                 $can = Variables::documentosCanCambiarEstado();
                 $b = $b && in_array($this->idDocumento, $can);
                 break;
+
+            case $roles['administrador']->id:
+                $b = false;
+                break;
         }
 
         return $b;

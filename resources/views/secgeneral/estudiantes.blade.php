@@ -9,6 +9,7 @@
     @include('components.filter.estudiante')
     @include('components.app.input')
     @include('components.inputs.InputFile')
+    @include('components.app.icono-estado')
     @include('components.app.sidebar')
     @include('components.app.badge')
     @include('components.app.icons-information')
@@ -17,7 +18,9 @@
     @include('components.modals.CargaDocumentoModal')
     @include('components.modals.verdocumento')
     @include('components.sidebars.documentos')
-
+    @include('components.sidebars.proceso_grado')
+    @include('components.modals.informacion_estudiante')
+    @include('secgeneral.btn_generar_snies')
 @endpush
 
 
@@ -36,7 +39,7 @@
 
 
 
-    <card-action title="FILTROS">
+    <card-action title="ACCIONES">
         <filter-estudiante v-model="filter"
         @initdtable="initDataTable()"
         filter_class="col-md-11 offset-md-{{ isset($backup) ? '3' : '2' }}"
@@ -54,6 +57,11 @@
                         </span>
                         <span class="text">Descargar Backup</span>
                     </button>
+                </template>
+
+            @else
+                <template v-slot:buttons>
+                    <btn-generar-snies :filter="filter"></btn-generar-snies>
                 </template>
             @endif
         </filter-estudiante>
@@ -80,7 +88,13 @@
         </table>
     </div>
 
+    <sidebar-proceso-grado :show="show_est" @hide="show_est = false" :estudiante_data="estudiante">
+    </sidebar-proceso-grado>
+
     <sidebar-documentos :show="show_sidebar" @hide="show_sidebar = false" :estudiante_data="estudiante" :secretaria="true">
 
     </sidebar-documentos>
+
+    <modal-informacion-estudiante :estudiante_id="estudiante_id" @hide="estudiante_id = undefined">
+    </modal-informacion-estudiante>
 @endsection

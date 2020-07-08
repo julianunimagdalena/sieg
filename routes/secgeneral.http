@@ -29,3 +29,10 @@ Accept: application/json
 ### obtener documentos del estudiante
 get http://167.172.127.114/sieg/public/direccion/documentos-estudiante/27300
 Accept: application/json
+
+### generar snies
+POST http://167.172.127.114/sieg/public/secgeneral/generar-snies HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{}

@@ -218,4 +218,9 @@ class AdminController extends Controller
     {
         return view('administrador.fechas_grado');
     }
+
+    public function estudiantes()
+    {
+        return view('secgeneral.estudiantes');
+    }
 }

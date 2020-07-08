@@ -42,16 +42,31 @@ class DirProgramaController extends Controller
             'rechazarDocumento',
             'noAprobarEstudiante',
             'aprobarEstudiante',
-            'datosEstudiante'
+            'datosEstudiante',
+            'procesoGrado',
+            'actualizarEstudiante'
         ]]);
-        $this->middleware('rol:' . $roles['coordinador']->nombre . '|' . $roles['secretariaGeneral']->nombre, ['only' => [
-            'getInfoAdicionalEstudiante',
-            'documentosEstudiante',
-            'rechazarDocumento',
-            'noAprobarEstudiante',
-            'aprobarEstudiante',
-            'datosEstudiante'
-        ]]);
+        $this->middleware(
+            'rol:' . $roles['coordinador']->nombre
+                . '|' . $roles['secretariaGeneral']->nombre,
+            ['only' => [
+                'noAprobarEstudiante',
+                'rechazarDocumento',
+                'aprobarEstudiante',
+            ]]
+        );
+        $this->middleware(
+            'rol:' . $roles['coordinador']->nombre
+                . '|' . $roles['secretariaGeneral']->nombre
+                . '|' . $roles['administrador']->nombre,
+            ['only' => [
+                'getInfoAdicionalEstudiante',
+                'documentosEstudiante',
+                'datosEstudiante',
+                'procesoGrado',
+                'actualizarEstudiante'
+            ]]
+        );
     }
 
     private function getEstudiante($estudiante_id)
@@ -66,6 +81,10 @@ class DirProgramaController extends Controller
                 break;
 
             case $roles['secretariaGeneral']->id:
+                $estudiante = Estudiante::find($estudiante_id);
+                break;
+
+            case $roles['administrador']->id:
                 $estudiante = Estudiante::find($estudiante_id);
                 break;
         }
@@ -398,9 +417,7 @@ class DirProgramaController extends Controller
 
     public function procesoGrado($estudiante_id)
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
-
+        $estudiante = $this->getEstudiante($estudiante_id);
         if (!$estudiante) return response('No permitido', 400);
 
         $paz_salvos = [];
@@ -667,7 +684,7 @@ class DirProgramaController extends Controller
     public function actualizarEstudiante($estudiante_id)
     {
         $ur = UsuarioRol::find(session('ur')->id);
-        $estudiante = $ur->usuario->estudiantes_coordinados->find($estudiante_id);
+        $estudiante = $this->getEstudiante($estudiante_id);
 
         if (!$estudiante) return response('No permitido', 400);
 

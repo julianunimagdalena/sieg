@@ -32,7 +32,7 @@ Vue.component('filter-estudiante', {
         {
             if(this.filter.tipo_grado_id !== undefined)
             {
-                let aditions = this.isbackup ? '&activa=1' : '';
+                let aditions = !this.isbackup ? '&activa=1' : '';
 
                 http.get(`recursos/fechas-grado?tipo_grado_id=${this.filter.tipo_grado_id}${aditions}`).then(
                     ({ data }) =>

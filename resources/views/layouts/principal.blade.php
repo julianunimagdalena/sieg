@@ -126,7 +126,9 @@
                     <a class="nav-link" href="{{Request::root()}}/direccion/solicitudes">
                         <i class=" fas fa-fw fa-file-alt badge-wrapper">
                             <span
-                                class="badge badge-danger font-weight-bold badge-icon-notify">{{session('ur')->solicitudes_grado_pendientes}}</span>
+                                class="badge badge-danger font-weight-bold badge-icon-notify" id="numero-de-solicitudes">
+                                {{session('ur')->solicitudes_grado_pendientes}}
+                            </span>
                         </i>
 
                         <span>Solicitudes de grado </span>
@@ -183,6 +185,12 @@
                     <a class="nav-link" href="{{Request::root()}}/administrador/fechas-grado">
                         <i class="fas fa-fw fa-calendar-day"></i>
                         <span>Administrar fechas de grado</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/administrador/estudiantes">
+                        <i class="fas fa-fw fa-users"></i>
+                        <span>Ver estudiantes</span>
                     </a>
                 </li>
                 @endif

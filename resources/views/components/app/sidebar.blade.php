@@ -42,17 +42,21 @@
             show()
             {
                 this.c_show = this.show;
+                if(this.show)
+                {
+                    document.onkeydown = evt => {
+                        evt = evt || window.event;
+                        if (evt.keyCode == 27) {
+                            this.close();
+                        }
+                    };
+                }else
+                    document.onkeydown = null;
             }
         },
         created()
         {
             this.c_show = this.show;
-            document.onkeydown = evt => {
-                evt = evt || window.event;
-                if (evt.keyCode == 27) {
-                    this.close();
-                }
-            };
         },
         methods: {
             close()

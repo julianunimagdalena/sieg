@@ -88,4 +88,18 @@ function verDocumento(documento_id, url = '/documento/ver')
 //window.open(`${baseURL}${url}/${documento_id}`, '__blank');
 }
 
-export { objectToFormData, initBootstrapSelect, DataTableManager, verDocumento, getDocumentoRoute };
+function objectToParameter(obj)
+{
+    let result = '';
+
+    for(let key in obj)
+    {
+        result += `${key}=${obj[key]}&`;
+    }
+
+    return result;
+}
+
+
+
+export { objectToFormData, initBootstrapSelect, DataTableManager, verDocumento, getDocumentoRoute, objectToParameter };

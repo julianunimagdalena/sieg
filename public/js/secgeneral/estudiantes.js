@@ -1,4 +1,5 @@
 import { baseURL } from '../variables.js';
+import { objectToParameter } from '../functions.js';
 import http from '../http.js';
 
 const vue = new Vue({
@@ -10,15 +11,26 @@ const vue = new Vue({
         estudiante: {
 
         },
+        estudiante_id: undefined,
         isBackup: false,
         show_sidebar: false,
+        show_est: false,
         dataTable: undefined
     }),
     methods: {
-        showSidebar(data)
+        objectToParameter,
+        showSidebar(data, sidebar)
         {
-            this.show_sidebar = true;
-            this.estudiante = {id: data};
+            this.estudiante = {id: data, info: {}, extra: {}};
+            if(sidebar === 'est')
+                this.show_est = true;
+            else
+                this.show_sidebar = true;
+        },
+
+        showEstudiante(id)
+        {
+            this.estudiante_id = id;
         },
         downloadBackup()
         {
@@ -89,7 +101,9 @@ const vue = new Vue({
 
                         if(!this.isBackup)
                             tdAcciones.innerHTML = `
-                            <i class="fas fa-info-circle text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
+                            <i class="fas fa-info-circle text-primary show-estudiante" data-id="${data.id}"></i>
+                            <i class="fas fa-user-graduate text-primary ml-3 show-info" data-id="${data.id}" sidebar="est"></i>
+                            <i class="fas fa-edit text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
                         `;
                     }
                 }
@@ -103,8 +117,13 @@ const vue = new Vue({
 });
 
 
+
 $('#tabla-estudiante').on( 'draw.dt', function () {
     $('.show-info').on('click', function(){
-        vue.showSidebar($(this).attr('data-id'));
+        vue.showSidebar($(this).attr('data-id'), $(this).attr('sidebar'));
+    });
+    $('.show-estudiante').on('click', function(){
+        vue.showEstudiante($(this).attr('data-id'));
     });
 });
+

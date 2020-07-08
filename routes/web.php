@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\User;
-use App\Tools\WSAdmisiones;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -18,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/prueba-documento/{html?}', function ($html = false) {
-    $ed = App\Models\EstudianteDocumento::find(5);
-    return App\Tools\DocumentoHelper::generarFicha($ed, true, $html);
+    $ed = App\Models\EstudianteDocumento::find(111);
+    return App\Tools\DocumentoHelper::generarPazSalvo($ed, true, $html);
 });
 
 Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
@@ -30,6 +27,11 @@ Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
 });
 
 Route::get('/prueba', function () {
+    $tipos = App\Tools\Variables::tiposEstudiante();
+    $estudiantes = App\Models\Estudiante::where('idTipo', $tipos['egresado']->id)->get();
+
+    return (new App\Exports\SNIESExport($estudiantes))->download('prueba.xlsx');
+    // return \Maatwebsite\Excel\Facades\Excel::download(new App\Exports\SNIESExport, 'prueba.xlsx');
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -39,6 +41,7 @@ Route::post('/autenticar', 'CustomLoginController@autenticar');
 Route::get('/programas-por-identificacion/{identificacion}', 'SolicitudGradoController@programasPorIdentificacion');
 Route::post('/solicitar-grado', 'SolicitudGradoController@solicitar');
 Route::get('/solicitud-grado/pendientes', 'SolicitudGradoController@pendientes');
+Route::get('/solicitud-grado/numero-solicitudes', 'SolicitudGradoController@getNumeroSolicitudes');
 Route::post('/solicitud-grado/eliminar', 'SolicitudGradoController@eliminar');
 
 Route::get('/fechas-grado/activas', 'FechaGradoController@getFechasActivas');
@@ -138,6 +141,7 @@ Route::post('/administrador/eliminar-fecha-grado', 'AdminController@eliminarFech
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');
+Route::get('/secgeneral/generar-snies', 'SecretariaGeneralController@generarSnies');
 
 //RUTAS VISTAS DIRECCION DE PROGRAMA
 
@@ -157,6 +161,7 @@ Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos')
 Route::get('/administrador', 'AdminController@index');
 Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
 Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
+Route::get('/administrador/estudiantes', 'AdminController@estudiantes');
 
 // RUTAS VISTA SECRETARIA GENERAL
 Route::get('/secgeneral', 'SecretariaGeneralController@index');

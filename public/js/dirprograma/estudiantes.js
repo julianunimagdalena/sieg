@@ -25,6 +25,7 @@ let vue = new Vue({
         filter: {
 
         },
+        estudiante_id: undefined,
         estudiante: undefined,
         show_est: false,
         show_dir: false
@@ -45,32 +46,14 @@ let vue = new Vue({
             this.estudiante = {id: data, info: {}, extra: {}};
 
             if(sidebar === 'est')
-            {
                 this.show_est = true;
-
-                http.get(`direccion/proceso-grado/${data}`).then(
-                    ({ data }) =>
-                    {
-                        this.estudiante = data;
-                        this.estudiante.info.foto = data.info.foto || defaultUserAvatar;
-                    }
-                );
-            }else {
+            else
                 this.show_dir = true;
-            }
+
         },
         showEstudiante(id)
         {
-            cargando();
-            http.get(`direccion/datos-estudiante/${id}`).then(
-                ({ data }) =>
-                {
-                    this.datos.estudiante           = data;
-                    this.datos.estudiante.id        = id;
-                    this.datos.estudiante.foto      = data.foto || defaultUserAvatar;
-                    $('#modalInformacionEstudiante').modal('show');
-                }
-            ).then(cerrarCargando);
+            this.estudiante_id = id;
         },
         actualizarEstudiante()
         {
@@ -79,7 +62,6 @@ let vue = new Vue({
                 ({ data }) =>
                 {
                     alertTareaRealizada();
-                    //$('#modalInformacionEstudiante').modal('hide');
                 },
                 err =>
                 {

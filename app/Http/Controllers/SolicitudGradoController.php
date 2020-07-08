@@ -123,4 +123,10 @@ class SolicitudGradoController extends Controller
 
         return 'ok';
     }
+
+
+    public function getNumeroSolicitudes()
+    {
+        return session('ur')->solicitudes_grado_pendientes;
+    }
 }
