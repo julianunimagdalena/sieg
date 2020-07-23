@@ -125,8 +125,8 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{Request::root()}}/direccion/solicitudes">
                         <i class=" fas fa-fw fa-file-alt badge-wrapper">
-                            <span
-                                class="badge badge-danger font-weight-bold badge-icon-notify" id="numero-de-solicitudes">
+                            <span class="badge badge-danger font-weight-bold badge-icon-notify"
+                                id="numero-de-solicitudes">
                                 {{session('ur')->solicitudes_grado_pendientes}}
                             </span>
                         </i>
@@ -197,6 +197,12 @@
                     <a class="nav-link" href="{{Request::root()}}/administrador/programas">
                         <i class="fas fa-university"></i>
                         <span>Configuración de Programas</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{Request::root()}}/administrador/graduados">
+                        <i class="fas fa-user-graduate"></i>
+                        <span>Graduados</span>
                     </a>
                 </li>
                 @endif

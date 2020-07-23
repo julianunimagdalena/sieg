@@ -45,4 +45,10 @@ class UsuarioRol extends Model
 
         return $count;
     }
+
+    public function isRol($key)
+    {
+        $roles = Variables::roles();
+        return $this->rol_id === $roles[$key]->id;
+    }
 }

@@ -88,18 +88,29 @@ class Estudiante extends Model
 
         switch (session('ur')->rol_id) {
             case $roles['coordinador']->id:
+                $programa = $this->estudio->programa;
                 $doc_count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
                 $ps_count = $this->estudiantePazSalvo()->where('paz_salvo', false)->count();
                 $can = $doc_count === 0
-                    && $ps_count === 0
-                    && ($pg->titulo_grado && trim($pg->titulo_grado) !== '-')
-                    && ($pg->modalidad_grado && trim($pg->modalidad_grado) !== '-')
-                    && ($pg->titulo_memoria_grado && trim($pg->titulo_memoria_grado) !== '-')
-                    && ($pg->nota && trim($pg->nota) !== '-')
-                    && $pg->codigo_ecaes !== null
-                    && $pg->mejor_ecaes !== null
-                    && $pg->incentivo_nacional !== null
-                    && $pg->inventivo_institucional !== null;
+                    && $ps_count === 0;
+
+                if ($programa->carga_ecaes) {
+                    $can = $can
+                        && ($pg->titulo_grado && trim($pg->titulo_grado) !== '-')
+                        && ($pg->modalidad_grado && trim($pg->modalidad_grado) !== '-')
+                        && ($pg->titulo_memoria_grado && trim($pg->titulo_memoria_grado) !== '-')
+                        && ($pg->nota && trim($pg->nota) !== '-')
+                        && $pg->tutor_grado !== null
+                        && $pg->tipo_vinculacion_tutor_id !== null;
+                }
+
+                if ($programa->carga_titulo_grado) {
+                    $can = $can
+                        && $pg->codigo_ecaes !== null
+                        && $pg->mejor_ecaes !== null
+                        && $pg->incentivo_nacional !== null
+                        && $pg->inventivo_institucional !== null;
+                }
 
                 break;
 
@@ -153,32 +164,21 @@ class Estudiante extends Model
 
     public function getDocumentosInicialesAttribute()
     {
+        $docs = [];
         $estados = Variables::estados();
-        $documentos = Variables::documentos();
-        $docs = [
-            $documentos['identificacion']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['paz_salvos']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['ficha']->id => ['estado_id' => $estados['sin_cargar']->id],
-            $documentos['ayre']->id => ['estado_id' => $estados['sin_cargar']->id],
-            // $documentos['ecaes']->id => ['estado_id' => $estados['sin_cargar']->id],
-            // $documentos['titulo_grado']->id => ['estado_id' => $estados['sin_cargar']->id],
-        ];
+        $programa = $this->estudio->programa;
 
-        if ($this->carga_ecaes) $docs[$documentos['ecaes']->id] = ['estado_id' => $estados['sin_cargar']->id];
-        if ($this->carga_titulo_grado) $docs[$documentos['titulo_grado']->id] = ['estado_id' => $estados['sin_cargar']->id];
+        foreach ($programa->documentosNecesarios as $doc) {
+            $docs[$doc->id] = ['estado_id' => $estados['sin_cargar']->id];
+        }
 
         return $docs;
     }
 
     public function getPazSalvosInicialesAttribute()
     {
-        $pazSalvos = Variables::defaultPazSalvos();
-        $ps = [
-            $pazSalvos['biblioteca']->id,
-            $pazSalvos['bienestar']->id,
-            $pazSalvos['recursosEducativos']->id,
-            $pazSalvos['pago']->id
-        ];
+        $programa = $this->estudio->programa;
+        $ps = $programa->pazSalvosNecesarios->pluck('id');
 
         return $ps;
     }

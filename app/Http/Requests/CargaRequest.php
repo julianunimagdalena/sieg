@@ -27,7 +27,7 @@ class CargaRequest extends FormRequest
             'programa_id' => 'integer|required|exists:dependencias,id',
             'value' => 'boolean|required',
         ];
-    },
+    }
 
     public function messages()
     {

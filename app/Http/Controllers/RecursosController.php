@@ -7,7 +7,9 @@ use App\Models\AreaDesempeno;
 use App\Models\Concejo;
 use App\Models\Departamento;
 use App\Models\Dependencia;
+use App\Models\DependenciaModalidad;
 use App\Models\Discapacidad;
+use App\Models\Documento;
 use Illuminate\Http\Request;
 
 use App\Models\Duracion;
@@ -15,6 +17,7 @@ use App\Models\EstadoCivil;
 use App\Models\FechaGrado;
 use App\Models\Genero;
 use App\Models\Idioma;
+use App\Models\Jornada;
 use App\Models\ModalidadEstudio;
 use App\Models\Municipio;
 use App\Models\NivelCargo;
@@ -139,12 +142,18 @@ class RecursosController extends Controller
         return $res;
     }
 
-    public function programas()
+    public function programas(Request $request)
     {
-        $tipos = Variables::tiposDependencia();
-        return Dependencia::where('idTipo', $tipos['dir_programa']->id)
-            ->select('id', 'nombre')
-            ->get();
+        $dms = new DependenciaModalidad();
+        if ($request->facultad_id) $dms = $dms->where('idFacultad', $request->facultad_id);
+
+        $dms = $dms->select('idPrograma')->distinct()->get();
+        $programas = $dms->map(fn ($dm) => $dm->programa()->select('id', 'nombre')->first())
+            ->sortBy('nombre')
+            ->values()
+            ->all();
+
+        return $programas;
     }
 
     public function nivelesEstudio()
@@ -224,5 +233,15 @@ class RecursosController extends Controller
     public function modalidadesEstudio()
     {
         return ModalidadEstudio::all();
+    }
+
+    public function jornadas()
+    {
+        return Jornada::all();
+    }
+
+    public function documentos()
+    {
+        return Documento::all();
     }
 }

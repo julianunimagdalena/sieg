@@ -3,8 +3,7 @@
 
 const swalHtml = document.createElement("div");
 
-const setLoadingText = (text) =>
-{
+const setLoadingText = (text) => {
     swalHtml.innerHTML = `
         <div class="loadingContent2" aria-hidden="true">
             <div class="loader"></div>
@@ -63,16 +62,14 @@ const meses = [
 ];
 
 
-function getNivelIdioma(id, niveles = [])
-{
+function getNivelIdioma(id, niveles = []) {
     return niveles.find((element) => id === element.id);
 }
 
 
-function resolveIdiomas(data, idiomas = [], niveles = [])
-{
+function resolveIdiomas(data, idiomas = [], niveles = []) {
     return {
-        idioma: idiomas.find( (element) => { return element.id === data.idioma_id } ).nombre,
+        idioma: idiomas.find((element) => { return element.id === data.idioma_id }).nombre,
         nivel_habla: getNivelIdioma(data.nivel_habla_id, niveles).nombre,
         nivel_escritura: getNivelIdioma(data.nivel_escritura_id, niveles).nombre,
         nivel_lectura: getNivelIdioma(data.nivel_lectura_id, niveles).nombre
@@ -80,63 +77,53 @@ function resolveIdiomas(data, idiomas = [], niveles = [])
 }
 
 
-function openModal(target="")
-{
+function openModal(target = "") {
     $(target).modal('show');
 }
 
 
-function getEstados (
-        estado = '',
-        class_sin_cargar='badge-secondary',
-        class_pendiente= 'badge-warning',
-        class_aprobado='badge-success',
-        class_rechazado = 'badge-danger')
-{
+function getEstados(
+    estado = '',
+    class_sin_cargar = 'badge-secondary',
+    class_pendiente = 'badge-warning',
+    class_aprobado = 'badge-success',
+    class_rechazado = 'badge-danger') {
     estado = estado.toLowerCase();
 
     return {
-        [class_sin_cargar]: estado === 'sin cargar' ,
+        [class_sin_cargar]: estado === 'sin cargar',
         [class_pendiente]: estado === 'pendiente' || estado === 'por aprobar' || estado === 'no generado' || estado === 'generar',
         [class_aprobado]: estado === 'aprobado',
         [class_rechazado]: estado === 'rechazado' || estado === 'no aprobado'
     }
 }
 
-function getBadgeClass(estado)
-{
-   let classes = getEstados(estado);
-    for (let key in classes)
-    {
+function getBadgeClass(estado) {
+    let classes = getEstados(estado);
+    for (let key in classes) {
         if (classes[key] === true)
             return key;
     }
 }
 
-function getClassEstado(estado)
-{
+function getClassEstado(estado) {
     let classes = getEstados(estado, 'secondary', 'warning', 'success', 'danger');
-    for (let key in classes)
-    {
+    for (let key in classes) {
         if (classes[key] === true)
             return key;
     }
 }
 
-function getUrlData()
-{
+function getUrlData() {
     return location.href.split('/').pop();
 }
 
 
-function getIconoEstado(estado)
-{
-    if(estado)
-    {
-        switch(estado.toLowerCase())
-        {
+function getIconoEstado(estado) {
+    if (estado) {
+        switch (estado.toLowerCase()) {
             case "aprobado":
-                return'far fa-check-circle text-success';
+                return 'far fa-check-circle text-success';
             case 'pendiente':
                 return 'far fa-clock text-warning';
             case 'rechazado':
@@ -145,8 +132,7 @@ function getIconoEstado(estado)
     }
 }
 
-function getForm(obj, form = false)
-{
+function getForm(obj, form = false) {
     let data = form ? { form: { ...obj } } : { ...obj };
     return {
         ...data,
@@ -154,4 +140,15 @@ function getForm(obj, form = false)
             ...obj
         }
     }
+}
+
+function getNonNull(obj) {
+    let result = {};
+
+    for (let key in obj) {
+        if (obj[key] !== null)
+            result[key] = obj[key];
+    }
+
+    return result;
 }

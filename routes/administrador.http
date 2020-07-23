@@ -1,0 +1,19 @@
+### graduados
+POST http://localhost:8082/sieg/public/administrador/graduados HTTP/1.1
+Content-Type: application/json
+Accept: application/json
+
+{
+    "draw": "1",
+    "columns": [
+        { "data": "identificacion" },
+        { "data": "nombres" },
+        { "data": "apellidos" },
+        { "data": "facultad" },
+        { "data": "programa" }
+    ],
+    "order": [{ "column": 1, "dir": "desc" }],
+    "start": 0,
+    "length": 10,
+    "search": { "value": "", "regex": false }
+}

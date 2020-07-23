@@ -2,7 +2,7 @@
 <div class="text-center">
     <img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid" v-bind:style="imgstyle">
     <br>
-    <div class="mt-4">
+    <div class="mt-4" v-if="actions">
         <button class="btn btn-outline-primary btn-sm btn-circle" title="Cargar Foto" type="button">
             <i class="fas fa-upload"></i>
         </button>
@@ -22,12 +22,16 @@
 @endcomponent
 
 @push('scripts')
-    <script>
-        Vue.component('user-avatar', {
+<script>
+    Vue.component('user-avatar', {
             template: '#user-avatar-component',
             props: {
-                imgstyle: Object
+                imgstyle: Object,
+                actions: {
+                    type: Boolean,
+                    default: true
+                }
             }
         });
-    </script>
+</script>
 @endpush

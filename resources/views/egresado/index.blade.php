@@ -30,55 +30,39 @@
 @endpush
 
 @section('content')
-<div >
+<div>
     <titulo>Estado del proceso de grado</titulo>
     <div class="mt-3">
         <card-action title="PERFIL">
             <div class="row">
-                <div class="col-md-2 col-sm-12" >
-                    <user-avatar :imgstyle="{'max-height': '100px'}"></user-avatar >
+                <div class="col-md-2 col-sm-12">
+                    <user-avatar :imgstyle="{'max-height': '100px'}"></user-avatar>
                 </div>
                 <div class="col-md-10 col-sm-12" v-if="info">
                     <div class="form-row">
                         <div class="col-md-6 col-sm-12 form-group">
-                            <app-input
-                                label="Nombre Completo"
-                                disabled
-                                v-model="info.nombre"
-                            />
+                            <app-input label="Nombre Completo" disabled v-model="info.nombre" />
                         </div>
                         <div class="col-md-6 col-sm-12 form-group">
-                            <app-input
-                                label="Código"
-                                disabled
-                                v-model="info.codigo"
-                            />
+                            <app-input label="Código" disabled v-model="info.codigo" />
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="col-md-2 col-sm-4 form-group">
-                            <app-input
-                                label="Tipo Documento"
-                                disabled
-                                v-model="info.tipo_documento"
-                            />
+                            <app-input label="Tipo Documento" disabled v-model="info.tipo_documento" />
                         </div>
                         <div class="col-md-4 col-sm-8 form-group">
-                            <app-input
-                                label="Documento"
-                                disabled
-                                v-model="info.documento"
-                            />
+                            <app-input label="Documento" disabled v-model="info.documento" />
                         </div>
                         <div class="col-md-6 col-sm-12 form-group">
-                            <app-input label="Programa" disabled v-model="info.programa"/>
+                            <app-input label="Programa" disabled v-model="info.programa" />
                         </div>
                     </div>
                 </div>
             </div>
         </card-action>
     </div>
-    <hr/>
+    <hr />
     <icons-information>
         <span class="ml-4">
             <span>Acciones: </span>
@@ -95,7 +79,7 @@
     </icons-information>
     <div class="row mt-3 mb-5">
         <div class="col-md-8 col-sm-12">
-            <card-action fluid title="Información de Proceso de Grado" :hflex="false" >
+            <card-action fluid title="Información de Proceso de Grado" :hflex="false">
                 <table class="table table-sm ">
                     <thead class="thead-light">
                         <tr>
@@ -106,7 +90,7 @@
                         </tr>
                     </thead>
                     <tbody class="app-text-black-1">
-                        <tr class="TableRow-2">
+                        <tr class="TableRow-2" v-if="info.diligencia_encuesta">
                             <td class="font-weight-bold">Registro de la encuesta (Momento de Grado)</td>
                             <td>Estudiante</td>
                             <td>
@@ -160,7 +144,9 @@
                         <tr class="TableRow-2">
                             <td class="font-weight-bold">Aprobación del proceso de grado</td>
                             <td>Dirección de programa</td>
-                            <td><icono-estado :estado="estadoPrograma"></icono-estado></td>
+                            <td>
+                                <icono-estado :estado="estadoPrograma"></icono-estado>
+                            </td>
                             <td> - </td>
                         </tr>
                     </tbody>
@@ -170,8 +156,7 @@
         <div class="col-md-4 col-sm-12">
             <card-action title="Listado de Paz y Salvos" fluid>
                 <list-group flush>
-                    <list-group-item-flex v-for="ps in info.paz_salvos" class="list-group-item-flex-md" :key="ps.id"
-                    >
+                    <list-group-item-flex v-for="ps in info.paz_salvos" class="list-group-item-flex-md" :key="ps.id">
                         <div class="font-weight-bold text-initial">
                             @{{ ps.nombre }}
                         </div>
@@ -218,32 +203,25 @@
     </div>
 </modal>
 
-<modal title="ECAES" id="modalFormularioEcaes" :onsubmit="onSubmitFormEcaes" :submit="onSubmitFormEcaes" :buttontext="'Enviar'" @onhide="toggleModals()">
+<modal title="ECAES" id="modalFormularioEcaes" :onsubmit="onSubmitFormEcaes" :submit="onSubmitFormEcaes"
+    :buttontext="'Enviar'" @onhide="toggleModals()">
     <div class="form-group">
-        <app-input
-            label="Código de ECAES"
-            placeholder="Código"
-            v-model="forms.documento.codigo_ecaes"
-            required
-        />
+        <app-input label="Código de ECAES" placeholder="Código" v-model="forms.documento.codigo_ecaes" required />
     </div>
     <div class="form-group">
-        <p class="font-weight-bold">Documento <app-required></app-required></p>
+        <p class="font-weight-bold">Documento <app-required></app-required>
+        </p>
         <input-file v-model="forms.documento.file" label="Documento"></input-file>
     </div>
 </modal>
 
-<carga-documento-modal id="cargaDocumentoModal" :documento="forms.documento"
-v-on:documento-cargado="toggleModals">
+<carga-documento-modal id="cargaDocumentoModal" :documento="forms.documento" v-on:documento-cargado="toggleModals">
 </carga-documento-modal>
 
 <asistencia-ceremonia-modal id="asistenciaCeremoniaModal" v-if="info" :codigo="info.codigo" v-on:complete="fetchData">
 </asistencia-ceremonia-modal>
 
-<modal-ver-documento
-    @onhide="toggleModals(false)"
-    :documento="show_documento"
-    v-if="show_documento">
+<modal-ver-documento @onhide="toggleModals(false)" :documento="show_documento" v-if="show_documento">
 </modal-ver-documento>
 @endsection
 

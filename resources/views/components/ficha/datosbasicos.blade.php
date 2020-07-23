@@ -14,7 +14,8 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <label>Apellidos</label>
-                            <input type="text" class="form-control" disabled placeholder="Apellidos"  v-model="input.apellidos"/>
+                            <input type="text" class="form-control" disabled placeholder="Apellidos"
+                                v-model="input.apellidos" />
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -38,7 +39,8 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>País de nacimiento</label>
-                            <select class="form-control" v-model="input.pais_nacimiento_id" :disabled="input.pais_nacimiento_id">
+                            <select class="form-control" v-model="input.pais_nacimiento_id"
+                                :disabled="input.pais_nacimiento_id">
                                 <option value="" selected hidden>Seleccione una opción</option>
                                 <option v-for="(pais) in datos.paises" :value="pais.id">@{{ pais.nombre }}</option>
                             </select>
@@ -47,19 +49,23 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Departamento de nacimiento</label>
-                            <select class="form-control" v-model="input.departamento_nacimiento_id" :disabled="input.departamento_nacimiento_id">
+                            <select class="form-control" v-model="input.departamento_nacimiento_id"
+                                :disabled="input.departamento_nacimiento_id">
                                 <option value="" selected hidden>Seleccione una opción</option>
 
-                                <option v-for="(departamento) in datos.departamentos" :value="departamento.id">@{{ departamento.nombre }}</option>
+                                <option v-for="(departamento) in datos.departamentos" :value="departamento.id">
+                                    @{{ departamento.nombre }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Municipio de nacimiento</label>
-                            <select class="form-control" v-model="input.municipio_nacimiento_id" :disabled="input.municipio_nacimiento_id">
+                            <select class="form-control" v-model="input.municipio_nacimiento_id"
+                                :disabled="input.municipio_nacimiento_id">
                                 <option value="" disabled>Seleccione una opción</option>
-                                <option v-for="(municipio) in datos.municipios" :value="municipio.id">@{{ municipio.nombre }}</option>
+                                <option v-for="(municipio) in datos.municipios" :value="municipio.id">
+                                    @{{ municipio.nombre }}</option>
                             </select>
                         </div>
                     </div>
@@ -80,23 +86,21 @@
                     <div class="col-md-3">
                         <div class="form-group">
                             <label>Estado civil</label> <small class="text-danger ml-1">*</small>
-                            <select class="form-control" v-model="input.estado_civil_id" @input="errors.estado_civil_id = undefined">
+                            <select class="form-control" v-model="input.estado_civil_id"
+                                @input="errors.estado_civil_id = undefined">
                                 <option value="" selected hidden>Seleccione una opción</option>
-                                <option v-for="(estado) in datos.estados_civiles" :value="estado.id">@{{ estado.nombre }}</option>
+                                <option v-for="(estado) in datos.estados_civiles" :value="estado.id">
+                                    @{{ estado.nombre }}</option>
                             </select>
-                            <small class="text-danger" v-if="errors.estado_civil_id">@{{errors.estado_civil_id[0]}}</small>
+                            <small class="text-danger"
+                                v-if="errors.estado_civil_id">@{{errors.estado_civil_id[0]}}</small>
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="form-group">
-                            <app-input
-                                v-model="input.estrato"
-                                type="number"
-                                label="Estrato"
-                                required
-                                @input="errors.estrato = undefined"
-                                placeholder="Estrato"
-                                v-bind:errors="errors.estrato"/>
+                            <app-input v-model="input.estrato" type="number" label="Estrato" required
+                                @input="errors.estrato = undefined" placeholder="Estrato"
+                                v-bind:errors="errors.estrato" />
                         </div>
                     </div>
                 </div>
@@ -104,7 +108,7 @@
         </div>
         <div class="col col-md-2 mt-3" id="imagen-perfil-form">
             <div class="text-center">
-                <user-avatar :imgstyle="{'max-height': '200px'}"></user-avatar >
+                <user-avatar :imgstyle="{'max-height': '200px'}" :actions="!admin"></user-avatar>
                 <!--<img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid">
                 <br>
                 <div class="btn-group-vertical" style="width:100%;" role="group" aria-label="...">
@@ -124,34 +128,33 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Tipo</label>
-                        <select class="form-control" v-model="input.tipo_documento_id" :disabled="datos.tipos_documento && input.tipo_documento_id">
+                        <select class="form-control" v-model="input.tipo_documento_id"
+                            :disabled="datos.tipos_documento && input.tipo_documento_id">
                             <option value="" selected hidden>Seleccione una opción</option>
-                            <option v-for="(t_documento) in datos.tipos_documento" :value="t_documento.id">@{{ t_documento.abrv || t_documento.nombre }}</option>
+                            <option v-for="(t_documento) in datos.tipos_documento" :value="t_documento.id">
+                                @{{ t_documento.abrv || t_documento.nombre }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Numero</label>
-                        <input type="number" class="form-control" disabled placeholder="Numero de documento" v-model="input.identificacion">
+                        <input type="number" class="form-control" disabled placeholder="Numero de documento"
+                            v-model="input.identificacion">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label>Lugar de expedición</label>
-                        <input type="text" class="form-control" disabled placeholder="Lugar de expedicion" v-model="input.lugar_expedicion_documento">
+                        <input type="text" class="form-control" disabled placeholder="Lugar de expedicion"
+                            v-model="input.lugar_expedicion_documento">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.fecha_expedicion_documento"
-                        type="date"
-                        label="Fecha De Expedición"
-                        required
-                        @input="errors.fecha_expedicion_documento = undefined"
-                        placeholder="Fecha"
-                        v-bind:errors="errors.fecha_expedicion_documento"/>
+                        <app-input v-model="input.fecha_expedicion_documento" type="date" label="Fecha De Expedición"
+                            required @input="errors.fecha_expedicion_documento = undefined" placeholder="Fecha"
+                            v-bind:errors="errors.fecha_expedicion_documento" />
                     </div>
                 </div>
             </div>
@@ -174,103 +177,76 @@
                         <label>Departamento de residencia</label>
                         <select class="form-control" v-model="input.departamento_residencia_id">
                             <option value="" selected hidden>Seleccione una opción</option>
-                            <option v-for="(departamento) in datos.departamentos_residencia" :value="departamento.id">@{{ departamento.nombre }}</option>
+                            <option v-for="(departamento) in datos.departamentos_residencia" :value="departamento.id">
+                                @{{ departamento.nombre }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
                         <label>Municipio de residencia</label><small class="text-danger ml-1">*</small>
-                        <select class="form-control" v-model="input.municipio_residencia_id" @input="errors.municipio_residencia_id = undefined">
+                        <select class="form-control" v-model="input.municipio_residencia_id"
+                            @input="errors.municipio_residencia_id = undefined">
                             <option value="" selected hidden>Seleccione una opción</option>
-                            <option v-for="(municipio) in datos.municipios_residencia" :value="municipio.id">@{{ municipio.nombre }}</option>
+                            <option v-for="(municipio) in datos.municipios_residencia" :value="municipio.id">
+                                @{{ municipio.nombre }}</option>
                         </select>
-                        <small class="text-danger" v-if="errors.municipio_residencia_id">@{{ errors.municipio_residencia_id[0] }}</small>
+                        <small class="text-danger"
+                            v-if="errors.municipio_residencia_id">@{{ errors.municipio_residencia_id[0] }}</small>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-4">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.telefono_fijo"
-                        type="number"
-                        label="Telefono Fijo"
-                        @input="errors.telefono_fijo = undefined"
-                        placeholder="Telefono"
-                        v-bind:errors="errors.telefono_fijo"/>
+                        <app-input v-model="input.telefono_fijo" type="number" label="Telefono Fijo"
+                            @input="errors.telefono_fijo = undefined" placeholder="Telefono"
+                            v-bind:errors="errors.telefono_fijo" />
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.celular"
-                        type="number"
-                        required
-                        label="Celular"
-                        @input="errors.celular = undefined"
-                        placeholder="Celular"
-                        v-bind:errors="errors.celular"/>
+                        <app-input v-model="input.celular" type="number" required label="Celular"
+                            @input="errors.celular = undefined" placeholder="Celular" v-bind:errors="errors.celular" />
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.celular2"
-                        type="number"
-                        label="Celular 2"
-                        @input="errors.celular2 = undefined"
-                        placeholder="Celular 2"
-                        v-bind:errors="errors.celular2"/>
+                        <app-input v-model="input.celular2" type="number" label="Celular 2"
+                            @input="errors.celular2 = undefined" placeholder="Celular 2"
+                            v-bind:errors="errors.celular2" />
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.direccion"
-                        label="Dirección"
-                        required
-                        @input="errors.direccion = undefined"
-                        placeholder="Dirección"
-                        v-bind:errors="errors.direccion"/>
+                        <app-input v-model="input.direccion" label="Dirección" required
+                            @input="errors.direccion = undefined" placeholder="Dirección"
+                            v-bind:errors="errors.direccion" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.barrio"
-                        label="Barrio / Sector"
-                        required
-                        @input="errors.barrio = undefined"
-                        placeholder="Barrio o Sector"
-                        v-bind:errors="errors.barrio"/>
+                        <app-input v-model="input.barrio" label="Barrio / Sector" required
+                            @input="errors.barrio = undefined" placeholder="Barrio o Sector"
+                            v-bind:errors="errors.barrio" />
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.correo"
-                        type="email"
-                        required
-                        label="Correo Institucional"
-                        @input="errors.correo = undefined"
-                        placeholder="Correo Electronico"
-                        v-bind:errors="errors.correo"/>
+                        <app-input v-model="input.correo" type="email" required label="Correo Institucional"
+                            @input="errors.correo = undefined" placeholder="Correo Electronico"
+                            v-bind:errors="errors.correo" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input
-                        v-model="input.correo2"
-                        type="email"
-                        label="Correo Personal"
-                        @input="errors.correo2 = undefined"
-                        placeholder="Correo Electronico"
-                        v-bind:errors="errors.correo2"/>
+                        <app-input v-model="input.correo2" type="email" label="Correo Personal"
+                            @input="errors.correo2 = undefined" placeholder="Correo Electronico"
+                            v-bind:errors="errors.correo2" />
                     </div>
                 </div>
             </div>

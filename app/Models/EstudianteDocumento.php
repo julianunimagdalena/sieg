@@ -122,7 +122,8 @@ class EstudianteDocumento extends Model
 
         if ($ur->rol_id === $roles['coordinador']->id) {
             $can = Variables::documentosCanCargarDireccion();
-            $b = in_array($this->idDocumento, $can);
+            $doc_ids = array_values(array_map(fn ($doc) => $doc->id, Variables::documentos()));
+            $b = in_array($this->idDocumento, $can) || !in_array($this->idDocumento, $doc_ids);
         }
 
         return $b;

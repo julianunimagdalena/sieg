@@ -36,6 +36,7 @@
         background-color: transparent !important;
         color: black !important;
     }
+
     .no-opacity {
         opacity: 0;
     }
@@ -60,6 +61,12 @@
 @include('components.ficha.datoslaborales')
 @endpush
 
+<?php
+    $isAdminView = (isset($isAdmin) && $isAdmin == true) ? 'true' : 'false';
+
+
+
+?>
 
 @section('content')
 <div class="row">
@@ -72,56 +79,53 @@
             Progreso
         </div>
         <div class="progress" style="height: 10px;">
-            <div class="progress-bar progress-bar-animated font-weight-bold" :class="{'bg-success': progress == 100, 'bg-warning': progress < 100}" role="progressbar" :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar progress-bar-animated font-weight-bold"
+                :class="{'bg-success': progress == 100, 'bg-warning': progress < 100}" role="progressbar"
+                :style="{width: progress+'%'}" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
                 @{{ progress }} %
             </div>
-          </div>
+        </div>
     </div>
 </div>
 <div class="mt-3 decorative">
     <ul class="nav nav-tabs tab" role="tablist" id="tab-list">
         <li class="nav-item">
-            <a
-                v-bind:class ="{'active' : active.datos_basicos}"
-                class="nav-link"
-                id="datos-basicos-tab" data-toggle="tab" href="#datos-basicos" role="tab" @click="setActiveTab('datos_basicos')"
+            <a v-bind:class="{'active' : active.datos_basicos}" class="nav-link" id="datos-basicos-tab"
+                data-toggle="tab" href="#datos-basicos" role="tab" @click="setActiveTab('datos_basicos')"
                 aria-controls="datos-basicos" aria-selected="true">Datos básicos</a>
         </li>
         <li class="nav-item">
-            <a
-                v-bind:class ="{'active' : active.datos_academicos}"
-                class="nav-link" id="datos-academicos-tab" data-toggle="tab" href="#datos-academicos" role="tab" @click="setActiveTab('datos_academicos')"
+            <a v-bind:class="{'active' : active.datos_academicos}" class="nav-link" id="datos-academicos-tab"
+                data-toggle="tab" href="#datos-academicos" role="tab" @click="setActiveTab('datos_academicos')"
                 aria-controls="datos-academicos" aria-selected="false">Datos académicos</a>
         </li>
         <li class="nav-item">
-            <a
-                v-bind:class ="{'active' : active.hoja_de_vida}"
-                class="nav-link" id="hoja-vida-tab" data-toggle="tab" href="#hoja-vida" role="tab" @click="setActiveTab('hoja_de_vida')"
-                aria-controls="hoja-vida" aria-selected="false">Datos de hoja de vida</a>
+            <a v-bind:class="{'active' : active.hoja_de_vida}" class="nav-link" id="hoja-vida-tab" data-toggle="tab"
+                href="#hoja-vida" role="tab" @click="setActiveTab('hoja_de_vida')" aria-controls="hoja-vida"
+                aria-selected="false">Datos de hoja de vida</a>
         </li>
         <li class="nav-item">
-            <a
-                v-bind:class ="{'active' : active.datos_laborales}"
-                class="nav-link" id="datos-laborales-tab" data-toggle="tab" href="#datos-laborales" role="tab" @click="setActiveTab('datos_laborales')"
+            <a v-bind:class="{'active' : active.datos_laborales}" class="nav-link" id="datos-laborales-tab"
+                data-toggle="tab" href="#datos-laborales" role="tab" @click="setActiveTab('datos_laborales')"
                 aria-controls="datos-laborales" aria-selected="false">Datos laborales</a>
         </li>
     </ul>
 
     <tab-content>
         <tab-pane id="datos-basicos" :active="active.datos_basicos">
-            <datos-basicos />
+            <datos-basicos :admin="{{$isAdminView}}" />
         </tab-pane>
 
         <tab-pane id="datos-academicos" :active="active.datos_academicos">
-            <datos-academicos @updateprogreso="updateProgreso()"/>
+            <datos-academicos @updateprogreso="updateProgreso()" :admin="{{$isAdminView}}" />
         </tab-pane>
 
         <tab-pane id="hoja-vida" :active="active.hoja_de_vida">
-            <hoja-de-vida @updateprogreso="updateProgreso()"/>
+            <hoja-de-vida @updateprogreso="updateProgreso()" :admin="{{$isAdminView}}" />
         </tab-pane>
 
         <tab-pane id="datos-laborales" :active="active.datos_laborales">
-            <datos-laborales @updateprogreso="updateProgreso()"/>
+            <datos-laborales @updateprogreso="updateProgreso()" :admin="{{$isAdminView}}" />
         </tab-pane>
     </tab-content>
 </div>

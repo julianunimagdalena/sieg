@@ -52,8 +52,32 @@ class DocumentoHelper
         return false;
     }
 
-    static public function actualizarDocumentoIdentidad()
+    static public function actualizarDocumentoIdentidad($ed, $prueba = false)
     {
-        return false;
+        $contents = null;
+        $ws = new WSAdmisiones();
+        $pdf = app('dompdf.wrapper');
+
+        try {
+            $contents = $ws->fetchDocumentoIdentidad($ed->estudiante->codigo);
+        } catch (\Throwable $th) {
+            return false;
+        }
+
+        $filename = 'temp/' . Carbon::now()->timestamp . '.jpg';
+
+        file_put_contents(public_path($filename), $contents);
+        Storage::makeDirectory($ed->folder);
+
+        $pdf->loadView('pdf.blank', compact('filename'));
+
+        if ($prueba) {
+            return $pdf->stream();
+        }
+
+        $pdf->save(storage_path('app/' . $ed->path));
+        Storage::disk('public_dir')->delete($filename);
+
+        return true;
     }
 }

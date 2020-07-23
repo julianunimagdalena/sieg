@@ -31,10 +31,10 @@ class DirProgramaController extends Controller
         $roles = Variables::roles();
 
         // rpineda coordinador de programa
-        session(['ur' => UsuarioRol::find(22)]);
+        // session(['ur' => UsuarioRol::find(22)]);
         // julianpitreap sec general
         // session(['ur' => UsuarioRol::find(20029)]);
-        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['coordinador']->nombre, ['except' => [
@@ -189,9 +189,11 @@ class DirProgramaController extends Controller
             $ed_ecaes->save();
         }
 
-        $files = Storage::files($old_folder);
-        foreach ($files as $file) {
-            if (!($same_folder && stristr($file, $ed_ecaes->filename))) Storage::delete($file);
+        if ($old_folder) {
+            $files = Storage::files($old_folder);
+            foreach ($files as $file) {
+                if (!($same_folder && stristr($file, $ed_ecaes->filename))) Storage::delete($file);
+            }
         }
     }
 
@@ -207,7 +209,7 @@ class DirProgramaController extends Controller
             ->where('codigo', $solicitud->codigo_estudiante)
             ->first();
 
-        if ($estudiante && !$estudiante->procesoGrado->no_aprobado)
+        if ($estudiante && $estudiante->procesoGrado && !$estudiante->procesoGrado->no_aprobado)
             return response('El estudiante ya se encuentra en el sistema', 400);
 
         $roles = Variables::roles();
@@ -284,7 +286,7 @@ class DirProgramaController extends Controller
 
         // DOCUMENTOS
         $eds = $estudiante->estudianteDocumento;
-        $old_folder = $eds[0]->folder;
+        $old_folder = $eds->count() > 0 ? $eds[0]->folder : null;
 
         $estudiante->documentos()->detach();
         $estudiante->documentos()->attach($estudiante->documentos_iniciales);
@@ -299,7 +301,7 @@ class DirProgramaController extends Controller
         $proceso->fecha_programa = null;
         $proceso->estado_ficha = 0;
         $proceso->fecha_ficha = null;
-        $proceso->estado_encuesta = 0;
+        $proceso->estado_encuesta = !$estudiante->estudio->programa->digita_encuesta;
         $proceso->fecha_encuesta = null;
         $proceso->estatura = null;
         $proceso->talla_camisa = null;
@@ -313,7 +315,8 @@ class DirProgramaController extends Controller
         // $proceso->motivo_no_aprobado = null;
         $proceso->save();
 
-        $this->moverDocumentos($eds, $old_folder);
+        if ($eds->count() > 0) $this->moverDocumentos($eds, $old_folder);
+
         $this->fetchDocumentoIdentidad($estudiante->id);
         $this->updatePazSalvos($estudiante);
 
@@ -473,11 +476,11 @@ class DirProgramaController extends Controller
 
         $pg = $estudiante->procesoGrado;
         $proceso = [
-            [
-                'proceso' => 'Registro de la encuesta (Momento de Grado)',
-                'responsable' => 'Estudiante',
-                'estado' => $pg->estado_encuesta ? 'APROBADO' : 'PENDIENTE'
-            ],
+            // [
+            //     'proceso' => 'Registro de la encuesta (Momento de Grado)',
+            //     'responsable' => 'Estudiante',
+            //     'estado' => $pg->estado_encuesta ? 'APROBADO' : 'PENDIENTE'
+            // ],
             [
                 'proceso' => 'Ficha de egresado',
                 'responsable' => 'Estudiante',
@@ -499,6 +502,14 @@ class DirProgramaController extends Controller
             //     'estado' => $pg->estadoPrograma->nombre
             // ]
         ];
+
+        if ($estudiante->estudio->programa->digita_encuesta) {
+            array_push($proceso, [
+                'proceso' => 'Registro de la encuesta (Momento de Grado)',
+                'responsable' => 'Estudiante',
+                'estado' => $pg->estado_encuesta ? 'APROBADO' : 'PENDIENTE'
+            ]);
+        }
 
         foreach ($estudiante->estudiantePazSalvo as $eps) {
             $ps = $eps->pazSalvo;
@@ -547,7 +558,7 @@ class DirProgramaController extends Controller
 
     public function documentosEstudiante($estudiante_id)
     {
-        $documentos = Variables::documentos();
+        // $documentos = Variables::documentos();
         $estudiante = $this->getEstudiante($estudiante_id);
 
         if (!$estudiante) return response('No permitido', 400);
@@ -557,8 +568,9 @@ class DirProgramaController extends Controller
             'documentos' => []
         ];
 
-        foreach ($documentos as $doc) {
-            $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc->id)->first();
+        foreach ($estudiante->estudianteDocumento as $ed) {
+            // foreach ($documentos as $doc) {
+            // $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc->id)->first();
 
             if ($ed) array_push($res['documentos'], [
                 'id' => $ed->id,
@@ -615,10 +627,11 @@ class DirProgramaController extends Controller
             $ed->user_update = $ur->usuario->identificacion;
             $ed->fecha_update = Carbon::now();
             $ed->save();
+
+            return 'ok';
+        } else {
+            return response('Hubo un error al actualizar el documento', 400);
         }
-
-
-        return 'ok';
     }
 
     public function aprobarDocumento(Request $request)

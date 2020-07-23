@@ -13,27 +13,28 @@ Vue.component('datos-academicos', {
         errors: {
         }
     }),
+    props: {
+        admin: {
+            type: Boolean,
+            default: false
+        }
+    },
     methods: {
-        init()
-        {
+        init() {
             http.get('egresado/datos-academicos').then(
-                ( { data } ) =>
-                {
-                    this.datos = {...this.datos, ...data};
+                ({ data }) => {
+                    this.datos = { ...this.datos, ...data };
                 },
-                err =>
-                {
-                    if(err)
+                err => {
+                    if (err)
                         alertErrorServidor();
                 }
             );
         },
-        handleSubmitInfoAcademica()
-        {
+        handleSubmitInfoAcademica() {
             cargando();
-            http.post('egresado/estudio', {...this.input }).then(
-                ( ) =>
-                {
+            http.post('egresado/estudio', { ...this.input }).then(
+                () => {
                     swal('Info', 'Información académica añadida con exito', 'success');
                     this.input = {
                         graduado: "0"
@@ -41,48 +42,40 @@ Vue.component('datos-academicos', {
                     this.init();
                     $('#modalAddInfoAcademica').modal('hide');
                 },
-                ({response}) =>
-                {
-                    if(response.status === 422)
+                ({ response }) => {
+                    if (response.status === 422)
                         this.errors = response.data.errors;
                     else
                         alertErrorServidor();
                 }
             ).then(cerrarCargando);
         },
-        editInfoAcademica(info)
-        {
-            this.input = {...info };
+        editInfoAcademica(info) {
+            this.input = { ...info };
             $('#modalAddInfoAcademica').modal('show');
         },
-        deleteInfoAcademica(info)
-        {
-            alertConfirmar().then( ( ok ) =>
-            {
-                if(!ok)
+        deleteInfoAcademica(info) {
+            alertConfirmar().then((ok) => {
+                if (!ok)
                     return;
 
                 cargando();
-                http.post('egresado/eliminar-estudio', { id: info.id }).then (
-                    ( ) =>
-                    {
+                http.post('egresado/eliminar-estudio', { id: info.id }).then(
+                    () => {
                         alertTareaRealizada();
                         this.init();
                         this.$emit('updateprogreso');
                     },
-                    err =>
-                    {
+                    err => {
                         alertErrorServidor();
                     }
                 ).then(cerrarCargando);
             })
         }
     },
-    mounted: function()
-    {
+    mounted: function () {
         http.get('recursos/niveles-estudio').then(
-            ({ data }) =>
-            {
+            ({ data }) => {
                 this.datos.niveles_estudio = data;
             }
         );

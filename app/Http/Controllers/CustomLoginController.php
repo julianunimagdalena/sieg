@@ -60,15 +60,15 @@ class CustomLoginController extends Controller
 
         if ($rol['activo'] !== '1') return response('Rol no activo', 400);
 
-        // $authRes = $client->request('POST', env('url_auth') . 'authic/auth', [
-        //     'form_params' => [
-        //         'user' => $req->username,
-        //         'password' => $req->password,
-        //         'token' => strtoupper(md5('@7t3nt1c4c10n' . \Carbon\Carbon::now()->toDateString()))
-        //     ]
-        // ])->getBody();
+        $authRes = $client->request('POST', env('url_auth') . 'authic/auth', [
+            'form_params' => [
+                'user' => $req->username,
+                'password' => $req->password,
+                'token' => strtoupper(md5('@7t3nt1c4c10n' . \Carbon\Carbon::now()->toDateString()))
+            ]
+        ])->getBody();
 
-        // if ($authRes == 'false') return response('Uusario o contraseña incorrectos', 400);
+        if ($authRes == 'false') return response('Uusario o contraseña incorrectos', 400);
 
         $ur = UsuarioRol::where('usuario_id', $user->id)
             ->where('rol_id', $rol['id'])

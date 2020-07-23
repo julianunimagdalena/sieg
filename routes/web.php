@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/prueba-documento/{html?}', function ($html = false) {
-    $ed = App\Models\EstudianteDocumento::find(111);
-    return App\Tools\DocumentoHelper::generarPazSalvo($ed, true, $html);
+    $ed = App\Models\EstudianteDocumento::find(10029);
+    return App\Tools\DocumentoHelper::actualizarDocumentoIdentidad($ed, true);
 });
 
 Route::get('/prueba-ws/{identificacion}', function ($identificacion) {
@@ -32,13 +32,9 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    $obj = [
-        'a' => (object) ['id' => 4],
-        'b' => (object) ['id' => 2],
-        'c' => (object) ['id' => 7],
-    ];
-
-    return array_values(array_map(fn ($ps) => $ps->id, $obj));
+    return [(int) "-45"];
+    $fecha = Carbon\Carbon::now()->locale('es_ES');
+    return $fecha->year;
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -81,6 +77,8 @@ Route::get('/recursos/areas-desempeno', 'RecursosController@areasDesempeno');
 Route::get('/recursos/paz-salvos', 'RecursosController@pazSalvos');
 Route::get('/recursos/facultades', 'RecursosController@facultades');
 Route::get('/recursos/modalidades-estudio', 'RecursosController@modalidadesEstudio');
+Route::get('/recursos/jornadas', 'RecursosController@jornadas');
+Route::get('/recursos/documentos', 'RecursosController@documentos');
 
 // PETICIONES DEL EGRESADO
 Route::get('/egresado/datos', 'EstudianteController@datos');
@@ -152,13 +150,21 @@ Route::post('/administrador/eliminar-fecha-grado', 'AdminController@eliminarFech
 Route::get('/administrador/info-programa/{programa_id}', 'AdminController@infoPrograma');
 Route::post('/administrador/carga-ecaes', 'AdminController@cargaEcaes');
 Route::post('/administrador/carga-titulo-grado', 'AdminController@cargaTituloGrado');
+Route::post('/administrador/diligencia-encuesta', 'AdminController@diligenciaEncuesta');
 Route::post('/administrador/paz-salvo', 'AdminController@nuevoPazSalvo');
 Route::post('/administrador/borrar-paz-salvo', 'AdminController@borrarPazSalvo');
+Route::post('/administrador/documento', 'AdminController@nuevoDocumento');
+Route::post('/administrador/borrar-documento', 'AdminController@borrarDocumento');
 Route::post('/administrador/registrar-programa', 'AdminController@registrarPrograma');
+Route::post('/administrador/graduados', 'AdminController@obtenerGraduados');
+Route::post('/administrador/registrar-graduados', 'AdminController@registrarGraduados');
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');
 Route::get('/secgeneral/generar-snies', 'SecretariaGeneralController@generarSnies');
+
+// PETICIONES MIGRACION
+Route::get('/migracion/estudiantes', 'MigracionController@migrarEstudiantes');
 
 //RUTAS VISTAS DIRECCION DE PROGRAMA
 
@@ -173,15 +179,17 @@ Route::get('/egresado', 'EstudianteController@index');
 Route::get('/egresado/ficha-egresado', 'EstudianteController@fichaEgresado');
 Route::get('/egresado/carga-documentos', 'EstudianteController@cargaDocumentos');
 
-//RUTAS VISTA ADMIN
+//RUTAS VISTAS ADMIN
 
 Route::get('/administrador', 'AdminController@index');
 Route::get('/administrador/administrar-usuarios', 'AdminController@administrarUsuarios');
 Route::get('/administrador/fechas-grado', 'AdminController@fechasGrado');
 Route::get('/administrador/estudiantes', 'AdminController@estudiantes');
 Route::get('/administrador/programas', 'AdminController@configuracionProgramas');
+Route::get('/administrador/graduados', 'AdminController@graduados');
+Route::get('/administrador/graduado/{estudiante_id}', 'AdminController@graduado');
 
-// RUTAS VISTA SECRETARIA GENERAL
+// RUTAS VISTAS SECRETARIA GENERAL
 Route::get('/secgeneral', 'SecretariaGeneralController@index');
 Route::get('/secgeneral/estudiantes', 'SecretariaGeneralController@estudiantes');
 Route::get('/secgeneral/aprobados', 'SecretariaGeneralController@vistaAprobados');

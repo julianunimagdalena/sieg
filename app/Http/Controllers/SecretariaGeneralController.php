@@ -16,8 +16,8 @@ class SecretariaGeneralController extends Controller
         $roles = Variables::roles();
 
         // julianpitreap sec general
-        session(['ur' => UsuarioRol::find(20029)]);
-        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        // session(['ur' => UsuarioRol::find(20029)]);
+        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['secretariaGeneral']->nombre, ['except' => [

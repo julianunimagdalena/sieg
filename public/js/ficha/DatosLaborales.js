@@ -30,58 +30,56 @@ Vue.component('datos-laborales', {
             xp: {}
         }
     }),
+    props: {
+        admin: {
+            type: Boolean,
+            default: false
+        }
+    },
     methods: {
         initBootstrapSelect,
-        init()
-        {
+        init() {
             http.get('egresado/datos-laborales').then(
-                ({ data }) =>
-                {
-                    const experiencias = data.experiencias.map( (element) =>
-                    {
-                        return {...element,
+                ({ data }) => {
+                    const experiencias = data.experiencias.map((element) => {
+                        return {
+                            ...element,
                             resolve: resolveExperienciaLaboral(element, this.datos.niveles_cargo,
-                                this.datos.duraciones, this.datos.tipos_vinculacion, this.datos.rangos_salariales)}
+                                this.datos.duraciones, this.datos.tipos_vinculacion, this.datos.rangos_salariales)
+                        }
                     })
 
-                    this.datos.experiencias         = experiencias;
-                    this.forms.a_laboral            = Number(data.actualidad_laboral);
+                    this.datos.experiencias = experiencias;
+                    this.forms.a_laboral = Number(data.actualidad_laboral);
                 }
             )
         },
-        initModalInformacionLaboral()
-        {
+        initModalInformacionLaboral() {
             this.openModal('#modalInformacionLaboral');
             this.initBootstrapSelect();
         },
-        onChangeActualidadLaboral(laborando)
-        {
+        onChangeActualidadLaboral(laborando) {
             http.post('egresado/actualidad-laboral', { laborando }).then(
-                ( ) =>
-                {
+                () => {
                     this.$emit('updateprogreso');
                 }
             );
         },
-        onChangePais(pais_id = null)
-        {
+        onChangePais(pais_id = null) {
             this.errors.xp.pais = undefined;
-            return getDepartamentos(pais_id || this.forms.xp.pais_id).then( (data) => this.datos.departamentos = data );
+            return getDepartamentos(pais_id || this.forms.xp.pais_id).then((data) => this.datos.departamentos = data);
         },
-        onChangeDepartamento(departamento_id = null)
-        {
+        onChangeDepartamento(departamento_id = null) {
             this.errors.xp.departamento = undefined;
-            return getMunicipios(departamento_id || this.forms.xp.departamento_id).then( (data) => this.datos.municipios = data );
+            return getMunicipios(departamento_id || this.forms.xp.departamento_id).then((data) => this.datos.municipios = data);
         },
-        onEditDatoLaboral(experiencia)
-        {
+        onEditDatoLaboral(experiencia) {
             cargando();
             Promise.all([
                 this.onChangePais(experiencia.pais_id),
                 this.onChangeDepartamento(experiencia.departamento_id)
             ]).then(
-                ( ) =>
-                {
+                () => {
                     this.forms.xp = { ...experiencia };
                     this.initModalInformacionLaboral();
                     cerrarCargando();
@@ -89,43 +87,36 @@ Vue.component('datos-laborales', {
             );
 
         },
-        onDeleteDatoLaboral(experiencia)
-        {
+        onDeleteDatoLaboral(experiencia) {
             alertConfirmar('¿Está seguro(a) de eliminar esta experiencia laboral?').then(
-                (ok) =>
-                {
-                    if(!ok)
+                (ok) => {
+                    if (!ok)
                         return;
 
                     cargando('Eliminando...');
-                    http.post('egresado/eliminar-experiencia-laboral', {id: experiencia.id}).then(
-                        ( )=>
-                        {
+                    http.post('egresado/eliminar-experiencia-laboral', { id: experiencia.id }).then(
+                        () => {
                             this.init();
                             alertTareaRealizada('Eliminado con exito');
                             this.$emit('updateprogreso');
                         },
-                        err =>
-                        {
+                        err => {
                             alertErrorServidor();
                         }
                     ).then(cerrarCargando);
                 }
             )
         },
-        onSubmitDatosLaborales()
-        {
+        onSubmitDatosLaborales() {
             cargando('Enviando experiencia laboral');
             http.post('egresado/experiencia-laboral', this.forms.xp).then(
-                ( ) =>
-                {
+                () => {
                     $('#modalInformacionLaboral').modal('hide');
                     alertTareaRealizada('Se ha añadido con exito la experiencia.');
                     this.init();
                 },
-                ({ response }) =>
-                {
-                    if(response.status === 422)
+                ({ response }) => {
+                    if (response.status === 422)
                         this.errors.xp = response.data.errors;
                     else
                         alertErrorServidor();
@@ -134,9 +125,9 @@ Vue.component('datos-laborales', {
         },
         openModal
     },
-    mounted: function() {
+    mounted: function () {
 
-        getPaises().then( data => this.datos.paises = data);
+        getPaises().then(data => this.datos.paises = data);
 
 
         Promise.all([
@@ -145,12 +136,11 @@ Vue.component('datos-laborales', {
             http.get('recursos/tipos-vinculacion'),
             http.get('recursos/salarios'),
         ]).then(
-            (response) =>
-            {
-                this.datos.niveles_cargo        = response[0].data;
-                this.datos.duraciones           = response[1].data;
-                this.datos.tipos_vinculacion    = response[2].data;
-                this.datos.rangos_salariales    = response[3].data;
+            (response) => {
+                this.datos.niveles_cargo = response[0].data;
+                this.datos.duraciones = response[1].data;
+                this.datos.tipos_vinculacion = response[2].data;
+                this.datos.rangos_salariales = response[3].data;
 
                 this.init();
 
@@ -164,12 +154,11 @@ Vue.component('datos-laborales', {
             http.get('recursos/actividades-economicas'),
             http.get('recursos/areas-desempeno')
         ]).then(
-            (response) =>
-            {
-                this.datos.sectores_empresa             = response[0].data;
-                this.datos.sectores_economicos          = response[1].data;
-                this.datos.actividades_economicas       = response[2].data;
-                this.datos.areas_des                    = response[3].data;
+            (response) => {
+                this.datos.sectores_empresa = response[0].data;
+                this.datos.sectores_economicos = response[1].data;
+                this.datos.actividades_economicas = response[2].data;
+                this.datos.areas_des = response[3].data;
             }
         );
     }

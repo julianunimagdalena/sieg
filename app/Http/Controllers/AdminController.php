@@ -12,7 +12,10 @@ use App\Tools\Variables;
 use Illuminate\Http\Request;
 use App\Http\Requests\UsuarioRequest;
 use App\Models\Dependencia;
+use App\Models\DependenciaDocumento;
 use App\Models\DependenciaPazSalvo;
+use App\Models\Documento;
+use App\Models\Estudiante;
 use App\Models\FechaGrado;
 use App\Models\PazSalvo;
 
@@ -23,8 +26,8 @@ class AdminController extends Controller
         $roles = Variables::roles();
 
         // egresados admin
-        session(['ur' => UsuarioRol::find(11)]);
-        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        // session(['ur' => UsuarioRol::find(11)]);
+        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['administrador']->nombre);
@@ -237,13 +240,22 @@ class AdminController extends Controller
             ->map(fn ($dps) => ['id' => $dps->id, 'nombre' => $dps->pazSalvo->nombre])
             ->all();
 
+        $documentos = $dependencia->dependenciaDocumento
+            ->map(fn ($dd) => [
+                'id' => $dd->id,
+                'nombre' => $dd->documento->nombre,
+                'can_delete' => $dd->can_delete
+            ])
+            ->all();
+
         return [
             'paz_salvos' => $paz_salvos,
+            'documentos' => $documentos,
             'carga_ecaes' => $dependencia->carga_ecaes,
-            'carga_titulo_grado' => $dependencia->carga_titulo_grado
+            'carga_titulo_grado' => $dependencia->carga_titulo_grado,
+            'diligencia_encuesta' => $dependencia->digita_encuesta
         ];
     }
-
 
     public function configuracionProgramas()
     {
@@ -260,6 +272,12 @@ class AdminController extends Controller
         $dependencia->carga_ecaes = $request->value;
         $dependencia->save();
 
+        $documentos = Variables::documentos();
+        $ecaes = $dependencia->documentosNecesarios()->find($documentos['ecaes']->id);
+
+        if ($dependencia->carga_ecaes && !$ecaes) $dependencia->documentosNecesarios()->attach($documentos['ecaes']->id);
+        else if (!$dependencia->carga_ecaes && $ecaes) $dependencia->documentosNecesarios()->detach($documentos['ecaes']->id);
+
         return 'ok';
     }
 
@@ -271,6 +289,25 @@ class AdminController extends Controller
         if (!$dependencia) return response('No valido', 400);
 
         $dependencia->carga_titulo_grado = $request->value;
+        $dependencia->save();
+
+        $documentos = Variables::documentos();
+        $titulo_grado = $dependencia->documentosNecesarios()->find($documentos['titulo_grado']->id);
+
+        if ($dependencia->carga_titulo_grado && !$titulo_grado) $dependencia->documentosNecesarios()->attach($documentos['titulo_grado']->id);
+        else if (!$dependencia->carga_titulo_grado && $titulo_grado) $dependencia->documentosNecesarios()->detach($documentos['titulo_grado']->id);
+
+        return 'ok';
+    }
+
+    public function diligenciaEncuesta(CargaRequest $request)
+    {
+        $tipos = Variables::tiposDependencia();
+        $dependencia = Dependencia::where('idTipo', $tipos['dir_programa']->id)->find($request->programa_id);
+
+        if (!$dependencia) return response('No valido', 400);
+
+        $dependencia->digita_encuesta = $request->value;
         $dependencia->save();
 
         return 'ok';
@@ -291,8 +328,12 @@ class AdminController extends Controller
 
         $paz_salvo = null;
 
-        if ($request->paz_salvo_id) $paz_salvo = PazSalvo::find($request->paz_salvo_id);
-        else {
+        if ($request->paz_salvo_id) {
+            $paz_salvo = $dependencia->pazSalvosNecesarios()->find($request->paz_salvo_id);
+            if ($paz_salvo) return response('Este paz y salvo ya se encuentra registrado.', 400);
+
+            $paz_salvo = PazSalvo::find($request->paz_salvo_id);
+        } else {
             $paz_salvo = new PazSalvo();
             $paz_salvo->nombre = $request->paz_salvo_nombre;
             $paz_salvo->save();
@@ -339,7 +380,9 @@ class AdminController extends Controller
         $programa->save();
 
         $ps_ids = array_values(array_map(fn ($ps) => $ps->id, Variables::defaultPazSalvos()));
+        $doc_ids = array_values(array_map(fn ($doc) => $doc->id, Variables::documentos()));
         $programa->pazSalvosNecesarios()->attach($ps_ids);
+        $programa->documentosNecesarios()->attach($doc_ids);
 
         $dm = new DependenciaModalidad();
         $dm->idPrograma = $programa->id;
@@ -349,5 +392,188 @@ class AdminController extends Controller
         $dm->save();
 
         return 'ok';
+    }
+
+    public function nuevoDocumento(Request $request)
+    {
+        $this->validate($request, [
+            'programa_id' => 'integer|required|exists:dependencias,id',
+            'documento_id' => 'integer|exists:documento,id',
+            'documento_nombre' => 'required_without:documento_id',
+            'documento_abrv' => 'required_without:documento_id'
+        ]);
+
+        $tipos = Variables::tiposDependencia();
+        $dependencia = Dependencia::where('idTipo', $tipos['dir_programa']->id)->find($request->programa_id);
+
+        if (!$dependencia) return response('No valido', 400);
+
+        $documento = null;
+
+        if ($request->documento_id) {
+            $documento = $dependencia->documentosNecesarios()->find($request->documento_id);
+            if ($documento) return response('Este documento ya se encuentra registrado.', 400);
+
+            $documento = Documento::find($request->documento_id);
+        } else {
+            $documento = new Documento();
+            $documento->nombre = $request->documento_nombre;
+            $documento->abrv = $request->documento_abrv;
+            $documento->save();
+        }
+
+        $dependencia->documentosNecesarios()->attach($documento->id);
+        return 'ok';
+    }
+
+    public function borrarDocumento(Request $request)
+    {
+        $this->validate($request, [
+            'id' => 'integer|required|exists:dependencia_documento,id'
+        ]);
+
+        $dd = DependenciaDocumento::find($request->id);
+        if (!$dd->can_delete) return response('No permitido', 400);
+
+        $dd->delete();
+
+        return 'ok';
+    }
+
+    public function graduados()
+    {
+        return view('administrador.graduados');
+    }
+
+    public function obtenerGraduados(Request $request)
+    {
+        $this->validate($request, [
+            'modalidad_id' => 'exists:modalidades_estudio,id',
+            'genero_id' => 'exists:genero,id',
+            'facultad_id' => 'exists:dependencias,id',
+            'programa_id' => 'exists:dependencias,id',
+            'tipo_grado_id' => 'exists:tipos_de_grados,id',
+            'fecha_grado_id' => 'exists:fechas_de_grado,id',
+            'fecha_inicial' => 'date',
+            'fecha_final' => 'date'
+        ]);
+
+        $data = [];
+        $tipos = Variables::tiposEstudiante();
+        $search = $request->search['value'];
+
+        $searchBy = [
+            'identificacion' => 'personas.identificacion',
+            'nombres' => 'personas.nombres',
+            'apellidos' => 'personas.apellidos',
+            'facultad' => 'facultad.nombre',
+            'programa' => 'programa.nombre',
+            'fecha_grado' => 'fg.fecha_grado'
+        ];
+
+        // DRAW VALUE
+        $draw = (int) $request->draw;
+
+        // RECORDS TOTAL
+        $estudiantes = Estudiante::where('estudiantes.idTipo', $tipos['graduado']->id)
+            ->whereHas('estudio', function ($dm) use ($request) {
+                if ($request->modalidad_id) $dm->where('idModalidad', $request->modalidad_id);
+                if ($request->facultad_id) $dm->where('idFacultad', $request->facultad_id);
+                if ($request->programa_id) $dm->where('idPrograma', $request->programa_id);
+            })
+            ->whereHas('persona', function ($per) use ($request) {
+                if ($request->genero_id) $per->where('idGenero', $request->genero_id);
+            })
+            ->whereHas('procesoGrado.fechaGrado', function ($fg) use ($request) {
+                if ($request->tipo_grado_id) $fg->where('tipo_grado', $request->tipo_grado_id);
+                if ($request->fecha_grado_id) $fg->where('id', $request->fecha_grado_id);
+                if ($request->fecha_inicial) $fg->where('fecha_grado', '>=', $request->fecha_inicial);
+                if ($request->fecha_final) $fg->where('fecha_grado', '<=', $request->fecha_final);
+            });
+
+        $recordsTotal = $estudiantes->count();
+
+        // RECORDS FILTERED
+        $estudiantes = $estudiantes->join('personas', 'personas.id', '=', 'estudiantes.idPersona')
+            ->join('dependencias_modalidades as dm', 'dm.id', '=', 'estudiantes.idPrograma')
+            ->join('dependencias as programa', 'programa.id', '=', 'dm.idPrograma')
+            ->join('dependencias as facultad', 'facultad.id', '=', 'dm.idFacultad')
+            ->join('proceso_grado as pg', 'pg.idEstudiante', '=', 'estudiantes.id')
+            ->join('fechas_de_grado as fg', 'fg.id', '=', 'pg.idFecha')
+            ->where(function ($query) use ($search, $searchBy) {
+                foreach (array_values($searchBy) as $key => $prop) {
+                    if ($key === 0) $query->where($prop, 'like', "%$search%");
+                    else $query->orWhere($prop, 'like', "%$search%");
+                }
+            });
+
+        $recordsFiltered = $estudiantes->count();
+
+        // ORDER
+        $order = $request->order[0];
+        $orderColumn = $request->columns[$order['column']]['data'];
+        $filter = array_filter($searchBy, fn ($key) => $key === $orderColumn, ARRAY_FILTER_USE_KEY);
+        $values = array_values($filter);
+
+        if (count($values) > 0) {
+            $orderProp = $values[0];
+            $orderDir = $order['dir'];
+            $estudiantes = $estudiantes->orderBy($orderProp, $orderDir);
+        }
+
+        // SELECT AND GET RESULTS
+        $estudiantes = $estudiantes
+            ->select('estudiantes.id')
+            ->skip($request->start)
+            ->take($request->length)
+            ->get();
+
+        // CALCULATE DATA
+        foreach ($estudiantes as $est) {
+            $estudiante = Estudiante::find($est->id);
+            $persona = $estudiante->persona;
+            $estudio = $estudiante->estudio;
+
+            array_push($data, [
+                'DT_RowData' => [
+                    'id' => $estudiante->id
+                ],
+                'identificacion' => $persona->identificacion,
+                'nombres' => $persona->nombres,
+                'apellidos' => $persona->apellidos,
+                'facultad' => $estudio->facultad->nombre,
+                'programa' => $estudio->programa->nombre,
+                'fecha_grado' => $est->procesoGrado->fechaGrado->fecha_grado,
+                'acciones' => ''
+            ]);
+        }
+
+        return compact('data', 'draw', 'recordsTotal', 'recordsFiltered');
+    }
+
+    public function graduado($estudiante_id)
+    {
+        $estudiante = Estudiante::graduados()->find($estudiante_id);
+        if (!$estudiante) return response('No encontrado', 404);
+
+        $ur = UsuarioRol::find(session('ur')->id);
+        session(['estudiante_id' => $estudiante->id]);
+
+        return view('egresado.ficha', ['isAdmin' => $ur->isRol('administrador')]);
+    }
+
+    public function registrarGraduados(Request $request)
+    {
+        $this->validate($request, [
+            'fecha_inicial' => 'date',
+            'fecha_final' => 'date|gte:fecha_inicial'
+        ], [
+            '*.date' => 'El campo debe ser una fecha',
+        ]);
+
+        return [
+            'registrados' => 0,
+            'actualizados' => 0
+        ];
     }
 }

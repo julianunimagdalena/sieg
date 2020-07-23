@@ -29,18 +29,62 @@ class EstudianteController extends Controller
         // josemartinezar estudiante
         // session(['ur' => UsuarioRol::find(10026)]);
         // danielviloriaap estudiante
-        session(['ur' => UsuarioRol::find(20026)]);
-        session(['estudiante_id' => 27300]);
-        \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+        // session(['ur' => UsuarioRol::find(20026)]);
+        // session(['estudiante_id' => 27300]);
+        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
 
         $this->middleware('auth');
-        $this->middleware('rol:' . $roles['estudiante']->nombre);
-        // dd(session('ur'));
+        $this->middleware('rol:' . $roles['estudiante']->nombre, ['except' => [
+            'datos',
+            'datosAcademicos',
+            'perfil',
+            'distinciones',
+            'asociaciones',
+            'concejos',
+            'discapacidades',
+            'progresoFicha',
+            'idiomas',
+            'datosLaborales',
+            'guardarDatosPersonales'
+        ]]);
+        $this->middleware('rol:' . $roles['estudiante']->nombre . '|' . $roles['administrador']->nombre, ['only' => [
+            'datos',
+            'datosAcademicos',
+            'perfil',
+            'distinciones',
+            'asociaciones',
+            'concejos',
+            'discapacidades',
+            'progresoFicha',
+            'idiomas',
+            'datosLaborales',
+            'guardarDatosPersonales'
+        ]]);
+    }
+
+    private function getPersona()
+    {
+        $ur = UsuarioRol::find(session('ur')->id);
+        $roles = Variables::roles();
+        $persona = null;
+
+        switch ($ur->rol_id) {
+            case $roles['estudiante']->id:
+                $persona = $ur->usuario->persona;
+                break;
+
+            case $roles['administrador']->id:
+                $persona = Estudiante::find(session('estudiante_id'))->persona;
+                break;
+        }
+
+        return $persona;
     }
 
     public function datos(Request $req)
     {
-        $persona = session('ur')->usuario->persona;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
 
         return [
             'nombres' => $persona->nombres,
@@ -51,14 +95,14 @@ class EstudianteController extends Controller
             'identificacion' => $persona->identificacion,
             'lugar_expedicion_documento' => $persona->ciudadExpedicion,
             'fecha_expedicion_documento' => $persona->fecha_expedicion,
-            'pais_nacimiento_id' => $persona->municipioNacimiento->departamento->idPais,
-            'departamento_nacimiento_id' => $persona->municipioNacimiento->idDepartamento,
+            'pais_nacimiento_id' => $persona->municipioNacimiento ? $persona->municipioNacimiento->departamento->idPais : null,
+            'departamento_nacimiento_id' => $persona->municipioNacimiento ? $persona->municipioNacimiento->idDepartamento : null,
             'municipio_nacimiento_id' => $persona->ciudadOrigen,
             'fecha_nacimiento' => $persona->fechaNacimiento,
             'estado_civil_id' => $persona->idEstadoCivil,
             'estrato' => $persona->estrato,
-            'pais_residencia_id' => $persona->municipioResidencia->departamento->idPais,
-            'departamento_residencia_id' => $persona->municipioResidencia->idDepartamento,
+            'pais_residencia_id' => $persona->municipioResidencia ? $persona->municipioResidencia->departamento->idPais : null,
+            'departamento_residencia_id' => $persona->municipioResidencia ? $persona->municipioResidencia->idDepartamento : null,
             'municipio_residencia_id' => $persona->ciudadResidencia,
             'direccion' => $persona->direccion,
             'barrio' => $persona->sector,
@@ -67,17 +111,18 @@ class EstudianteController extends Controller
             'celular2' => $persona->celular2,
             'correo' => $persona->correo,
             'correo2' => $persona->correo2,
-            'correo_institucional' => $persona->correo_institucional
+            'correo_institucional' => $persona->correo_institucional,
+            'estado_vida' => $persona->estadovida
         ];
     }
 
     public function datosAcademicos(Request $req)
     {
-        $tipos = Variables::tiposEstudiante();
-        $ur = UsuarioRol::find(session('ur')->id);
-        $persona = $ur->usuario->persona;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
 
         $info_grado = [];
+        $tipos = Variables::tiposEstudiante();
         $estudiantesEgresados = $persona->estudiantes()
             ->where('idTipo', $tipos['egresado']->id)
             ->get();
@@ -105,7 +150,8 @@ class EstudianteController extends Controller
                 'codigo' => $est->codigo,
                 'programa' => $estudio->programa->nombre,
                 'facultad' => $estudio->facultad->nombre,
-                'modalidad' => $estudio->modalidad->nombre
+                'modalidad' => $estudio->modalidad->nombre,
+                'fecha_grado' => $est->procesoGrado->fechaGrado->fecha_grado
             ]);
         }
 
@@ -132,40 +178,52 @@ class EstudianteController extends Controller
 
     public function perfil()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->usuario->persona->hojaVida->perfil;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->hojaVida->perfil;
     }
 
     public function distinciones()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->usuario->persona->hojaVida->distinciones;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->hojaVida->distinciones;
     }
 
     public function asociaciones()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->usuario->persona->hojaVida->asociaciones;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->hojaVida->asociaciones;
     }
 
     public function concejos()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->usuario->persona->hojaVida->concejos;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->hojaVida->concejos;
     }
 
     public function discapacidades()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->usuario->persona->hojaVida->discapacidades;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->hojaVida->discapacidades;
     }
 
     public function idiomas()
     {
-        $res = [];
-        $ur = UsuarioRol::find(session('ur')->id);
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
 
-        foreach ($ur->usuario->persona->hojaVida->idiomas as $idm) {
+        $res = [];
+
+        foreach ($persona->hojaVida->idiomas as $idm) {
             array_push($res, [
                 'id' => $idm->id,
                 'idioma_id' => $idm->idioma->id,
@@ -180,13 +238,14 @@ class EstudianteController extends Controller
 
     public function datosLaborales()
     {
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
         $actualidad_laboral = null;
         $experiencias = [];
-        $ur = UsuarioRol::find(session('ur')->id);
-        $hoja = $ur->usuario->persona->hojaVida;
+        $hoja = $persona->hojaVida;
 
         if ($hoja) {
-            // return $hoja;
             $actualidad_laboral = $hoja->laborando;
 
             foreach ($hoja->experiencias as $exp) {
@@ -231,13 +290,16 @@ class EstudianteController extends Controller
 
     public function actualizarProgresoFicha()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        PersonaHelper::actualizarProgresoFicha($ur->usuario->persona);
+        $persona = $this->getPersona();
+        if (!$persona) return response('no permitido', 400);
+
+        PersonaHelper::actualizarProgresoFicha($persona);
     }
 
     public function guardarDatosPersonales(PersonaRequest $request)
     {
-        $persona = session('ur')->usuario->persona;
+        $persona = $this->getPersona();
+        if (!$persona) return response('no permitido', 400);
 
         $persona->fecha_expedicion = $request->fecha_expedicion_documento;
         $persona->idEstadoCivil = $request->estado_civil_id;
@@ -251,6 +313,7 @@ class EstudianteController extends Controller
         $persona->celular2 = $request->celular2;
         $persona->correo = $request->correo;
         $persona->correo2 = $request->correo2;
+        $persona->estadovida = $request->estado_vida !== null ? $request->estado_vida : true;
         $persona->save();
 
         $this->actualizarProgresoFicha();
@@ -582,8 +645,10 @@ class EstudianteController extends Controller
 
     public function progresoFicha()
     {
-        $ur = UsuarioRol::find(session('ur')->id);
-        return $ur->persona->progreso_ficha;
+        $persona = $this->getPersona();
+        if (!$persona) return response('No permitido', 400);
+
+        return $persona->progreso_ficha;
     }
 
     // DEMAS PETICIONES
@@ -617,7 +682,8 @@ class EstudianteController extends Controller
             'estado_secretaria' => $estudiante->procesoGrado->estadoSecretaria->nombre,
             'confirmacion_ceremonia' => $estudiante->procesoGrado->confirmacion_asistencia,
             'estado_documentos' => $estudiante->estado_documentos,
-            'paz_salvos' => $paz_salvos
+            'paz_salvos' => $paz_salvos,
+            'diligencia_encuesta' => $estudiante->estudio->programa->digita_encuesta
         ]);
 
         return $res;
