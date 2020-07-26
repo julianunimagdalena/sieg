@@ -82,14 +82,8 @@ class MigracionController extends Controller
         return $res;
     }
 
-    private function registrarHojaVida($persona, $data)
+    private function registrarHojaVida($hoja, $data)
     {
-        $hoja = $persona->hojaVida ?? new HojaVida();
-        $hoja->activa = 0;
-        $hoja->perfil = $data->perfil;
-        $hoja->laborando = $data->labora;
-        $hoja->idPersona = $persona->id;
-        $hoja->save();
 
         $old_data = [];
         $old_data['estudios'] = DB::connection('old')->table('Hvestudios')
@@ -171,7 +165,14 @@ class MigracionController extends Controller
                 $persona->ciudadResidencia = $municipio_residencia ? $municipio_residencia->id : null;
                 $persona->save();
 
-                if ($registrar_hv) $this->registrarHojaVida($persona, $data);
+                $hoja = $persona->hojaVida ?? new HojaVida();
+                $hoja->activa = 0;
+                $hoja->perfil = $data->perfil;
+                $hoja->laborando = $data->labora;
+                $hoja->idPersona = $persona->id;
+                $hoja->save();
+
+                if ($registrar_hv) $this->registrarHojaVida($hoja, $data);
 
                 $tiposEstudiante = Variables::tiposEstudiante();
                 $estudiante = Estudiante::where('codigo', $data->codigo)

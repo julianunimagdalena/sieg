@@ -138,7 +138,7 @@
                     <div class="form-group">
                         <label>Mes de culminación</label>
                         <select class="form-control" v-model="input.mes_culminacion">
-                            <option selected disabled>Seleccione una opción</option>
+                            <option selected disabled :value="undefined">Seleccione un mes</option>
                             <option v-for="(mes, index) in datos.meses" :value="index">@{{ mes }}</option>
                         </select>
                     </div>

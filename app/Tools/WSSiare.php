@@ -32,6 +32,8 @@ class WSSiare
             'Token' => $token
         ]);
 
+        // dd($res);
+
         return $res->ConsultarPazySalvoResult === 'true';
     }
 }

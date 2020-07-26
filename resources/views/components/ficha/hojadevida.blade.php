@@ -140,7 +140,7 @@
         </div>
     </div>
 
-    <modal title="Añadir Idioma" id="modal-idioma" large :onSubmit="onSubmitLanguaje" @onhide="forms.idioma = {}">
+    <modal title="Añadir Idioma" id="modal-idioma" large :onsubmit="onSubmitLanguaje" @onhide="forms.idioma = {}">
         <div class="row">
             <div class="col col-md-6">
                 <div class="form-group">
@@ -195,7 +195,7 @@
         </div>
     </modal>
 
-    <modal title="Añadir Distinción" id="modal-distincion" :onSubmit="onSubmitDistincion"
+    <modal title="Añadir Distinción" id="modal-distincion" :onsubmit="onSubmitDistincion"
         @onhide="forms.distincion = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
@@ -210,7 +210,7 @@
         </div>
     </modal>
 
-    <modal title="Añadir Información de Asociación" id="modal-asociacion" :onSubmit="onSubmitAsociacion"
+    <modal title="Añadir Información de Asociación" id="modal-asociacion" :onsubmit="onSubmitAsociacion"
         @onhide="forms.asociacion = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
@@ -225,7 +225,7 @@
         </div>
     </modal>
 
-    <modal title="Añadir Consejo Profesional" id="modal-consejo" :onSubmit="onSubmitConsejo"
+    <modal title="Añadir Consejo Profesional" id="modal-consejo" :onsubmit="onSubmitConsejo"
         @onhide="forms.consejo = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">
@@ -238,7 +238,7 @@
         </div>
     </modal>
 
-    <modal title="Añadir Dispacidad" id="modal-discapacidad" :onSubmit="onSubmitDiscapacidad"
+    <modal title="Añadir Dispacidad" id="modal-discapacidad" :onsubmit="onSubmitDiscapacidad"
         @onhide="forms.discapacidad = {}">
         <div class="row">
             <div class="col col-md-8 offset-md-2">

@@ -63,7 +63,7 @@
         </card-action>
     </div>
 
-    <modal id="modalInformacionLaboral" title="Añadir Información Laboral" :onSubmit="onSubmitDatosLaborales"
+    <modal id="modalInformacionLaboral" title="Añadir Información Laboral" :onsubmit="onSubmitDatosLaborales"
         @onhide="forms.xp = {}" large>
         <div class="row">
             <div class="col-md-4 col-sm-12">

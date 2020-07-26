@@ -148,6 +148,7 @@ class DirProgramaController extends Controller
 
                 if ($eps) {
                     $eps->paz_salvo = $value;
+                    $eps->fecha = Carbon::now();
                     $eps->save();
                 }
             } else {
@@ -230,8 +231,8 @@ class DirProgramaController extends Controller
             else $genero = 'OTRO';
 
             $persona = new Persona();
-            $persona->nombres = $data->nombres;
-            $persona->apellidos = $data->apellidos;
+            $persona->nombres = strtoupper($data->nombres);
+            $persona->apellidos = strtoupper($data->apellidos);
             $persona->correo = $data->correoPers;
             $persona->correo_institucional = $data->correoInst;
             $persona->celular = $data->telefono1;

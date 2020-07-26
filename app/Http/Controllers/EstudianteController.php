@@ -81,9 +81,9 @@ class EstudianteController extends Controller
         return $persona;
     }
 
-    public function datos(Request $req)
+    public function datos($persona = null)
     {
-        $persona = $this->getPersona();
+        $persona = $persona ?? $this->getPersona();
         if (!$persona) return response('No permitido', 400);
 
         return [
@@ -317,7 +317,7 @@ class EstudianteController extends Controller
         $persona->save();
 
         $this->actualizarProgresoFicha();
-        return 'ok';
+        return ['id' => $persona->id];
     }
 
     public function guardarEstudio(EstudioRequest $request)

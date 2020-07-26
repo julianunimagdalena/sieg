@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CargaRequest;
+use App\Http\Requests\EstudianteRequest;
 use App\Http\Requests\FechaGradoRequest;
 use App\Models\DependenciaModalidad;
 use App\Models\Persona;
@@ -575,5 +576,98 @@ class AdminController extends Controller
             'registrados' => 0,
             'actualizados' => 0
         ];
+    }
+
+    public function registrarGraduado()
+    {
+        return view('administrador.registrar_graduado');
+    }
+
+    public function consultarGraduado(Request $request)
+    {
+        $this->validate($request, [
+            'identificacion' => 'required'
+        ], [
+            '*.required' => 'Obligatorio'
+        ]);
+
+        $res = [];
+        $persona = Persona::where('identificacion', $request->identificacion)->first();
+
+        if ($persona) {
+            $ctrl = new EstudianteController();
+            $res = [
+                'id' => $persona->id,
+                'datos' => $ctrl->datos($persona)
+            ];
+        }
+
+        return $res;
+    }
+
+    public function consultarGraduadoProgramas(Request $request)
+    {
+        $this->validate($request, [
+            'persona_id' => 'required|exists:personas,id'
+        ], [
+            '*.required' => 'Obligatorio',
+            '*.exists' => 'No valido'
+        ]);
+
+        $res = ['programas' => []];
+        $persona = Persona::find($request->persona_id);
+
+        foreach ($persona->estudiantes as $estudiante) {
+            $dm = $estudiante->estudio;
+            $pg = $estudiante->procesoGrado;
+
+            array_push($res['programas'], [
+                'id' => $estudiante->id,
+                'codigo' => $estudiante->codigo,
+                'folio' => $estudiante->folio,
+                'acta' => $estudiante->acta,
+                'libro' => $estudiante->libro,
+                'distincion_id' => $estudiante->distincion,
+                'fecha_grado' => $pg->fechaGrado->fecha_grado,
+                'facultad_id' => $dm->idFacultad,
+                'programa_id' => $dm->idPrograma,
+                'jornada_id' => $dm->idJornada,
+                'modalidad_id' => $dm->idModalidad,
+                'resolve' => [
+                    'programa' => $dm->programa->nombre,
+                    'facultad' => $dm->facultad->nombre,
+                    'modalidad' => $dm->modalidad->nombre,
+                    'fecha_grado' => $pg->fechaGrado->fecha_grado,
+                ]
+            ]);
+        }
+
+        return $res;
+    }
+
+    public function updateGraduado(EstudianteRequest $request)
+    {
+        $persona = Persona::find($request->persona_id);
+        $estudiante = $request->id ? $persona->estudiantes()->find($request->id) : new Estudiante();
+
+        if (!$estudiante) return response('No valido', 400);
+
+        $dm = DependenciaModalidad::where('idPrograma', $request->programa_id)
+            ->where('idFacultad', $request->facultad_id)
+            ->where('idJornada', $request->jornada_id)
+            ->where('idModalidad', $request->modalidad_id)
+            ->first();
+
+        if (!$dm) return response('Programa no valido', 400);
+
+        $estudiante->codigo = $request->codigo;
+        $estudiante->folio = $request->folio;
+        $estudiante->acta = $request->acta;
+        $estudiante->libro = $request->libro;
+        $estudiante->distincion = $request->distincion_id;
+        $estudiante->idPrograma = $dm->id;
+        $estudiante->save();
+
+        return 'ok';
     }
 }

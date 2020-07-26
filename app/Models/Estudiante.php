@@ -9,7 +9,8 @@ class Estudiante extends Model
 {
     protected $table = 'estudiantes';
     protected $casts = [
-        'idTipo' => 'integer'
+        'idTipo' => 'integer',
+        'distincion' => 'integer',
     ];
 
     public function estudiantePazSalvo()

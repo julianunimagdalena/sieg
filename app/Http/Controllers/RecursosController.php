@@ -9,6 +9,7 @@ use App\Models\Departamento;
 use App\Models\Dependencia;
 use App\Models\DependenciaModalidad;
 use App\Models\Discapacidad;
+use App\Models\DistincionEstudiante;
 use App\Models\Documento;
 use Illuminate\Http\Request;
 
@@ -222,26 +223,55 @@ class RecursosController extends Controller
         return PazSalvo::select('id', 'nombre')->get();
     }
 
-    public function facultades()
+    public function facultades(Request $request)
     {
-        $tipos = Variables::tiposDependencia();
-        return Dependencia::where('idTipo', $tipos['facultad']->id)
-            ->select('id', 'nombre')
-            ->get();
+        $dms = new DependenciaModalidad();
+        if ($request->programa_id) $dms = $dms->where('idPrograma', $request->programa_id);
+
+        $dms = $dms->select('idFacultad')->distinct()->get();
+        $res = $dms->map(fn ($dm) => $dm->facultad()->select('id', 'nombre')->first())
+            ->sortBy('nombre')
+            ->values()
+            ->all();
+
+        return $res;
     }
 
-    public function modalidadesEstudio()
+    public function modalidadesEstudio(Request $request)
     {
-        return ModalidadEstudio::all();
+        $dms = new DependenciaModalidad();
+        if ($request->programa_id) $dms = $dms->where('idPrograma', $request->programa_id);
+
+        $dms = $dms->select('idModalidad')->distinct()->get();
+        $res = $dms->map(fn ($dm) => $dm->modalidad)
+            ->sortBy('nombre')
+            ->values()
+            ->all();
+
+        return $res;
     }
 
-    public function jornadas()
+    public function jornadas(Request $request)
     {
-        return Jornada::all();
+        $dms = new DependenciaModalidad();
+        if ($request->programa_id) $dms = $dms->where('idPrograma', $request->programa_id);
+
+        $dms = $dms->select('idJornada')->distinct()->get();
+        $res = $dms->map(fn ($dm) => $dm->jornada)
+            ->sortBy('nombre')
+            ->values()
+            ->all();
+
+        return $res;
     }
 
     public function documentos()
     {
         return Documento::all();
+    }
+
+    public function distincionesEstudiante()
+    {
+        return DistincionEstudiante::all();
     }
 }

@@ -79,6 +79,7 @@ Route::get('/recursos/facultades', 'RecursosController@facultades');
 Route::get('/recursos/modalidades-estudio', 'RecursosController@modalidadesEstudio');
 Route::get('/recursos/jornadas', 'RecursosController@jornadas');
 Route::get('/recursos/documentos', 'RecursosController@documentos');
+Route::get('/recursos/distinciones-estudiante', 'RecursosController@distincionesEstudiante');
 
 // PETICIONES DEL EGRESADO
 Route::get('/egresado/datos', 'EstudianteController@datos');
@@ -158,6 +159,9 @@ Route::post('/administrador/borrar-documento', 'AdminController@borrarDocumento'
 Route::post('/administrador/registrar-programa', 'AdminController@registrarPrograma');
 Route::post('/administrador/graduados', 'AdminController@obtenerGraduados');
 Route::post('/administrador/registrar-graduados', 'AdminController@registrarGraduados');
+Route::get('/administrador/consultar-graduado', 'AdminController@consultarGraduado');
+Route::get('/administrador/consultar-graduado-programas', 'AdminController@consultarGraduadoProgramas');
+Route::get('/administrador/update-graduado', 'AdminController@updateGraduado');
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');
@@ -188,6 +192,7 @@ Route::get('/administrador/estudiantes', 'AdminController@estudiantes');
 Route::get('/administrador/programas', 'AdminController@configuracionProgramas');
 Route::get('/administrador/graduados', 'AdminController@graduados');
 Route::get('/administrador/graduado/{estudiante_id}', 'AdminController@graduado');
+Route::get('/administrador/registrar-graduado', 'AdminController@registrarGraduado');
 
 // RUTAS VISTAS SECRETARIA GENERAL
 Route::get('/secgeneral', 'SecretariaGeneralController@index');
