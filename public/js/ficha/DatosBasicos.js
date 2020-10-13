@@ -5,7 +5,13 @@ import http from '../http.js';
 Vue.component('datos-basicos', {
     template: '#datos-basicos-component',
     data: () => ({
-        datos: {},
+        datos: {
+            paises: [],
+            departamentos: [],
+            departamentos_residencia: [],
+            municipios: [],
+            municipios_residencia: []
+        },
         input: {},
         errors: {
         }
@@ -14,14 +20,40 @@ Vue.component('datos-basicos', {
         admin: {
             type: Boolean,
             default: false
+        },
+        register: {
+            type: Boolean,
+            default: false
+        },
+        updateregister: Function,
+        c_data: Object
+    },
+    watch: {
+        c_data(new_v) {
+            this.input = new_v.datos;
+            if (new_v.id) {
+                this.input.id = new_v.id;
+                this.input.edad = moment().diff(this.input.fecha_nacimiento, 'years', false);
+
+                this.onChangePaisNacimiento();
+                this.onChangeDepartamentoNacimiento();
+
+                this.onChangePaisResidencia();
+                this.onChangeDepartamentoResidencia();
+            }
         }
     },
     methods: {
         handleSubmit() {
             cargando('Enviando datos');
             http.post('egresado/datos', this.input).then(
-                () => {
+                ({ data }) => {
                     swal('Info', 'Se han guardado satisfactoriamente los datos', 'success');
+
+                    if (this.register && this.updateregister) {
+                        this.input.id = data.id;
+                        this.updateregister(this.input);
+                    }
                 },
                 ({ response }) => {
                     if (response.status === 422)
@@ -46,6 +78,18 @@ Vue.component('datos-basicos', {
                 },
                 error => []
             );
+        },
+        onChangePaisNacimiento() {
+            this.getDepartamentos(this.input.pais_nacimiento_id).then((data) => this.datos.departamentos = data);
+        },
+        onChangeDepartamentoNacimiento() {
+            this.getMunicipios(this.input.departamento_nacimiento_id).then((data) => this.datos.municipios = data);
+        },
+        onChangePaisResidencia() {
+            this.getDepartamentos(this.input.pais_residencia_id).then((data) => this.datos.departamentos_residencia = data);
+        },
+        onChangeDepartamentoResidencia() {
+            this.getMunicipios(this.input.departamento_residencia_id).then((data) => this.datos.municipios_residencia = data);
         }
     },
     mounted: function () {
@@ -74,33 +118,35 @@ Vue.component('datos-basicos', {
         );
 
 
-        http.get('egresado/datos').then(
-            async ({ data }) => {
-                let departamentos = await this.getDepartamentos(data.pais_nacimiento_id);
-                let municipios = await this.getMunicipios(data.departamento_nacimiento_id);
-                let departamentos_residencia = data.pais_nacimiento_id === data.pais_residencia_id ? departamentos : await this.getDepartamentos(data.pais_residencia_id);
-                let municipios_residencia = data.departamento_nacimiento === data.departamento_residencia ? municipios : await this.getMunicipios(data.departamento_residencia);
-                return {
-                    data,
-                    departamentos,
-                    municipios,
-                    departamentos_residencia,
-                    municipios_residencia
+        if (!this.register) {
+            http.get('egresado/datos').then(
+                async ({ data }) => {
+                    let departamentos = await this.getDepartamentos(data.pais_nacimiento_id);
+                    let municipios = await this.getMunicipios(data.departamento_nacimiento_id);
+                    let departamentos_residencia = data.pais_nacimiento_id === data.pais_residencia_id ? departamentos : await this.getDepartamentos(data.pais_residencia_id);
+                    let municipios_residencia = data.departamento_nacimiento === data.departamento_residencia ? municipios : await this.getMunicipios(data.departamento_residencia);
+                    return {
+                        data,
+                        departamentos,
+                        municipios,
+                        departamentos_residencia,
+                        municipios_residencia
+                    }
+                },
+                error => {
+
                 }
-            },
-            error => {
+            ).then(
+                ({ data, ...datos }) => {
+                    this.input = data;
 
-            }
-        ).then(
-            ({ data, ...datos }) => {
-                this.input = data;
+                    this.input.edad = moment().diff(data.fecha_nacimiento, 'years', false);
 
-                this.input.edad = moment().diff(data.fecha_nacimiento, 'years', false);
-
-                this.datos = { ...this.datos, ...datos };
+                    this.datos = { ...this.datos, ...datos };
 
 
-            }
-        );
+                }
+            );
+        }
     }
 });

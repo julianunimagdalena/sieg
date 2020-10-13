@@ -16,7 +16,9 @@ use App\Models\Estudiante;
 use App\Models\EstudianteDocumento;
 use App\Models\Estudio;
 use App\Models\ExperienciaLaboral;
+use App\Models\HojaVida;
 use App\Models\HojaVidaIdioma;
+use App\Models\Persona;
 use App\Models\ProcesoGrado;
 use App\Tools\PersonaHelper;
 use Illuminate\Support\Facades\Storage;
@@ -74,7 +76,7 @@ class EstudianteController extends Controller
                 break;
 
             case $roles['administrador']->id:
-                $persona = Estudiante::find(session('estudiante_id'))->persona;
+                if (session('estudiante_id')) $persona = Estudiante::find(session('estudiante_id'))->persona;
                 break;
         }
 
@@ -299,6 +301,24 @@ class EstudianteController extends Controller
     public function guardarDatosPersonales(PersonaRequest $request)
     {
         $persona = $this->getPersona();
+
+        if (!$persona) {
+            $ur = UsuarioRol::find(session('ur')->id);
+
+            if ($ur->isRol('administrador')) {
+                $persona = new Persona();
+                $persona->nombres = $request->nombres;
+                $persona->apellidos = $request->apellidos;
+                $persona->etnia = $request->etnia;
+                $persona->fechaNacimiento = $request->fecha_nacimiento;
+                $persona->tipodoc = $request->tipo_documento_id;
+                $persona->identificacion = $request->identificacion;
+                $persona->ciudadExpedicion = $request->lugar_expedicion_documento;
+                $persona->ciudadOrigen = $request->municipio_nacimiento_id;
+                $persona->save();
+            }
+        }
+
         if (!$persona) return response('no permitido', 400);
 
         $persona->fecha_expedicion = $request->fecha_expedicion_documento;
@@ -315,6 +335,12 @@ class EstudianteController extends Controller
         $persona->correo2 = $request->correo2;
         $persona->estadovida = $request->estado_vida !== null ? $request->estado_vida : true;
         $persona->save();
+
+        $hv = $persona->hojaVida ?? new HojaVida();
+        $hv->perfil = $hv->perfil ?? '-';
+        $hv->laborando = $hv->laborando !== null ? $hv->laborando : 0;
+        $hv->idPersona = $persona->id;
+        $hv->save();
 
         $this->actualizarProgresoFicha();
         return ['id' => $persona->id];

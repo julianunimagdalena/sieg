@@ -378,6 +378,7 @@ class AdminController extends Controller
         $programa->idNivelestudio = $request->nivel_estudio_id;
         $programa->carga_ecaes = true;
         $programa->carga_titulo_grado = true;
+        $programa->digita_encuesta = true;
         $programa->save();
 
         $ps_ids = array_values(array_map(fn ($ps) => $ps->id, Variables::defaultPazSalvos()));
@@ -580,7 +581,7 @@ class AdminController extends Controller
 
     public function registrarGraduado()
     {
-        return view('administrador.registrar_graduado');
+        return view('egresado.ficha', ['register' => true]);
     }
 
     public function consultarGraduado(Request $request)
@@ -617,6 +618,8 @@ class AdminController extends Controller
         $res = ['programas' => []];
         $persona = Persona::find($request->persona_id);
 
+        if (!$persona) return response('No valido', 400);
+
         foreach ($persona->estudiantes as $estudiante) {
             $dm = $estudiante->estudio;
             $pg = $estudiante->procesoGrado;
@@ -628,7 +631,7 @@ class AdminController extends Controller
                 'acta' => $estudiante->acta,
                 'libro' => $estudiante->libro,
                 'distincion_id' => $estudiante->distincion,
-                'fecha_grado' => $pg->fechaGrado->fecha_grado,
+                'fecha_grado' => $pg ? $pg->fechaGrado->fecha_grado : null,
                 'facultad_id' => $dm->idFacultad,
                 'programa_id' => $dm->idPrograma,
                 'jornada_id' => $dm->idJornada,
@@ -637,7 +640,7 @@ class AdminController extends Controller
                     'programa' => $dm->programa->nombre,
                     'facultad' => $dm->facultad->nombre,
                     'modalidad' => $dm->modalidad->nombre,
-                    'fecha_grado' => $pg->fechaGrado->fecha_grado,
+                    'fecha_grado' => $pg ? $pg->fechaGrado->fecha_grado : null,
                 ]
             ]);
         }
@@ -660,12 +663,15 @@ class AdminController extends Controller
 
         if (!$dm) return response('Programa no valido', 400);
 
+        $tipos = Variables::tiposEstudiante();
         $estudiante->codigo = $request->codigo;
         $estudiante->folio = $request->folio;
         $estudiante->acta = $request->acta;
         $estudiante->libro = $request->libro;
         $estudiante->distincion = $request->distincion_id;
         $estudiante->idPrograma = $dm->id;
+        $estudiante->idPersona = $persona->id;
+        $estudiante->idTipo = $tipos['graduado']->id;
         $estudiante->save();
 
         return 'ok';

@@ -59,21 +59,24 @@
 @include('components.ficha.datosacademicos')
 @include('components.ficha.hojadevida')
 @include('components.ficha.datoslaborales')
+@include('components.ficha.datosprogramas')
 @endpush
 
 <?php
     $isAdminView = (isset($isAdmin) && $isAdmin == true) ? 'true' : 'false';
 
-
+    $isRegister = isset($register) && $register == true;
 
 ?>
 
 @section('content')
+<input type="hidden" value="{{ $isRegister }}" id="is-register" />
 <div class="row">
     <div class="col col-md-8">
         <h3 class="text-primary text-uppercase">Ficha de Egresado</h3>
         <div>Los campos con <span class="text-danger">*</span> son requeridos</div>
     </div>
+    @if(!$isRegister)
     <div class="col col-md-4" id="progreso-view">
         <div class="font-weight-bold app-text-back-1 mb-3">
             Progreso
@@ -86,6 +89,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 <div class="mt-3 decorative">
     <ul class="nav nav-tabs tab" role="tablist" id="tab-list">
@@ -94,6 +98,14 @@
                 data-toggle="tab" href="#datos-basicos" role="tab" @click="setActiveTab('datos_basicos')"
                 aria-controls="datos-basicos" aria-selected="true">Datos básicos</a>
         </li>
+        @if($isRegister)
+        <li class="nav-item">
+            <a v-bind:class="{'active' : active.datos_programas}" class="nav-link" id="datos-programas-tab"
+                v-if="egresado_data.datos.id || egresado_data.id" data-toggle="tab" href="#datos-programas" role="tab"
+                @click="setActiveTab('datos_programas')" aria-controls="datos-programas" aria-selected="false">
+                Datos Programas</a>
+        </li>
+        @else
         <li class="nav-item">
             <a v-bind:class="{'active' : active.datos_academicos}" class="nav-link" id="datos-academicos-tab"
                 data-toggle="tab" href="#datos-academicos" role="tab" @click="setActiveTab('datos_academicos')"
@@ -109,13 +121,21 @@
                 data-toggle="tab" href="#datos-laborales" role="tab" @click="setActiveTab('datos_laborales')"
                 aria-controls="datos-laborales" aria-selected="false">Datos laborales</a>
         </li>
+        @endif
     </ul>
 
     <tab-content>
         <tab-pane id="datos-basicos" :active="active.datos_basicos">
-            <datos-basicos :admin="{{$isAdminView}}" />
+            <datos-basicos :admin="{{$isAdminView}}" :register="{{ $isRegister ? 'true' : 'false' }}"
+                :c_data="egresado_data" :updateregister="updateRegister" />
         </tab-pane>
 
+
+        @if($isRegister)
+        <tab-pane id="datos-programas" :active="active.datos_programas">
+            <datos-programas :c_data="egresado_data" />
+        </tab-pane>
+        @else
         <tab-pane id="datos-academicos" :active="active.datos_academicos">
             <datos-academicos @updateprogreso="updateProgreso()" :admin="{{$isAdminView}}" />
         </tab-pane>
@@ -127,6 +147,7 @@
         <tab-pane id="datos-laborales" :active="active.datos_laborales">
             <datos-laborales @updateprogreso="updateProgreso()" :admin="{{$isAdminView}}" />
         </tab-pane>
+        @endif
     </tab-content>
 </div>
 @endsection

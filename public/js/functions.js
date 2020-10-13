@@ -40,7 +40,7 @@ function objectToFormData(obj, rootName, ignoreList) {
     return formData;
 }
 
-function initBootstrapSelect(id = null,time = 10) {
+function initBootstrapSelect(id = null, time = 10) {
     $.fn.selectpicker.Constructor.DEFAULTS.style = 'form-control';
     $.fn.selectpicker.Constructor.DEFAULTS.styleBase = 'form-control';
     $.fn.selectpicker.Constructor.DEFAULTS.noneSelectedText = 'Seleccione';
@@ -72,28 +72,24 @@ class DataTableManager {
         });
     }
 }
-function getDocumentoRoute(documento_id,url = '/documento/ver')
-{
+function getDocumentoRoute(documento_id, url = '/documento/ver') {
     return `${baseURL}${url}/${documento_id}?rnd=${Math.floor(Math.random() * 10000)}`;
 }
 
-function verDocumento(documento_id, url = '/documento/ver')
-{
+function verDocumento(documento_id, url = '/documento/ver') {
     let link = document.createElement('a');
     link.setAttribute('href', getDocumentoRoute(documento_id, url));
     link.target = '_blank';
     link.click();
 
     link.remove();
-//window.open(`${baseURL}${url}/${documento_id}`, '__blank');
+    //window.open(`${baseURL}${url}/${documento_id}`, '__blank');
 }
 
-function objectToParameter(obj)
-{
+function objectToParameter(obj) {
     let result = '';
 
-    for(let key in obj)
-    {
+    for (let key in obj) {
         result += `${key}=${obj[key]}&`;
     }
 
@@ -101,5 +97,9 @@ function objectToParameter(obj)
 }
 
 
+function openModal(target = "") {
+    $(target).modal('show');
+}
 
-export { objectToFormData, initBootstrapSelect, DataTableManager, verDocumento, getDocumentoRoute, objectToParameter };
+
+export { objectToFormData, initBootstrapSelect, DataTableManager, verDocumento, getDocumentoRoute, objectToParameter, openModal };

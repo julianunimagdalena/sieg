@@ -32,6 +32,7 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
+    return App\Models\HojaVida::all();
     return [(int) "-45"];
     $fecha = Carbon\Carbon::now()->locale('es_ES');
     return $fecha->year;
@@ -161,7 +162,7 @@ Route::post('/administrador/graduados', 'AdminController@obtenerGraduados');
 Route::post('/administrador/registrar-graduados', 'AdminController@registrarGraduados');
 Route::get('/administrador/consultar-graduado', 'AdminController@consultarGraduado');
 Route::get('/administrador/consultar-graduado-programas', 'AdminController@consultarGraduadoProgramas');
-Route::get('/administrador/update-graduado', 'AdminController@updateGraduado');
+Route::post('/administrador/update-graduado', 'AdminController@updateGraduado');
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');

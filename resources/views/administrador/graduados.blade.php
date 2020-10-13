@@ -4,6 +4,7 @@
 @push('components')
 @include('components.app.Titulo')
 @include('components.app.card-action')
+@include('components.app.icon-btn')
 @include('components.app.input')
 @include('components.app.select')
 @include('components.app.modal')
@@ -15,7 +16,7 @@
 <div>
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <card-action title="FILTRO">
+            <card-action title="ACCIONES">
                 <div class="row">
                     <div class="col-md-4 col-sm-12 form-group">
                         <app-select label="Facultad" v-model="filter.facultad_id" @input="onChangeFacultad()">
@@ -90,6 +91,11 @@
                         </span>
                         <span class="text">Registrar Graduados</span>
                     </button>
+                    <a href="{{ Request::root() }}/administrador/registrar-graduado">
+                        <icon-button color="primary" sm text="Registrar Graduado" c_class="ml-3">
+                            <i class="fas fa-user"></i>
+                        </icon-button>
+                    </a>
                 </div>
             </card-action>
         </div>
