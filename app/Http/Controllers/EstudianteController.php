@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\PersonaRequest;
 use App\Models\Asociacion;
 use App\Models\Distincion;
+use App\Models\Encuesta;
 use App\Models\Estudiante;
 use App\Models\EstudianteDocumento;
 use App\Models\Estudio;
@@ -21,6 +22,7 @@ use App\Models\HojaVidaIdioma;
 use App\Models\Persona;
 use App\Models\ProcesoGrado;
 use App\Tools\PersonaHelper;
+use App\Tools\WSFoto;
 use Illuminate\Support\Facades\Storage;
 
 class EstudianteController extends Controller
@@ -147,13 +149,14 @@ class EstudianteController extends Controller
 
         foreach ($estudiantesGraduados as $est) {
             $estudio = $est->estudio;
+            $pg = $est->procesoGrado;
 
             array_push($programas, [
                 'codigo' => $est->codigo,
                 'programa' => $estudio->programa->nombre,
                 'facultad' => $estudio->facultad->nombre,
                 'modalidad' => $estudio->modalidad->nombre,
-                'fecha_grado' => $est->procesoGrado->fechaGrado->fecha_grado
+                'fecha_grado' => $pg ? $pg->fechaGrado->fecha_grado : ''
             ]);
         }
 
@@ -815,5 +818,72 @@ class EstudianteController extends Controller
         $pg->save();
 
         return 'ok';
+    }
+
+    public function validarFoto(Request $request)
+    {
+        return ['success' => true];
+    }
+
+    public function cargarFoto(Request $request)
+    {
+        $this->validate($request, [
+            'aprobar' => 'boolean|required',
+            'foto' => 'required_if:aprobar,false'
+        ]);
+
+        $res = true;
+        $estudiante = Estudiante::find(session('estudiante_id'));
+        $pg = $estudiante->procesoGrado;
+
+        if ($request->aprobar) {
+            $pg->foto_aprobada = true;
+            $pg->save();
+        } else {
+            $ws = new WSFoto();
+            $success = $ws->guardarFoto($request->foto, $estudiante);
+
+            if ($success) {
+                $pg->foto_cargada = true;
+                $pg->save();
+            } else $res = false;
+        }
+
+        return ['success' => $res];
+    }
+
+    public function datosFoto()
+    {
+        $estudiante = Estudiante::find(session('estudiante_id'));
+        $pg = $estudiante->procesoGrado;
+
+        return [
+            'foto_aprobada' => $pg->foto_aprobada,
+            'foto_cargada' => $pg->foto_cargada,
+            'foto' => $estudiante->foto
+        ];
+    }
+
+    public function encuesta($encuesta_id)
+    {
+        $encuesta = Encuesta::find($encuesta_id);
+        $res = [];
+
+        foreach ($encuesta->modulos as $modulo) {
+            $preguntas = [];
+
+            foreach ($modulo->preguntas()->noroot()->get() as $pregunta) {
+                array_push($preguntas, [
+                    'id' => $pregunta->id,
+                    'text' => $pregunta->text,
+                ]);
+            }
+
+            array_push($res, [
+                'titulo' => $modulo->titulo,
+                'descripcion' => $modulo->descripcion,
+                'preguntas' => $preguntas
+            ]);
+        }
     }
 }

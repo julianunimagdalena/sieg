@@ -103,6 +103,26 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
         ],
+
+        'carnetizacion' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_CARNETIZACION', '127.0.0.1'),
+            'port' => env('DB_PORT_CARNETIZACION', '3306'),
+            'database' => env('DB_DATABASE_CARNETIZACION', 'forge'),
+            'username' => env('DB_USERNAME_CARNETIZACION', 'forge'),
+            'password' => env('DB_PASSWORD_CARNETIZACION', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
     ],
 
     /*

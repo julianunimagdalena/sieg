@@ -1,12 +1,16 @@
 @component('component', ['id' => 'user-avatar-component'])
 <div class="text-center">
-    <img src="{{ asset('img/sin_perfil.png') }}" alt="" class="img-fluid" v-bind:style="imgstyle">
+    <img :src="foto || '{{ asset('img/sin_perfil.png') }}' " alt="" class="img-fluid" v-bind:style="imgstyle">
     <br>
-    <div class="mt-4" v-if="actions">
-        <button class="btn btn-outline-primary btn-sm btn-circle" title="Cargar Foto" type="button">
+    <input type="file" id="foto-input" accept="image/*" @change="onChangeFoto($event.target.files)"
+        style="display: none;" />
+    <div class="mt-4" v-if="actions && !foto_aprobada">
+        <button class="btn btn-outline-primary btn-sm btn-circle" @click="onClickUpload()" title="Cargar Foto"
+            type="button">
             <i class="fas fa-upload"></i>
         </button>
-        <button class="btn btn-success btn-sm btn-circle ml-3" title="Aprobar Foto" type="button">
+        <button class="btn btn-success btn-sm btn-circle ml-3" :disabled="!valid" @click="onclickAprobar()"
+            title="Aprobar Foto" type="button">
             <i class="fas fa-check"></i>
         </button>
     </div>
@@ -22,16 +26,5 @@
 @endcomponent
 
 @push('scripts')
-<script>
-    Vue.component('user-avatar', {
-            template: '#user-avatar-component',
-            props: {
-                imgstyle: Object,
-                actions: {
-                    type: Boolean,
-                    default: true
-                }
-            }
-        });
-</script>
+<script type="module" src="{{ asset('js/ficha/UserAvatar.js') }}"></script>
 @endpush

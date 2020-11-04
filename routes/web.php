@@ -1,6 +1,8 @@
 <?php
 
+use App\Tools\WSFoto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -32,10 +34,9 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    return App\Models\HojaVida::all();
-    return [(int) "-45"];
-    $fecha = Carbon\Carbon::now()->locale('es_ES');
-    return $fecha->year;
+    $split = str_split(str_split('201424136', 5)[0], 4);
+    return $split[0] . '-' . ($split[1] === '1' ? 'I' : 'II');
+    return DB::connection('carnetizacion')->table('usuarios')->get();
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -115,6 +116,9 @@ Route::get('/egresado/documentos-grado', 'EstudianteController@documentosGrado')
 Route::post('/egresado/cargar-documento', 'EstudianteController@cargarDocumento');
 Route::get('/egresado/info-asistencia-ceremonia/{codigo}', 'EstudianteController@infoAsistenciaCeremonia');
 Route::post('/egresado/asistencia-ceremonia', 'EstudianteController@guardarAsistenciaCeremonia');
+Route::post('/egresado/cargar-foto', 'EstudianteController@cargarFoto');
+Route::get('/egresado/foto', 'EstudianteController@datosFoto');
+Route::post('/egresado/validar-foto', 'EstudianteController@validarFoto');
 
 // PETICIONES DIRECCION DE PROGRAMA
 Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');

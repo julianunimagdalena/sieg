@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Tools\Variables;
+use App\Tools\WSFoto;
 use Illuminate\Database\Eloquent\Model;
 
 class Estudiante extends Model
@@ -26,6 +27,11 @@ class Estudiante extends Model
     public function estudio()
     {
         return $this->belongsTo('App\Models\DependenciaModalidad', 'idPrograma');
+    }
+
+    public function zonal()
+    {
+        return $this->belongsTo('App\Models\Municipio', 'idZonal');
     }
 
     public function procesoGrado()
@@ -93,7 +99,8 @@ class Estudiante extends Model
                 $doc_count = $this->estudianteDocumento()->where('estado_id', '<>', $estados['aprobado']->id)->count();
                 $ps_count = $this->estudiantePazSalvo()->where('paz_salvo', false)->count();
                 $can = $doc_count === 0
-                    && $ps_count === 0;
+                    && $ps_count === 0
+                    && $pg->foto_aprobada;
 
                 if ($programa->carga_ecaes) {
                     $can = $can
@@ -182,5 +189,21 @@ class Estudiante extends Model
         $ps = $programa->pazSalvosNecesarios->pluck('id');
 
         return $ps;
+    }
+
+    public function getFotoAttribute()
+    {
+        $ws = new WSFoto();
+        $res = $ws->consultarFoto($this->codigo);
+
+        return $this->procesoGrado->foto_cargada ? $res->foto_prevalidada : $res->foto_actual;
+    }
+
+    public function getCohorteAttribute()
+    {
+        $split = str_split($this->codigo, 5);
+        $split = str_split($split[0], 4);
+
+        return $split[0] . '-' . ($split[1] === '1' ? 'I' : 'II');
     }
 }
