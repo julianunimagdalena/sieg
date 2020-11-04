@@ -864,6 +864,7 @@ class EstudianteController extends Controller
         ];
     }
 
+    /**hola */
     public function encuesta($encuesta_id)
     {
         $encuesta = Encuesta::find($encuesta_id);
