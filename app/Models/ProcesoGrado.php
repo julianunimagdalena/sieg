@@ -19,7 +19,9 @@ class ProcesoGrado extends Model
         'mejor_ecaes' => 'boolean',
         'mencion_honor' => 'boolean',
         'incentivo_nacional' => 'boolean',
-        'incentivo_institucional' => 'boolean'
+        'incentivo_institucional' => 'boolean',
+        'foto_aprobada' => 'boolean',
+        'foto_cargada' => 'boolean'
     ];
 
     public function estudiante()
