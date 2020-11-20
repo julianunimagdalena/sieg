@@ -702,7 +702,7 @@ class EstudianteController extends Controller
         array_push($res, [
             'nombre' => $estudiante->persona->nombre,
             'documento' => $estudiante->persona->identificacion,
-            'tipo_documento' => $estudiante->persona->tipoDocumento->nombre,
+            'tipo_documento' => $estudiante->persona->tipoDocumento->abrv,
             'programa' => $estudiante->estudio->programa->nombre,
             'codigo' => $estudiante->codigo,
             'estado_encuesta' => $estudiante->procesoGrado->estado_encuesta,
@@ -822,7 +822,10 @@ class EstudianteController extends Controller
 
     public function validarFoto(Request $request)
     {
-        return ['success' => true];
+        $ws = new WSFoto();
+        $res = $ws->validarFoto($request->foto);
+
+        return ['success' => $res->valido, 'descripcion' => $res->descripcion];
     }
 
     public function cargarFoto(Request $request)
@@ -864,27 +867,67 @@ class EstudianteController extends Controller
         ];
     }
 
-    /**hola */
+    private function respuestasPregunta($pregunta)
+    {
+        $respuestas = [];
+
+        foreach ($pregunta->posiblesRespuestas as $respuesta) {
+            array_push($respuestas, [
+                'id' => $respuesta->id,
+                'valor' => $respuesta->descripcion,
+                'abierta' => $respuesta->abierta,
+                'to_pregunta' => $respuesta->to_pregunta_id,
+            ]);
+        }
+
+        return $respuestas;
+    }
+
     public function encuesta($encuesta_id)
     {
         $encuesta = Encuesta::find($encuesta_id);
-        $res = [];
+        $res = [
+            'nombre' => $encuesta->nombre,
+            'descripcion' => $encuesta->descripcion,
+            'modulos' => []
+        ];
 
         foreach ($encuesta->modulos as $modulo) {
             $preguntas = [];
 
             foreach ($modulo->preguntas()->noroot()->get() as $pregunta) {
+                $subpreguntas = [];
+
+                foreach ($pregunta->subpreguntas as $subpregunta) {
+                    array_push($subpreguntas, [
+                        'id' => $subpregunta->id,
+                        'orden' => $subpregunta->orden,
+                        'text' => $subpregunta->text,
+                        'obligatoria' => $subpregunta->obligatorio,
+                        'abierta' => $subpregunta->abierta,
+                        'multiple' => $subpregunta->multiple,
+                    ]);
+                }
+
                 array_push($preguntas, [
                     'id' => $pregunta->id,
+                    'orden' => $pregunta->orden,
                     'text' => $pregunta->text,
+                    'obligatoria' => $pregunta->obligatorio,
+                    'abierta' => $pregunta->abierta,
+                    'multiple' => $pregunta->multiple,
+                    'respuestas' => $this->respuestasPregunta($pregunta),
+                    'preguntas' => $subpreguntas
                 ]);
             }
 
-            array_push($res, [
+            array_push($res['modulos'], [
                 'titulo' => $modulo->titulo,
                 'descripcion' => $modulo->descripcion,
                 'preguntas' => $preguntas
             ]);
         }
+
+        return $res;
     }
 }

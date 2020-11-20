@@ -34,9 +34,9 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    $split = str_split(str_split('201424136', 5)[0], 4);
-    return $split[0] . '-' . ($split[1] === '1' ? 'I' : 'II');
-    return DB::connection('carnetizacion')->table('usuarios')->get();
+    // return DB::connection('carnetizacion')->table('estudiante')->get();
+    $ctrl = new App\Http\Controllers\EstudianteController();
+    return $ctrl->encuesta(1);
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');

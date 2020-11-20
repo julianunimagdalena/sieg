@@ -32,7 +32,9 @@ class WSFoto
         $headers = ['Content-Type' => 'application/json'];
         $body = '{ "key": "' . strtoupper(md5($token)) . '", "Foto": "' . $foto . '", }';
 
-        return $this->fetch($url, 'POST', $headers, $body);
+        $res = json_decode($this->fetch($url, 'POST', $headers, $body));
+
+        return (object) ['valido' => $res->Valido, 'descripcion' => $res->Descripcion];
     }
 
     public function registrar($estudiante)
@@ -48,7 +50,7 @@ class WSFoto
             'roles_id' => $rol_estudiante->id
         ]);
 
-        DB::connection('carnetizacion')->table('estudiante')->insert([
+        $est_id = DB::connection('carnetizacion')->table('estudiante')->insertGetId([
             'codigo' => $estudiante->codigo,
             'programa' => $estudiante->estudio->programa->nombre,
             'codPrograma' => $estudiante->estudio->programa->codigoPrograma,
@@ -63,6 +65,20 @@ class WSFoto
             'estado' => 0,
             'usuarios_id' => $usr_id
         ]);
+
+        $pg = $estudiante->procesoGrado;
+        $pg->est_carnetizacion_id = $est_id;
+        $pg->save();
+    }
+
+    public function consultarEstado($est_id)
+    {
+        $estudiante = DB::connection('carnetizacion')->table('estudiante')->where('id', $est_id)->first();
+
+        if (!$estudiante) return 'rechazado';
+        if ($estudiante->estado == '1') return 'aprobado';
+
+        return 'no aprobado';
     }
 
     public function guardarFoto(string $foto, $estudiante, bool $definitiva = false)
@@ -77,7 +93,7 @@ class WSFoto
         $res = $this->fetch($url, 'POST', $headers, $body);
         $res = json_decode($res);
 
-        $this->registrar($estudiante);
+        if ($res->Valido) $this->registrar($estudiante);
 
         return $res->Valido;
     }

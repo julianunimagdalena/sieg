@@ -1,0 +1,38 @@
+{
+    nombre: string,
+    descripcion: string,
+    modulos: [
+        {
+            nombre: string,
+            descripcion: string,
+            preguntas: [
+                {
+                    id: number,
+                    orden: number,
+                    text: string,
+                    obligatoria: boolean,
+                    abierta: boolean,
+                    multiple: boolean,
+                    respuestas: [
+                        {
+                            id: number,
+                            valor: string,
+                            abierta: boolean,
+                            to_pregunta: number
+                        }
+                    ]
+                    preguntas?: [
+                        {
+                            id: number,
+                            orden: number,
+                            text: string,
+                            obligatoria: boolean,
+                            abierta: boolean,
+                            multiple: boolean
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

@@ -150,6 +150,12 @@ class Estudiante extends Model
         return $query->where('idTipo', $tipos['graduado']->id);
     }
 
+    public function scopeEgresados($query)
+    {
+        $tipos = Variables::tiposEstudiante();
+        return $query->where('idTipo', $tipos['egresado']->id);
+    }
+
     public function getCargaEcaesAttribute()
     {
         $res = true;
