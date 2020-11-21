@@ -119,6 +119,8 @@ Route::post('/egresado/asistencia-ceremonia', 'EstudianteController@guardarAsist
 Route::post('/egresado/cargar-foto', 'EstudianteController@cargarFoto');
 Route::get('/egresado/foto', 'EstudianteController@datosFoto');
 Route::post('/egresado/validar-foto', 'EstudianteController@validarFoto');
+Route::get('/egresado/encuesta/{key}', 'EstudianteController@encuesta');
+Route::get('/egresado/datos-encuesta/{key}', 'EstudianteController@datosEncuesta');
 
 // PETICIONES DIRECCION DE PROGRAMA
 Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');

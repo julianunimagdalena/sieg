@@ -3,6 +3,7 @@
 namespace App\Tools;
 
 use App\Models\Documento;
+use App\Models\Encuesta;
 use App\Models\Estado;
 use App\Models\NivelEstudio;
 use App\Models\PazSalvo;
@@ -146,5 +147,14 @@ class Variables
             'doctorado' => NivelEstudio::where('nombre', 'DOCTORADO')->first(),
             'otro' => NivelEstudio::where('nombre', 'OTRO')->first(),
         ];
+    }
+
+    static public function encuestas($key)
+    {
+        $encuestas = [
+            'momento_0' => Encuesta::where('nombre', 'Encuesta de Seguimiento a Graduandos V 2.0 -2019')->first()
+        ];
+
+        return $encuestas[$key];
     }
 }

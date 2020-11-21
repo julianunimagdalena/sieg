@@ -883,12 +883,19 @@ class EstudianteController extends Controller
         return $respuestas;
     }
 
-    public function encuesta($encuesta_id)
+    public function encuesta($key)
     {
-        $encuesta = Encuesta::find($encuesta_id);
+        return view('egresado.encuesta', compact('key'));
+    }
+
+    public function datosEncuesta($key)
+    {
+        $encuesta = Variables::encuestas($key);
+        $estudiante = Estudiante::find(session('estudiante_id'));
         $res = [
             'nombre' => $encuesta->nombre,
             'descripcion' => $encuesta->descripcion,
+            'diligenciada' => $estudiante->procesoGrado->estado_encuesta,
             'modulos' => []
         ];
 

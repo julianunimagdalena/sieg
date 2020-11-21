@@ -36,3 +36,14 @@
         }
     ]
 }
+
+post /egresado/encuesta/{key}
+{
+    respuestas: [
+        {
+            pregunta_id: number,
+            texto?: string,
+            multiple?: [string]
+        }
+    ]
+}
