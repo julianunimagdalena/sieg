@@ -1,5 +1,5 @@
 import http from '../../http.js';
-import {  defaultUserAvatar } from '../../variables.js';
+import { defaultUserAvatar } from '../../variables.js';
 
 
 Vue.component('sidebar-proceso-grado', {
@@ -12,30 +12,24 @@ Vue.component('sidebar-proceso-grado', {
         estudiante: undefined
     }),
     methods: {
-        initData()
-        {
+        initData() {
             http.get(`direccion/proceso-grado/${this.estudiante_data.id}`).then(
-                ({ data }) =>
-                {
+                ({ data }) => {
                     this.estudiante = data;
-                    this.estudiante.info.foto = data.info.foto || defaultUserAvatar;
+                    this.estudiante.info.foto = this.estudiante_data.foto;
                 }
             );
         },
-        updatePazSalvos()
-        {
+        updatePazSalvos() {
             cargando();
             http.post('direccion/actualizar-paz-salvos', { estudiante_id: this.estudiante_data.id }).then(
-                ({ data }) =>
-                {
-                    if(data.success)
-                    {
+                ({ data }) => {
+                    if (data.success) {
                         alertTareaRealizada();
                         this.initData();
                     }
-                    else
-                    {
-                        let elements ='';
+                    else {
+                        let elements = '';
 
                         data.errors.forEach((element) => {
                             elements += `<li class="list-group-item font-weight-bold">${element}</li>`;
@@ -57,24 +51,21 @@ Vue.component('sidebar-proceso-grado', {
                         `;
 
                         swal({
-                            title:"Información",
+                            title: "Información",
                             content: swalHtml,
                             icon: "warning"
                         });
                     }
                 },
-                error =>
-                {
+                error => {
                     alertErrorServidor();
                 }
             ).then(cerrarCargando);
         }
     },
     watch: {
-        show(new_v, old_v)
-        {
-            if(new_v)
-            {
+        show(new_v, old_v) {
+            if (new_v) {
                 this.initData();
             }
         }

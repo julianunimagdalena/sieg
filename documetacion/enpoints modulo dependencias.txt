@@ -6,7 +6,8 @@ modificar endpoint login -> roles y sesion para guardar la dependencia
 /dependencia -> index
 
 ------------------- PETICIONES -------------------
-/dependencia/estudiantes
+obtener estudiantes
+post /dependencia/estudiantes
 {
     ...tableObject
     estado: 'aprobado' | 'pendiente'
@@ -23,4 +24,11 @@ return {
     data: {
         estudiante_id: number
     }
+}
+
+aprobar paz y salvo
+post /dependencia/cambiar-estado
+{
+    estudiante_id: int
+    motivo?: string
 }

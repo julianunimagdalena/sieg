@@ -113,6 +113,7 @@ class Variables
         return [
             $documentos['ecaes']->id,
             $documentos['identificacion']->id,
+            $documentos['pago']->id,
         ];
     }
 

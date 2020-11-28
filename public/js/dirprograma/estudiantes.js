@@ -39,9 +39,9 @@ let vue = new Vue({
                 }
             );
         },
-        showSidebar(data, sidebar) {
-            console.log(data);
-            this.estudiante = { id: data, info: {}, extra: {} };
+        showSidebar(data, sidebar, foto = null) {
+
+            this.estudiante = { id: data, info: {}, extra: {}, foto };
 
             if (sidebar === 'est')
                 this.show_est = true;
@@ -112,7 +112,7 @@ let vue = new Vue({
                         tdApellidos.innerText = tdApellidos.innerText.toLowerCase();
 
                         let foto = !tdFoto.innerText ? baseURL + fotoUrl : 'data:image/*;base64,' + fotoUrl;
-                        tdFoto.innerHTML = `<img src="${foto}" id="" alt="foto-estudiante" class="img-fluid Table-Image"/>`;
+                        tdFoto.innerHTML = `<img src="${foto}" id="foto-${data.id}" alt="foto-estudiante" class="img-fluid Table-Image"/>`;
 
 
                         tdEstadoEst.innerHTML = `<i class="badge ${getBadgeClass(tdEstadoEst.innerText)}">${tdEstadoEst.innerText}</i>`;
@@ -137,7 +137,8 @@ let vue = new Vue({
 
 $('#tabla-estudiante').on('draw.dt', function () {
     $('.show-info').on('click', function () {
-        vue.showSidebar($(this).attr('data-id'), $(this).attr('sidebar'));
+        let id = $(this).attr('data-id');
+        vue.showSidebar(id, $(this).attr('sidebar'), $(`#foto-${id}`).attr('src'));
     });
     $('.show-estudiante').on('click', function () {
         vue.showEstudiante($(this).attr('data-id'));

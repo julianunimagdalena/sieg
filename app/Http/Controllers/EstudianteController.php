@@ -733,7 +733,11 @@ class EstudianteController extends Controller
         $documentosGrado = Variables::documentos();
         $estudiante = Estudiante::find(session('estudiante_id'));
 
-        $whitelist = [$documentosGrado['ecaes']->id, $documentosGrado['identificacion']->id];
+        $whitelist = [
+            $documentosGrado['ecaes']->id,
+            $documentosGrado['identificacion']->id,
+            $documentosGrado['pago']->id
+        ];
 
         foreach ($whitelist as $doc_id) {
             $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc_id)->first();

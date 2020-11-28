@@ -7,7 +7,7 @@
             <div class="mt-2">@{{ estudiante.info.codigo}}</div>
             <div class="">@{{ estudiante.info.programa}}</div>
         </div>
-        <hr/>
+        <hr />
         <div class="pl-2 pr-2">
             <div class="d-flex flex-row align-items-center justify-content-between">
                 <div class="font-weight-bold">
@@ -16,7 +16,7 @@
             </div>
             <div class="mt-1">
                 <list-group flush>
-                    <list-group-item-flex light md v-for="(item) in estudiante.proceso" :key="item.proceso" >
+                    <list-group-item-flex light md v-for="(item) in estudiante.proceso" :key="item.proceso">
                         <div class="">
                             @{{ item.proceso }}
                         </div>
@@ -28,14 +28,15 @@
                 </list-group>
             </div>
         </div>
-        <hr/>
+        <hr />
         <div class="pl-2 pr-2">
             <div class="font-weight-bold">
                 Paz y Salvos
             </div>
             <div>
                 <list-group flush>
-                    <list-group-item-flex light sm v-for="(item) in estudiante.paz_salvos" :key="item.nombre" :bold="false">
+                    <list-group-item-flex light sm v-for="(item) in estudiante.paz_salvos" :key="item.nombre"
+                        :bold="false">
                         <div class="text-initial">@{{ item.nombre }}</div>
                         <div>
                             <icono-estado :estado="item.estado"></icono-estado>
@@ -44,7 +45,8 @@
                 </list-group>
             </div>
             <div class="text-center mt-3 mb-3">
-                <button class="btn btn-icon-split btn-primary btn-sm" title="Actualizar Paz y Salvos" @click="updatePazSalvos()">
+                <button class="btn btn-icon-split btn-primary btn-sm" title="Actualizar Paz y Salvos"
+                    @click="updatePazSalvos()">
                     <span class="icon text-white-50">
                         <i class="fas fa-sync-alt"></i>
                     </span>
