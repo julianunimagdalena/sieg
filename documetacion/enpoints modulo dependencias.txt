@@ -1,0 +1,26 @@
+modificar endpoint nuevo usuario para enviar dependencia_id
+
+modificar endpoint login -> roles y sesion para guardar la dependencia
+
+------------------- VISTAS ------------------------
+/dependencia -> index
+
+------------------- PETICIONES -------------------
+/dependencia/estudiantes
+{
+    ...tableObject
+    estado: 'aprobado' | 'pendiente'
+    fecha_grado_inicio: date,
+    fecha_grado_final: date,
+    programa_id: number
+}
+return {
+    nombre: string,
+    programa: string,
+    codigo: string,
+    foto: string,
+    fecha_grado: string
+    data: {
+        estudiante_id: number
+    }
+}

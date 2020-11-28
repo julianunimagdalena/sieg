@@ -48,4 +48,9 @@ class ProcesoGrado extends Model
     {
         return $this->belongsTo('App\Models\TipoVinculacion', 'tipo_vinculacion_tutor_id');
     }
+
+    public function procesoGradoEncuesta()
+    {
+        return $this->hasOne('App\Models\ProcesoGradoEncuesta', 'proceso_grado_id');
+    }
 }

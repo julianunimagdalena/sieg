@@ -4,7 +4,7 @@
     <br>
     <input type="file" id="foto-input" accept="image/*" @change="onChangeFoto($event.target.files)"
         style="display: none;" />
-    <div class="mt-4" v-if="actions && !foto_aprobada">
+    <div class="mt-4" v-if="actions && !foto_aprobada && !foto_cargada">
         <button class="btn btn-outline-primary btn-sm btn-circle" @click="onClickUpload()" title="Cargar Foto"
             type="button">
             <i class="fas fa-upload"></i>
@@ -13,6 +13,9 @@
             title="Aprobar Foto" type="button">
             <i class="fas fa-check"></i>
         </button>
+    </div>
+    <div v-if="foto_cargada" class="mt-2">
+        <small class="text-muted">Esperando aprobación de foto</small>
     </div>
     <!--<div class="btn-group-vertical" style="width:100%;" role="group" aria-label="...">
         <button type="button" class="btn btn-light btn-block btn-sm" title="Actualizar foto">

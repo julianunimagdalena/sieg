@@ -15,7 +15,8 @@ Vue.component('user-avatar', {
         foto: null,
         valid: false,
         aprobar: true,
-        foto_aprobada: null
+        foto_aprobada: null,
+        foto_cargada: null,
     }),
     methods: {
         onChangeFoto(files) {
@@ -33,7 +34,7 @@ Vue.component('user-avatar', {
                                 this.valid = true;
                                 this.aprobar = false;
                             } else {
-                                swal('Información', 'Su fotografía no cumple con el formato solicitado', 'info');
+                                swal('Información', response.descripcion, 'info');
                             }
                         }
                     ).catch(
@@ -74,6 +75,7 @@ Vue.component('user-avatar', {
             http.get('egresado/foto').then(
                 ({ data }) => {
                     this.foto_aprobada = data.foto_aprobada;
+                    this.foto_cargada = data.foto_cargada;
                     if (data.foto) {
                         this.foto = 'data:image/*;base64,' + data.foto;
                         this.valid = true;

@@ -129,13 +129,14 @@ class RecursosController extends Controller
         $res = [];
         $roles = Variables::roles();
 
-        $blacklistElegir = [$roles['estudiante']->id, $roles['dependencia']->id];
+        $blacklistElegir = [$roles['estudiante']->id];
 
         foreach ($roles as $rol) {
             array_push($res, [
                 'id' => $rol->id,
                 'nombre' => $rol->nombre,
                 'canElegirProgramas' => $rol->id === $roles['coordinador']->id,
+                'canElegirDependencias' => $rol->id === $roles['dependencia']->id,
                 'canElegir' => !in_array($rol->id, $blacklistElegir),
             ]);
         }
@@ -155,6 +156,14 @@ class RecursosController extends Controller
             ->all();
 
         return $programas;
+    }
+
+    public function dependencias()
+    {
+        $tipos = Variables::tiposDependencia();
+        $dependencias = Dependencia::where('idTipo', $tipos['administrativa']->id)->select('id', 'nombre')->get();
+
+        return $dependencias;
     }
 
     public function nivelesEstudio()

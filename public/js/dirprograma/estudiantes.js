@@ -1,5 +1,5 @@
 import { baseURL, defaultUserAvatar } from '../variables.js';
-import { verDocumento  } from '../functions.js';
+import { verDocumento } from '../functions.js';
 import http from '../http.js';
 
 let vue = new Vue({
@@ -32,45 +32,38 @@ let vue = new Vue({
     }),
     methods: {
         verDocumento,
-        initInfoExtraEstudiante()
-        {
+        initInfoExtraEstudiante() {
             http.get(`direccion/info-adicional-estudiante/${this.estudiante.id}`).then(
-                ({ data }) =>
-                {
+                ({ data }) => {
                     this.estudiante.extra = data;
                 }
             );
         },
-        showSidebar(data, sidebar)
-        {
-            this.estudiante = {id: data, info: {}, extra: {}};
+        showSidebar(data, sidebar) {
+            console.log(data);
+            this.estudiante = { id: data, info: {}, extra: {} };
 
-            if(sidebar === 'est')
+            if (sidebar === 'est')
                 this.show_est = true;
             else
                 this.show_dir = true;
 
         },
-        showEstudiante(id)
-        {
+        showEstudiante(id) {
             this.estudiante_id = id;
         },
-        actualizarEstudiante()
-        {
+        actualizarEstudiante() {
             cargando();
             http.get(`direccion/actualizar-estudiante/${this.datos.estudiante.id}`).then(
-                ({ data }) =>
-                {
+                ({ data }) => {
                     alertTareaRealizada();
                 },
-                err =>
-                {
+                err => {
                     alertErrorServidor();
                 }
             ).then(cerrarCargando);
         },
-        initDataTable()
-        {
+        initDataTable() {
             if (this.dataTable) {
                 $('.show-info').unbind('click');
                 this.dataTable.destroy();
@@ -86,26 +79,26 @@ let vue = new Vue({
                     },
                     responsive: true,
                     columns: [
-                        {data: "foto", "orderable": false},
-                        {data: "codigo"},
-                        {data: "nombres"},
-                        {data: "apellidos"},
-                        {data: "fecha_grado"},
-                        {data: "estado"},
-                        {data: "estado_programa", "orderable": false},
-                        {data: "estado_secretaria", "orderable": false},
-                        {data: "acciones", "orderable": false}
+                        { data: "foto", "orderable": false },
+                        { data: "codigo" },
+                        { data: "nombres" },
+                        { data: "apellidos" },
+                        { data: "fecha_grado" },
+                        { data: "estado" },
+                        { data: "estado_programa", "orderable": false },
+                        { data: "estado_secretaria", "orderable": false },
+                        { data: "acciones", "orderable": false }
                     ],
                     rowCallback: row => {
-                        const data                      = $(row).data();
-                        const tdFoto                    = row.children[0];
-                        const tdNombres                 = row.children[2];
-                        const tdApellidos               = row.children[3];
-                        const tdEstadoEst               = row.children[5];
-                        const tdEstadoPrograma          = row.children[6];
-                        const tdEstadoSecretaria        = row.children[7];
-                        const tdAcciones                = row.children[ row.children.length - 1];
-                        const fotoUrl                   = tdFoto.innerText || '/img/sin_perfil.png';
+                        const data = $(row).data();
+                        const tdFoto = row.children[0];
+                        const tdNombres = row.children[2];
+                        const tdApellidos = row.children[3];
+                        const tdEstadoEst = row.children[5];
+                        const tdEstadoPrograma = row.children[6];
+                        const tdEstadoSecretaria = row.children[7];
+                        const tdAcciones = row.children[row.children.length - 1];
+                        const fotoUrl = tdFoto.innerText || '/img/sin_perfil.png';
 
 
                         $(row).addClass('TableRow TableRow-Centered TableRow-Rounded');
@@ -115,11 +108,11 @@ let vue = new Vue({
                         $(tdEstadoPrograma).addClass('TableItem-Center');
                         $(tdEstadoSecretaria).addClass('TableItem-Center');
 
-                        tdNombres.innerText     = tdNombres.innerText.toLowerCase();
-                        tdApellidos.innerText   = tdApellidos.innerText.toLowerCase();
+                        tdNombres.innerText = tdNombres.innerText.toLowerCase();
+                        tdApellidos.innerText = tdApellidos.innerText.toLowerCase();
 
-
-                        tdFoto.innerHTML = `<img src="${baseURL}${fotoUrl}" alt="foto-estudiante" class="img-fluid Table-Image"/>`;
+                        let foto = !tdFoto.innerText ? baseURL + fotoUrl : 'data:image/*;base64,' + fotoUrl;
+                        tdFoto.innerHTML = `<img src="${foto}" id="" alt="foto-estudiante" class="img-fluid Table-Image"/>`;
 
 
                         tdEstadoEst.innerHTML = `<i class="badge ${getBadgeClass(tdEstadoEst.innerText)}">${tdEstadoEst.innerText}</i>`;
@@ -132,22 +125,21 @@ let vue = new Vue({
                             <i class="fas fa-edit text-primary ml-3 show-info" data-id="${data.id}" sidebar="dir"></i>
                         `;
                     }
-            });
+                });
         }
     },
-    mounted: function ()
-    {
+    mounted: function () {
     }
 });
 
 
 
 
-$('#tabla-estudiante').on( 'draw.dt', function () {
-    $('.show-info').on('click', function(){
+$('#tabla-estudiante').on('draw.dt', function () {
+    $('.show-info').on('click', function () {
         vue.showSidebar($(this).attr('data-id'), $(this).attr('sidebar'));
     });
-    $('.show-estudiante').on('click', function(){
+    $('.show-estudiante').on('click', function () {
         vue.showEstudiante($(this).attr('data-id'));
     });
 });

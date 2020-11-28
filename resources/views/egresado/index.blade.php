@@ -97,7 +97,7 @@
                                 <icono-estado :estado="estadoEncuesta"></icono-estado>
                             </td>
                             <td class="font-weight-bold">
-                                <a href="egresado/encuesta" class="text-secondary">
+                                <a href="egresado/encuesta/momento_0" class="text-secondary">
                                     <i class="fas fa-location-arrow"></i>
                                 </a>
                             </td>

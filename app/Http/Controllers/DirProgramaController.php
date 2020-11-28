@@ -446,7 +446,7 @@ class DirProgramaController extends Controller
                 'DT_RowData' => [
                     'id' => $estudiante->id
                 ],
-                'foto' => null,
+                'foto' => $estudiante->foto,
                 'codigo' => $estudiante->codigo,
                 'nombres' => $persona->nombres,
                 'apellidos' => $persona->apellidos,
@@ -538,7 +538,7 @@ class DirProgramaController extends Controller
 
         return [
             'id' => $estudiante->id,
-            'foto' => null,
+            'foto' => $estudiante->foto,
             'nombres' => $persona->nombres,
             'apellidos' => $persona->apellidos,
             'tipo_documento' => $persona->tipoDocumento->abrv,

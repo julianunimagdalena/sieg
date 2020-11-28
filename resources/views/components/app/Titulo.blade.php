@@ -7,6 +7,7 @@
 @push('scripts')
 <script type="module">
     Vue.component('titulo', {
+        name: 'titulo',
         template: '#titulo-component'
     });
 </script>

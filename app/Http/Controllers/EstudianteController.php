@@ -21,6 +21,8 @@ use App\Models\HojaVida;
 use App\Models\HojaVidaIdioma;
 use App\Models\Persona;
 use App\Models\ProcesoGrado;
+use App\Models\ProcesoGradoEncuesta;
+use App\Models\RespuestaEncuesta;
 use App\Tools\PersonaHelper;
 use App\Tools\WSFoto;
 use Illuminate\Support\Facades\Storage;
@@ -36,6 +38,7 @@ class EstudianteController extends Controller
         // session(['ur' => UsuarioRol::find(20026)]);
         // session(['estudiante_id' => 27300]);
         // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
+
 
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['estudiante']->nombre, ['except' => [
@@ -936,5 +939,53 @@ class EstudianteController extends Controller
         }
 
         return $res;
+    }
+
+    public function diligenciarEncuesta(Request $request, $key)
+    {
+        $estudiante = Estudiante::find(session('estudiante_id'));
+        $pg = $estudiante->procesoGrado;
+
+        if ($pg->estado_encuesta) return response('Ya se diligenció la encuesta', 400);
+
+        $pge = $pg->procesoGradoEncuesta;
+
+        function crearRespuesta($params)
+        {
+            $respuesta = new RespuestaEncuesta();
+            $respuesta->texto = $params->texto;
+            $respuesta->pregunta_id = $params->pregunta_id;
+            $respuesta->pge_id = $params->pge_id;
+            $respuesta->save();
+        }
+
+        if (!$pge) {
+            $encuesta = Variables::encuestas($key);
+            $pge = new ProcesoGradoEncuesta();
+            $pge->proceso_grado_id = $pg->id;
+            $pge->encuesta_id = $encuesta->id;
+            $pge->save();
+        }
+
+        foreach ($request->respuestas as $respuesta) {
+            $r = (object) [
+                'pregunta_id' => $respuesta['pregunta_id'],
+                'pge_id' => $pge->id
+            ];
+
+            if ($respuesta['texto']) {
+                $r->texto = $respuesta['texto'];
+                crearRespuesta($r);
+            } else {
+                foreach ($respuesta['multiple'] as $text) {
+                    $r->texto = $text;
+                    crearRespuesta($r);
+                }
+            }
+        }
+
+
+        $pg->estado_encuesta = true;
+        $pg->save();
     }
 }

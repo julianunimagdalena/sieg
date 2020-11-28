@@ -71,6 +71,7 @@ class Variables
             'ficha' => Documento::where('abrv', 'FICHA')->first(),
             'titulo_grado' => Documento::where('abrv', 'TITULOGRADO')->first(),
             'ayre' => Documento::where('abrv', 'PSAYRE')->first(),
+            'pago' => Documento::where('abrv', 'RECIBIDOPAGO')->first(),
         ];
     }
 
@@ -100,7 +101,8 @@ class Variables
         $documentos = Variables::documentos();
 
         return [
-            $documentos['ecaes']->id
+            $documentos['ecaes']->id,
+            $documentos['pago']->id,
         ];
     }
 
@@ -149,12 +151,12 @@ class Variables
         ];
     }
 
-    static public function encuestas($key)
+    static public function encuestas($key = null)
     {
         $encuestas = [
             'momento_0' => Encuesta::where('nombre', 'Encuesta de Seguimiento a Graduandos V 2.0 -2019')->first()
         ];
 
-        return $encuestas[$key];
+        return $key ? $encuestas[$key] : $encuestas;
     }
 }

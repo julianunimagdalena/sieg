@@ -34,6 +34,9 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
+    $a = (object) [];
+    $a->malparido = 4;
+    return response()->json($a);
     // return DB::connection('carnetizacion')->table('estudiante')->get();
     $ctrl = new App\Http\Controllers\EstudianteController();
     return $ctrl->encuesta(1);
@@ -81,6 +84,7 @@ Route::get('/recursos/facultades', 'RecursosController@facultades');
 Route::get('/recursos/modalidades-estudio', 'RecursosController@modalidadesEstudio');
 Route::get('/recursos/jornadas', 'RecursosController@jornadas');
 Route::get('/recursos/documentos', 'RecursosController@documentos');
+Route::get('/recursos/dependencias', 'RecursosController@dependencias');
 Route::get('/recursos/distinciones-estudiante', 'RecursosController@distincionesEstudiante');
 
 // PETICIONES DEL EGRESADO
@@ -121,6 +125,7 @@ Route::get('/egresado/foto', 'EstudianteController@datosFoto');
 Route::post('/egresado/validar-foto', 'EstudianteController@validarFoto');
 Route::get('/egresado/encuesta/{key}', 'EstudianteController@encuesta');
 Route::get('/egresado/datos-encuesta/{key}', 'EstudianteController@datosEncuesta');
+Route::get('/egresado/encuesta/{key}', 'EstudianteController@encuesta');
 
 // PETICIONES DIRECCION DE PROGRAMA
 Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');
