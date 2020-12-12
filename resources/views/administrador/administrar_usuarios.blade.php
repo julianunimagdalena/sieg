@@ -30,7 +30,7 @@
             <th>Usuario</th>
             <th>Identificación</th>
             <th>Rol</th>
-            <th>Programas</th>
+            <th>Dirige</th>
             <th>Acciones</th>
         </tr>
     </thead>
@@ -39,7 +39,7 @@
             <td>@{{usr.username}}</td>
             <td>@{{usr.identificacion}}</td>
             <td>@{{usr.rol}}</td>
-            <td style="font-size: .8rem">@{{usr.programas || '-'}}</td>
+            <td style="font-size: .8rem">@{{usr.dirige || '-'}}</td>
             <td>
                 <i class="fas fa-pen text-primary" title="Editar" v-on:click="usuarioModal(usr)"></i>
                 <i class="fas fa-trash text-danger" title="Eliminar" v-on:click="eliminar(usr)"></i>

@@ -28,6 +28,18 @@ class EstudianteDocumento extends Model
         return $this->belongsTo('App\Models\Estudiante', 'idEstudiante');
     }
 
+    public function scopeType($query, $key)
+    {
+        $documentos = Variables::documentos();
+        $query->where('idDocumento', $documentos[$key]->id);
+    }
+
+    public function scopeEstado($query, $key)
+    {
+        $estados = Variables::estados();
+        $query->where('estado_id', $estados[$key]->id);
+    }
+
     public function getFilenameAttribute()
     {
         return $this->documento->abrv . '_' . $this->estudiante->codigo . '.pdf';
@@ -66,6 +78,11 @@ class EstudianteDocumento extends Model
             if ($this->idDocumento === $documentos['ficha']->id) {
                 $pg = $this->estudiante->procesoGrado;
                 $can = $can && ($pg->estado_ficha && $pg->estado_encuesta);
+            }
+
+            if ($this->idDocumento === $documentos['paz_salvos']->id) {
+                $psPendientes = $this->estudiante->estudiantePazSalvo()->where('paz_salvo', false)->count();
+                $can = $can && !$psPendientes;
             }
         }
 

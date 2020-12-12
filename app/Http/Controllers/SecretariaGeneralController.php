@@ -153,7 +153,7 @@ class SecretariaGeneralController extends Controller
                 'DT_RowData' => [
                     'id' => $estudiante->id
                 ],
-                'foto' => null,
+                'foto' => $estudiante->foto,
                 'codigo' => $estudiante->codigo,
                 'nombres' => $persona->nombres,
                 'apellidos' => $persona->apellidos,

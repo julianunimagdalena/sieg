@@ -120,6 +120,10 @@ class Estudiante extends Model
                         && $pg->inventivo_institucional !== null;
                 }
 
+                if ($programa->digita_encuesta) {
+                    $can = $can && $pg->estado_encuesta;
+                }
+
                 break;
 
             case $roles['secretariaGeneral']->id:
@@ -153,7 +157,7 @@ class Estudiante extends Model
     public function scopeEgresados($query)
     {
         $tipos = Variables::tiposEstudiante();
-        return $query->where('idTipo', $tipos['egresado']->id);
+        return $query->where('estudiantes.idTipo', $tipos['egresado']->id);
     }
 
     public function getCargaEcaesAttribute()

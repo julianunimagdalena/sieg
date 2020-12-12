@@ -54,11 +54,17 @@ class AdminController extends Controller
             ->get();
 
         foreach ($urs as $ur) {
-            $programas = [];
+            $dirige = [];
 
             if ($ur->rol_id === $roles['coordinador']->id) {
                 foreach ($ur->usuario->dependenciasModalidades as $dm) {
-                    if (!in_array($dm->programa->nombre, $programas)) array_push($programas, $dm->programa->nombre);
+                    if (!in_array($dm->programa->nombre, $dirige)) array_push($dirige, $dm->programa->nombre);
+                }
+            }
+
+            if ($ur->rol_id === $roles['dependencia']->id) {
+                foreach ($ur->usuario->dependencias as $dep) {
+                    if (!in_array($dep->nombre, $dirige)) array_push($dirige, $dep->nombre);
                 }
             }
 
@@ -67,7 +73,7 @@ class AdminController extends Controller
                 'username' => $ur->usuario->identificacion,
                 'identificacion' => $ur->usuario->persona->identificacion,
                 'rol' => $ur->rol->nombre,
-                'programas' => implode(', ', $programas)
+                'dirige' => implode(', ', $dirige)
             ]);
         }
 
@@ -114,6 +120,19 @@ class AdminController extends Controller
             $usuario->dependenciasModalidades()->attach($dm_ids);
         }
 
+        switch ($request->rol_id) {
+            case $roles['coordinador']->id:
+                $dm_ids = DependenciaModalidad::whereIn('idPrograma', $request->programa_ids)->get()->pluck('id');
+                $usuario->dependenciasModalidades()->detach();
+                $usuario->dependenciasModalidades()->attach($dm_ids);
+                break;
+            case $roles['dependencia']->id:
+                $dependencia_ids = Dependencia::whereIn('id', $request->dependencia_ids)->get()->pluck('id');
+                $usuario->dependencias()->detach();
+                $usuario->dependencias()->attach($dependencia_ids);
+                break;
+        }
+
         return 'ok';
     }
 
@@ -152,6 +171,13 @@ class AdminController extends Controller
             }
         }
 
+        $dependencias = [];
+        if ($ur && $ur->rol_id === $roles['dependencia']->id) {
+            foreach ($usuario->dependencias as $dep) {
+                if (!in_array($dep->id, $dependencias)) array_push($dependencias, $dep->id);
+            }
+        }
+
         return [
             'id' => $ur ? $ur->id : null,
             'activo' => $ur ? $ur->activo : null,
@@ -160,7 +186,8 @@ class AdminController extends Controller
             'apellidos' => $persona->apellidos,
             'identificacion' => $persona->identificacion,
             'username' => $usuario->identificacion,
-            'programa_ids' => $programas
+            'programa_ids' => $programas,
+            'dependencia_ids' => $dependencias
         ];
     }
 

@@ -12,7 +12,8 @@ Vue.component('usuario-modal', {
     data: () => ({
         input: {},
         errors: {},
-        cargando: false
+        cargando: false,
+        dependencias: []
     }),
     computed: {
         title() {
@@ -29,12 +30,24 @@ Vue.component('usuario-modal', {
 
             return can;
         },
+        canElegirDependencias() {
+            let can = false;
+            const { rol_id } = this.input;
+            if (rol_id) {
+                let rol = this.roles.filter(r => r.id === rol_id)[0];
+                can = rol.canElegirDependencias;
+            }
+            return can;
+        },
         rolesDisponibles() {
             return this.roles.filter(r => r.canElegir);
         },
         programasSeleccionados() {
             const programas = this.programas.filter(p => this.input.programa_ids.indexOf(p.id) !== -1);
             return programas;
+        },
+        dependenciasSeleccionadas() {
+            return this.dependencias.filter(d => this.input.dependencia_ids.indexOf(d.id) !== -1);
         }
     },
     watch: {
@@ -43,11 +56,14 @@ Vue.component('usuario-modal', {
         },
         canElegirProgramas(val, oldVal) {
             initBootstrapSelect();
+        },
+        canElegirDependencias(val, oldVal) {
+            initBootstrapSelect();
         }
     },
     methods: {
         fetchData() {
-            this.input = { activo: true, programa_ids: [] };
+            this.input = { activo: true, programa_ids: [], dependencia_ids: [] };
             this.errors = {};
 
             if (this.usuario) {
@@ -65,7 +81,7 @@ Vue.component('usuario-modal', {
                 Object.entries(res.data).forEach(v => {
                     if (v[1]) input[v[0]] = v[1];
                 });
-                
+
                 if (!input.activo) input.activo = true;
 
                 this.input = input;
@@ -90,5 +106,12 @@ Vue.component('usuario-modal', {
                 }
             ).then(() => this.cargando = false);
         }
+    },
+    mounted() {
+        http.get('recursos/dependencias').then(
+            ({ data }) => {
+                this.dependencias = data;
+            }
+        )
     }
 });

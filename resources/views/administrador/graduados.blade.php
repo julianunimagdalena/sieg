@@ -78,7 +78,7 @@
                 </div>
 
                 <div class="text-center">
-                    <button class="btn btn-sm btn-primary btn-icon-split" @click="initFilter()">
+                    <button class="btn btn-sm btn-danger btn-icon-split" @click="initFilter()">
                         <span class="icon text-white-50">
                             <i class="fas fa-times"></i>
                         </span>
@@ -92,7 +92,7 @@
                         <span class="text">Registrar Graduados</span>
                     </button>
                     <a href="{{ Request::root() }}/administrador/registrar-graduado">
-                        <icon-button color="primary" sm text="Registrar Graduado" c_class="ml-3">
+                        <icon-button color="secondary" sm text="Registrar Graduado" c_class="ml-3">
                             <i class="fas fa-user"></i>
                         </icon-button>
                     </a>

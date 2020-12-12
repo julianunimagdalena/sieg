@@ -160,9 +160,22 @@ class DirProgramaController extends Controller
         return $witherrors;
     }
 
-    private function fetchDocumentoIdentidad($estudiante_id)
+    public function fetchDocumentoIdentidad($estudiante)
     {
-        # code...
+        $ur = UsuarioRol::find(session('ur')->id);
+        $docs = Variables::documentos();
+        $estados = Variables::estados();
+        $ed = $estudiante->estudianteDocumento()->where('idDocumento', $docs['identificacion']->id)->first();
+        $success = DocumentoHelper::actualizarDocumentoIdentidad($ed);
+
+        if ($success) {
+            $ed->estado_id = $estados['pendiente']->id;
+            $ed->url_documento = $ed->path;
+            $ed->motivo_rechazo = null;
+            $ed->user_update = $ur->usuario->identificacion;
+            $ed->fecha_update = Carbon::now();
+            $ed->save();
+        }
     }
 
     public function moverDocumentos($eds, $old_folder)
@@ -319,7 +332,7 @@ class DirProgramaController extends Controller
 
         if ($eds->count() > 0) $this->moverDocumentos($eds, $old_folder);
 
-        $this->fetchDocumentoIdentidad($estudiante->id);
+        $this->fetchDocumentoIdentidad($estudiante);
         $this->updatePazSalvos($estudiante);
 
         if ($solicitud) {

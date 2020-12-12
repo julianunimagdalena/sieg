@@ -16,9 +16,9 @@
         </div>
         <div class="form-group" v-if="roles.length > 0">
             <label>Seleccione un rol:</label>
-            <select class="form-control" v-model="input.rol_id" @input="errors.rol_id=undefined">
+            <select class="form-control" v-model="input.local_id" @input="errors.rol_id=undefined">
                 <option :value="undefined" hidden selected>Seleccione una opción</option>
-                <option v-for="item in roles" :key="item.id" :value="item.id">@{{item.nombre}}</option>
+                <option v-for="item in roles" :key="item.id" :value="item.local_id">@{{item.nombre}}</option>
             </select>
             <small class="text-danger" v-if="errors.rol_id">@{{errors.rol_id[0]}}</small>
         </div>

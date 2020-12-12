@@ -11,6 +11,7 @@ class DocumentoHelper
     {
         $pdf = app('dompdf.wrapper');
         $estudiante = $ed->estudiante;
+
         $persona = $estudiante->persona;
         $date = Carbon::now()->format('d/m/Y g:i:s A');
         $pdf->loadView('pdf.pazsalvo', compact('ed', 'persona', 'estudiante', 'date'));

@@ -9,12 +9,14 @@ Vue.component('login-form', {
         errors: {}
     }),
     watch: {
-        'input.rol_id': function (n, o) {
-            const rol = this.roles.find(r => r.id === n);
+        'input.local_id': function (n, o) {
+            const rol = this.roles.find(r => r.local_id === n);
             console.log('hola', n, rol);
 
             if (rol) {
+                this.input.rol_id = rol.id;
                 this.input.estudiante_id = rol.estudiante_id;
+                this.input.dependencia_id = rol.dependencia_id;
             }
         }
     },
@@ -28,7 +30,10 @@ Vue.component('login-form', {
                     res => {
                         const { data } = res;
 
-                        if (data !== "ok") this.roles = data;
+                        if (data !== "ok") {
+                            this.roles = data;
+                            this.roles = this.roles.map((data, key) => ({ ...data, local_id: key }));
+                        }
                         else window.location.reload();
                     },
                     err => {

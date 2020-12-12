@@ -742,15 +742,17 @@ class EstudianteController extends Controller
         foreach ($whitelist as $doc_id) {
             $ed = $estudiante->estudianteDocumento()->where('idDocumento', $doc_id)->first();
 
-            array_push($documentos, [
-                'id' => $ed->id,
-                'nombre' => $ed->documento->nombre,
-                'estado' => $ed->estado->nombre,
-                'motivo_rechazo' => $ed->motivo_rechazo,
-                'can_show' => $ed->can_show,
-                'can_upload' => $ed->can_cargar_estudiante,
-                'is_ecaes' => $ed->idDocumento === $documentosGrado['ecaes']->id
-            ]);
+            if ($ed) {
+                array_push($documentos, [
+                    'id' => $ed->id,
+                    'nombre' => $ed->documento->nombre,
+                    'estado' => $ed->estado->nombre,
+                    'motivo_rechazo' => $ed->motivo_rechazo,
+                    'can_show' => $ed->can_show,
+                    'can_upload' => $ed->can_cargar_estudiante,
+                    'is_ecaes' => $ed->idDocumento === $documentosGrado['ecaes']->id
+                ]);
+            }
         }
 
         array_push($res, [
@@ -971,16 +973,16 @@ class EstudianteController extends Controller
             $pge->save();
         }
 
-        foreach ($request->respuestas as $respuesta) {
+        foreach ($request->all() as $respuesta) {
             $r = (object) [
                 'pregunta_id' => $respuesta['pregunta_id'],
                 'pge_id' => $pge->id
             ];
 
-            if ($respuesta['texto']) {
+            if (isset($respuesta['texto'])) {
                 $r->texto = $respuesta['texto'];
                 crearRespuesta($r);
-            } else {
+            } else if (isset($respuesta['multiple'])) {
                 foreach ($respuesta['multiple'] as $text) {
                     $r->texto = $text;
                     crearRespuesta($r);
@@ -991,5 +993,7 @@ class EstudianteController extends Controller
 
         $pg->estado_encuesta = true;
         $pg->save();
+
+        return 'ok';
     }
 }

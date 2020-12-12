@@ -5,8 +5,9 @@
             <div class="col-md-3 col-sm-12 form-group">
                 <label>Programa</label>
                 <select v-model="filter.programa_id" class="form-control bselect" @change="onChange()">
-                    <option :value="undefined">Todos</option>
-                    <option v-for="(programa, index) in datos.programas" :value="programa.id" :selected="index === 0">@{{ programa.nombre }}</option>
+                    <option :value="undefined" disabled>SELECCIONE UN PROGRAMA</option>
+                    <option v-for="(programa, index) in datos.programas" :value="programa.id" :selected="index === 0">
+                        @{{ programa.nombre }}</option>
                 </select>
             </div>
             <div class="col-md-2 col-sm-12 form-group">
@@ -18,7 +19,8 @@
             </div>
             <div class="col-md-2 col-sm-12 form-group">
                 <label>Fecha de Grado</label>
-                <select v-model="filter.fecha_grado_id" class="form-control" id="fecha-grado-filter" @change="onChange()">
+                <select v-model="filter.fecha_grado_id" class="form-control" id="fecha-grado-filter"
+                    @change="onChange()">
                     <option :value="undefined">Todas</option>
                     <option v-for="(fecha) in datos.fechas_grado" :value="fecha.id">@{{ fecha.nombre }}</option>
                 </select>

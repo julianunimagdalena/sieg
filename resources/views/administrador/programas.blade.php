@@ -63,10 +63,9 @@
 <hr />
 <div class="row" v-if="programa.id">
     <div class="col-md-6 col-sm-12 mb-4 mb-md-0">
-        <card-action title="Paz y Salvos" @onAdd="openModal('#modalPazSalvos')" fluid>
+        <card-action title="Paz y Salvos" fluid>
             <list-group flush>
-                <list-group-item actions light v-for="paz in programa.paz_salvos" @onDelete="onDeletePazSalvo(paz)"
-                    :key="paz.id">
+                <list-group-item actions light v-for="paz in programa.paz_salvos" :key="paz.id">
                     @{{ paz.nombre }}
                 </list-group-item>
             </list-group>

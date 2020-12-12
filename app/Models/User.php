@@ -38,6 +38,11 @@ class User extends Authenticatable
         return $this->belongsToMany('App\Models\DependenciaModalidad', 'coordinador_programas', 'idCoordinador', 'idPrograma');
     }
 
+    public function dependencias()
+    {
+        return $this->belongsToMany('App\Models\Dependencia', 'usuario_dependencia', 'usuario_id', 'dependencia_id');
+    }
+
     public function getProgramasCoordinadosAttribute()
     {
         $programa_ids = [];

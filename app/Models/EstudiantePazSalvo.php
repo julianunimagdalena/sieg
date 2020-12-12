@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Tools\Variables;
 use Illuminate\Database\Eloquent\Model;
 
 class EstudiantePazSalvo extends Model

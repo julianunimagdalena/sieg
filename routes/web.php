@@ -34,12 +34,14 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    $a = (object) [];
-    $a->malparido = 4;
-    return response()->json($a);
-    // return DB::connection('carnetizacion')->table('estudiante')->get();
-    $ctrl = new App\Http\Controllers\EstudianteController();
-    return $ctrl->encuesta(1);
+    $ctrl = new App\Http\Controllers\DirProgramaController();
+    $estudiante = App\Models\Estudiante::find(27503);
+    // $ctrl->fetchDocumentoIdentidad($estudiante);
+    $ed = $estudiante->estudianteDocumento()->type('paz_salvos')->first();
+    $ctrl->generarDocumento($ed->id);
+
+    // $estudiante = App\Models\Estudiante::find(27503);
+    // $estudiante->canAprobar;
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -125,7 +127,7 @@ Route::get('/egresado/foto', 'EstudianteController@datosFoto');
 Route::post('/egresado/validar-foto', 'EstudianteController@validarFoto');
 Route::get('/egresado/encuesta/{key}', 'EstudianteController@encuesta');
 Route::get('/egresado/datos-encuesta/{key}', 'EstudianteController@datosEncuesta');
-Route::get('/egresado/encuesta/{key}', 'EstudianteController@encuesta');
+Route::post('/egresado/encuesta/{key}', 'EstudianteController@diligenciarEncuesta');
 
 // PETICIONES DIRECCION DE PROGRAMA
 Route::post('/dirprograma/activar-estudiante', 'DirProgramaController@activarEstudiante');
@@ -210,6 +212,12 @@ Route::get('/administrador/registrar-graduado', 'AdminController@registrarGradua
 Route::get('/secgeneral', 'SecretariaGeneralController@index');
 Route::get('/secgeneral/estudiantes', 'SecretariaGeneralController@estudiantes');
 Route::get('/secgeneral/aprobados', 'SecretariaGeneralController@vistaAprobados');
+
+// RUTAS DEPENDENCIAS
+Route::get('/dependencia', 'DependenciaController@index');
+Route::get('/dependencia/administrar-estudiantes', 'DependenciaController@administrarEstudiantes');
+Route::post('/dependencia/estudiantes', 'DependenciaController@obtenerEstudiantes');
+Route::post('/dependencia/cambiar-estado', 'DependenciaController@cambiarEstado');
 
 Route::get('/', function () {
     if (!Auth::check()) return view('login2');

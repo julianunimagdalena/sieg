@@ -1,4 +1,4 @@
-modificar endpoint nuevo usuario para enviar dependencia_id
+modificar endpoint nuevo usuario para enviar dependencia_ids
 
 modificar endpoint login -> roles y sesion para guardar la dependencia
 

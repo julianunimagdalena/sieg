@@ -58,6 +58,19 @@
             <li v-for="prg in programasSeleccionados">@{{prg.nombre}}</li>
         </ul>
     </div>
+    <div v-if="canElegirDependencias">
+        <div class="form-group">
+            <label>Dependencias</label>
+            <select class="form-control bselect" multiple v-model="input.dependencia_ids"
+                v-on:input="errors.dependencia_ids=undefined">
+                <option v-for="dep in dependencias" :value="dep.id">@{{dep.nombre}}</option>
+            </select>
+            <small class="text-danger" v-if="errors.dependencia_ids">@{{errors.dependencia_ids[0]}}</small>
+        </div>
+        <ul>
+            <li v-for="dependencia in dependenciasSeleccionadas">@{{dependencia.nombre}}</li>
+        </ul>
+    </div>
 </modal>
 @endcomponent
 

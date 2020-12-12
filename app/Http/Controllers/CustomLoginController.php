@@ -25,30 +25,65 @@ class CustomLoginController extends Controller
         if ($req->rol_id) {
             $rolObject = $user->roles()->whereIn('roles.id', $ids)->find($req->rol_id);
             $estudiante = $user->persona->estudiantes()->find($req->estudiante_id);
+            $dependencia = $user->dependencias()->find($req->dependencia_id);
 
-            if ($rolObject->id === $rolesPlatforma['estudiante']->id && !$estudiante) return response('Bad data', 400);
+            if (
+                ($rolObject->id === $rolesPlatforma['estudiante']->id && !$estudiante)
+                || ($rolObject->id === $rolesPlatforma['dependencia']->id && !$dependencia)
+            ) return response('Bad data', 400);
 
             $rol = [
                 'id' => $rolObject->id,
                 'estudiante_id' => $estudiante ? $estudiante->id : null,
+                'dependencia_id' => $dependencia ? $dependencia->id : null,
                 'activo' => $rolObject->pivot->activo
             ];
         } else {
             $roles = $user->roles()->whereIn('roles.id', $ids)->get();
             $rolesProcesed = [];
 
+            function crearResRol($params)
+            {
+                $nombre = $params['rol']->nombre;
+                $exist = [
+                    'estudiante' => isset($params['estudiante']),
+                    'dependencia' => isset($params['dependencia']),
+                ];
+
+                if ($exist['estudiante']) $nombre .= ' - ' . $params['estudiante']->estudio->programa->nombre;
+                if ($exist['dependencia']) $nombre .= ' - ' . $params['dependencia']->nombre;
+
+                return [
+                    'id' => $params['rol']->id,
+                    'nombre' => $nombre,
+                    'estudiante_id' => $exist['estudiante'] ? $params['estudiante']->id : null,
+                    'dependencia_id' => $exist['dependencia'] ? $params['dependencia']->id : null,
+                    'activo' => $params['rol']->pivot->activo
+                ];
+            }
+
             foreach ($roles as $rol) {
-                $estudiantes = [null];
 
-                if ($rol->id === $rolesPlatforma['estudiante']->id) $estudiantes = $user->persona->estudiantes;
+                $params = [
+                    'rol' => $rol
+                ];
 
-                foreach ($estudiantes as $e) {
-                    array_push($rolesProcesed, [
-                        'id' => $rol->id,
-                        'nombre' => $rol->nombre . ($e ? ' - ' . $e->estudio->programa->nombre : ''),
-                        'estudiante_id' => $e ? $e->id : null,
-                        'activo' => $rol->pivot->activo
-                    ]);
+                switch ($rol->id) {
+                    case $rolesPlatforma['estudiante']->id:
+                        foreach ($user->persona->estudiantes as $e) {
+                            $params['estudiante'] = $e;
+                            array_push($rolesProcesed, crearResRol($params));
+                        }
+                        break;
+                    case $rolesPlatforma['dependencia']->id:
+                        foreach ($user->dependencias as $dep) {
+                            $params['dependencia'] = $dep;
+                            array_push($rolesProcesed, crearResRol($params));
+                        }
+                        break;
+                    default:
+                        array_push($rolesProcesed, crearResRol($params));
+                        break;
                 }
             }
 
@@ -77,6 +112,7 @@ class CustomLoginController extends Controller
         Auth::login($user);
         session(['ur' => $ur]);
         session(['estudiante_id' => $rol['estudiante_id']]);
+        session(['dependencia_id' => $rol['dependencia_id']]);
 
         return 'ok';
     }

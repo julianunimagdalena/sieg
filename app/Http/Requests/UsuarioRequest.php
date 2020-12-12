@@ -34,7 +34,8 @@ class UsuarioRequest extends FormRequest
             'username' => 'required',
             'activo' => 'required|boolean',
             'rol_id' => 'required|integer|exists:roles,id',
-            'programa_ids' => 'required_if:rol_id,' . $roles['coordinador']->id . '|array'
+            'programa_ids' => 'required_if:rol_id,' . $roles['coordinador']->id . '|array',
+            'dependencia_ids' => 'required_if:rol_id,' . $roles['dependencia']->id . '|array'
         ];
     }
 
