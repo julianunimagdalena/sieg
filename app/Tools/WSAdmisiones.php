@@ -80,7 +80,6 @@ class WSAdmisiones
         $ff = Carbon::parse($fechaFinal)->format('dmY');
         $url = $this->baseURL . '/listgrdfec/' . $fi . '/' . $ff . '/' . $this->generateToken($fi . $ff);
 
-        return [$this->initialToken . $fi . $ff, $url];
         return $this->fetch($url);
     }
 

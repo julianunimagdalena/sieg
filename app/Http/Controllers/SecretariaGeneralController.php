@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\SNIESExport;
+use App\Exports\ListadoAsistenciaCeremoniaExport;
 use App\Http\Requests\FiltroEstudiantesRequest;
 use App\Models\Estudiante;
 use App\Models\UsuarioRol;
@@ -177,6 +178,14 @@ class SecretariaGeneralController extends Controller
     {
         $estudiantes = $this->getEstudiantes($request)->get();
         $export = new SNIESExport($estudiantes);
+
+        return $export->download('estudiantes.xlsx');
+    }
+
+    public function listadoAsistenciaCeremonia(FiltroEstudiantesRequest $request)
+    {
+        $estudiantes = $this->getEstudiantes($request)->get();
+        $export = new ListadoAsistenciaCeremoniaExport($estudiantes);
 
         return $export->download('estudiantes.xlsx');
     }

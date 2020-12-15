@@ -17,6 +17,7 @@ use App\Models\TipoDocumento;
 use App\Models\User;
 use App\Models\UsuarioRol;
 use App\Tools\DocumentoHelper;
+use App\Tools\MailHelper;
 use App\Tools\Variables;
 use App\Tools\WSAdmisiones;
 use App\Tools\WSFoto;
@@ -722,11 +723,21 @@ class DirProgramaController extends Controller
             case $roles['secretariaGeneral']->id:
                 $pg->estado_secretaria_id = $estados['aprobado']->id;
                 $pg->fecha_secretaria = Carbon::now();
+
                 break;
         }
 
         $pg->motivo_no_aprobado = null;
         $pg->save();
+
+        if ($ur->rol_id === $roles['secretariaGeneral']->id) {
+            $persona = $estudiante->persona;
+            $content = 'Su proceso de grado ha finalizado exitosamente en la plataforma SAEG Unimagdalena';
+            MailHelper::enviarCorreo($content, [$persona->correo_institucional], (object) [
+                'name' => $persona->nombre,
+                'subject' => 'PROCESO DE GRADO FINALIZADO SATISFACTORIAMENTE - SAEG UNIMAGDALENA',
+            ]);
+        }
 
         return 'ok';
     }
@@ -852,37 +863,4 @@ class DirProgramaController extends Controller
             'errors' => $errors
         ];
     }
-
-    // public function fotoEstudiante(Request $request)
-    // {
-    //     $this->validate($request, [
-    //         'estudiante_id' => 'required|exists:estudiantes,id',
-    //         'aprobar' => 'required|boolean'
-    //     ], [
-    //         '*.required' => 'Obligatorio'
-    //     ]);
-
-    //     $ur = UsuarioRol::find(session('ur')->id);
-    //     $estudiante = $ur->usuario->estudiantes_coordinados->find($request->estudiante_id);
-    //     $pg = $estudiante->procesoGrado;
-
-    //     if ($request->aprobar) {
-    //         $ws = new WSFoto();
-    //         $foto_prevalidada = $ws->consultarFoto($estudiante->codigo)->foto_prevalidada;
-
-    //         if (!$foto_prevalidada) return response('error al consultar foto prevalidada', 401);
-
-    //         $success = $ws->guardarFoto($foto_prevalidada, $estudiante->codigo, true);
-
-    //         if ($success) {
-    //             $pg->foto_aprobada = true;
-    //             $pg->save();
-    //         } else return response('error al cargar foto', 401);
-    //     } else {
-    //         $pg->foto_cargada = false;
-    //         $pg->save();
-
-    //         // ENVIAR CORREO
-    //     }
-    // }
 }

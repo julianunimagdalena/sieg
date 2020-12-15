@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\EncuestaExport;
 use App\Http\Requests\CargaRequest;
 use App\Http\Requests\EstudianteRequest;
 use App\Http\Requests\FechaGradoRequest;
@@ -18,7 +19,17 @@ use App\Models\DependenciaPazSalvo;
 use App\Models\Documento;
 use App\Models\Estudiante;
 use App\Models\FechaGrado;
+use App\Models\Municipio;
 use App\Models\PazSalvo;
+use App\Models\TipoDocumento;
+use App\Models\Genero;
+use App\Models\ProcesoGrado;
+use App\Models\ProcesoGradoEncuesta;
+use App\Models\TipoGrado;
+use App\Tools\WSAdmisiones;
+use App\Tools\FechaHelper;
+use App\Tools\StringManager;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -591,7 +602,7 @@ class AdminController extends Controller
         return view('egresado.ficha', ['isAdmin' => $ur->isRol('administrador')]);
     }
 
-    public function registrarGraduados(Request $request)
+    public function registrarGraduados(Request $request = null)
     {
         $this->validate($request, [
             'fecha_inicial' => 'date',
@@ -600,10 +611,158 @@ class AdminController extends Controller
             '*.date' => 'El campo debe ser una fecha',
         ]);
 
-        return [
+        $ws = new WSAdmisiones();
+        $results = $ws->getListaGraduadoByFechas($request->fecha_inicial, $request->fecha_final);
+        $res = [
+            'errors' => [],
+            'ya_graduados' => 0,
             'registrados' => 0,
             'actualizados' => 0
         ];
+
+        function addError($pos, $descripcion, $arr)
+        {
+            array_push($arr['errors'], [
+                'pos' => $pos,
+                'descripcion' => $descripcion
+            ]);
+
+            return $arr;
+        }
+
+        foreach ($results as $key => $result) {
+            $programa = StringManager::eliminarTildes($result->nombreDelPrograma);
+            $modalidad = $result->modalidad === 'POSTGRADOS' ? 'POSGRADO' : $result->modalidad;
+            $dm = DependenciaModalidad::whereHas('programa', fn ($prg) => $prg->where('nombre', $programa))
+                ->whereHas('facultad', fn ($fac) => $fac->where('nombre', $result->nombreFacultad))
+                ->whereHas('modalidad', fn ($mod) => $mod->where('nombre', $modalidad))
+                ->first();
+
+            if (!$dm) {
+                $text = 'No se encuentra dependencia modalidad asociado a este registro: ' . json_encode((object) [
+                    'programa' => $programa,
+                    'modalidad' => $modalidad,
+                    'facultad' => $result->nombreFacultad
+                ]);
+                $res = addError($key, $text, $res);
+                continue;
+            }
+
+            $data = null;
+            $persona = Persona::where('identificacion', $result->numeroDocumento)->first();
+
+            if (!$persona) {
+                $data = $ws->getInformacionGraduadoByDocumentoIdentidad($result->numeroDocumento)[0];
+
+                if (!$data) {
+                    $res = addError($key, 'Error al endpoint getInformacionGraduadoByDocumentoIdentidad con este registro', $res);
+                    continue;
+                }
+
+                $ciudadResidencia = Municipio::where('nombre', $data->ciudadResidencia)->first();
+                $ciudadOrigen = Municipio::where('nombre', $data->ciudad)->first();
+                $tipoDoc = TipoDocumento::where('abrv', $data->tipoDocumento)->first();
+                $genero = $data->sexo;
+
+                if ($genero === 'M') $genero = 'MASCULINO';
+                else if ($genero === 'F') $genero = 'FEMENINO';
+                else $genero = 'OTRO';
+
+                $persona = new Persona();
+                $persona->nombres = strtoupper($data->nombres);
+                $persona->apellidos = strtoupper($data->apellidos);
+                $persona->correo = $data->correoPers;
+                $persona->correo_institucional = $data->correoInst;
+                $persona->celular = $data->telefono1;
+                $persona->celular2 = $data->telefono2;
+                $persona->identificacion = $data->numeroDocumento;
+                $persona->ciudadExpedicion = $data->ciudadCedula;
+                $persona->fecha_expedicion = $data->fechaExpDocumento !== '-' ? Carbon::createFromFormat('d/m/Y', $data->fechaExpDocumento) : null;
+                $persona->ciudadResidencia = $ciudadResidencia ? $ciudadResidencia->id : null;
+                $persona->ciudadOrigen = $ciudadOrigen ? $ciudadOrigen->id : null;
+                $persona->fechaNacimiento = Carbon::createFromFormat('d/m/Y', $data->fechaNacimiento);
+                $persona->direccion = $data->direccion;
+                $persona->estrato = $data->estrato;
+                $persona->idGenero = Genero::where('nombre', $genero)->first()->id;
+                $persona->tipodoc = $tipoDoc ? $tipoDoc->id : null;
+                $persona->save();
+            }
+
+            $tiposEstudiante = Variables::tiposEstudiante();
+            $nuevo = false;
+            $estudiante = Estudiante::where('idPersona', $persona->id)
+                ->where('idPrograma', $dm->id)
+                ->where('codigo', $result->codigoEstudiantil)
+                ->first();
+
+            if (!$estudiante) {
+                $data2 = $ws->getInfoEstudianteByCodigo($result->codigoEstudiantil)[0];
+
+                if ($data2->codigo === 'null') {
+                    $res = addError($key, 'Falla endpoint getInfoEstudianteByCodigo con este registro', $res);
+                    continue;
+                }
+
+                $nuevo = true;
+                $zonal = $data2->zonal === 'NO DEFINIDO' ? 'SANTA MARTA' : $data2->zonal;
+                $municipioZonal = Municipio::where('nombre', $zonal)->first();
+
+                $estudiante = new Estudiante();
+                $estudiante->codigo = $data2->codigo;
+                $estudiante->idTipo = $tiposEstudiante['egresado']->id;
+                $estudiante->idPrograma = $dm->id;
+                $estudiante->idPersona = $persona->id;
+                $estudiante->idZonal = $municipioZonal ? $municipioZonal->id : null;
+                $estudiante->save();
+            }
+
+            if ($estudiante->idTipo === $tiposEstudiante['graduado']->id) {
+                $res['ya_graduados']++;
+                continue;
+            }
+
+            $fecha = Carbon::createFromFormat('d/m/Y', $result->fechaGrado);
+            $fechaGrado = FechaGrado::where('fecha_grado', $fecha->toDateString())->first();
+
+            if (!$fechaGrado) {
+                $tipos = Variables::tiposGrado();
+                $tipoGrado = TipoGrado::where('nombre', ucfirst(strtolower($result->tipoDeGruadiacion)))->first();
+
+                $fechaGrado = new fechaGrado();
+                $fechaGrado->anio = $fecha->year;
+                $fechaGrado->estado = 0;
+                $fechaGrado->fecha_grado = $fecha->toDateString();
+                $fechaGrado->tipo_grado = $tipoGrado ? $tipoGrado->id : $tipos['no_reporta']->id;
+                $fechaGrado->nombre = FechaHelper::nombreFecha($fechaGrado);
+                $fechaGrado->save();
+            }
+
+            $estados = Variables::estados();
+            $pg = $estudiante->procesoGrado ?? new ProcesoGrado();
+            $pg->idEstudiante = $estudiante->id;
+            $pg->idFecha = $fechaGrado->id;
+            $pg->estado_secretaria_id = $estados['aprobado']->id;
+            $pg->estado_programa_id = $estados['aprobado']->id;
+            $pg->estado_ficha = 1;
+            $pg->estado_encuesta = $dm->programa->digita_encuesta;
+            $pg->titulo_grado = $result->tituloProfesional;
+            $pg->modalidad_grado = $result->opcionGrado;
+            $pg->titulo_memoria_grado = $result->descripcionOpcionGrado;
+            $pg->nota = $result->notaOpcionGrado;
+            $pg->no_aprobado = false;
+            // $pg->motivo_no_aprobado = null;
+            $pg->save();
+
+            $estudiante->idTipo = $tiposEstudiante['graduado']->id;
+            $estudiante->acta = $result->acta;
+            $estudiante->folio = $result->folio;
+            $estudiante->libro = $result->libro;
+            $estudiante->save();
+
+            $res[$nuevo ? 'registrados' : 'actualizados']++;
+        }
+
+        return $res;
     }
 
     public function registrarGraduado()
@@ -702,5 +861,27 @@ class AdminController extends Controller
         $estudiante->save();
 
         return 'ok';
+    }
+
+    public function descargarEncuesta(Request $request)
+    {
+        $this->validate($request, [
+            'key' => 'required',
+            'fecha_inicio' => 'date',
+            'fecha_fin' => 'date',
+        ]);
+
+        $encuesta = Variables::encuestas($request->key);
+        if (!$encuesta) return response('No se encuentra la encuesta', 400);
+
+        $pges = ProcesoGradoEncuesta
+            ::whereHas('procesoGrado.fechaGrado', function ($fg) use ($request) {
+                if ($request->fecha_inicio) $fg->whereDate('fecha_grado', '>=', $request->fecha_inicio);
+                if ($request->fecha_fin) $fg->whereDate('fecha_grado', '<=', $request->fecha_fin);
+            })
+            ->get();
+
+        $export = new EncuestaExport($encuesta, $pges);
+        return $export->download('encuesta.xlsx');
     }
 }

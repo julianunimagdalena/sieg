@@ -13,4 +13,14 @@ class Encuesta extends Model
     {
         return $this->hasMany('App\Models\ModuloEncuesta', 'encuesta_id');
     }
+
+    public function preguntas()
+    {
+        return $this->hasManyThrough(
+            'App\Models\PreguntaEncuesta',
+            'App\Models\ModuloEncuesta',
+            'encuesta_id',
+            'modulo_id'
+        );
+    }
 }

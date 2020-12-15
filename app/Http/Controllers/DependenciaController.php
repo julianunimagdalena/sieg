@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estudiante;
+use App\Tools\MailHelper;
 use App\Tools\Variables;
 use Illuminate\Http\Request;
 
@@ -144,7 +145,12 @@ class DependenciaController extends Controller
         $estadoActual = $eps->paz_salvo;
 
         if ($estadoActual === true) {
-            /// ENVIAR CORREO CON $req->motivo
+            $persona = $estudiante->persona;
+            $content = 'Su paz y salvo de ' . $eps->pazSalvo->nombre . ' ha sido rechazado debido a ' . $req->motivo;
+            MailHelper::enviarCorreo($content, [$persona->correo_institucional], (object) [
+                'name' => $persona->nombre,
+                'subject' => 'PAZ Y SALVO RECHAZADO - SAEG UNIMAGDALENA',
+            ]);
         }
 
         $eps->paz_salvo = !$estadoActual;

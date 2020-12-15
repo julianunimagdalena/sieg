@@ -1,8 +1,6 @@
 <?php
 
-use App\Tools\WSFoto;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,14 +32,11 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 });
 
 Route::get('/prueba', function () {
-    $ctrl = new App\Http\Controllers\DirProgramaController();
-    $estudiante = App\Models\Estudiante::find(27503);
-    // $ctrl->fetchDocumentoIdentidad($estudiante);
-    $ed = $estudiante->estudianteDocumento()->type('paz_salvos')->first();
-    $ctrl->generarDocumento($ed->id);
-
-    // $estudiante = App\Models\Estudiante::find(27503);
-    // $estudiante->canAprobar;
+    // return App\Models\RespuestaEncuesta::all();
+    $ctrl = new App\Http\Controllers\AdminController();
+    $request = new \Illuminate\Http\Request();
+    $request->replace(['key' => 'momento_0']);
+    return $ctrl->descargarEncuesta($request);
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');

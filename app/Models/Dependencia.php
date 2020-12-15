@@ -16,6 +16,11 @@ class Dependencia extends Model
         'digita_encuesta' => 'boolean'
     ];
 
+    public function dependenciaModalidadPrograma()
+    {
+        return $this->hasMany('App\Models\DependenciaModalidad', 'idPrograma');
+    }
+
     public function nivelEstudio()
     {
         return $this->belongsTo('App\Models\NivelEstudio', 'idNivelestudio');
