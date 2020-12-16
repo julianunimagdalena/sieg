@@ -32,12 +32,6 @@ class DirProgramaController extends Controller
     {
         $roles = Variables::roles();
 
-        // rpineda coordinador de programa
-        // session(['ur' => UsuarioRol::find(22)]);
-        // julianpitreap sec general
-        // session(['ur' => UsuarioRol::find(20029)]);
-        // \Illuminate\Support\Facades\Auth::login(session('ur')->usuario);
-
         $this->middleware('auth');
         $this->middleware('rol:' . $roles['coordinador']->nombre, ['except' => [
             'getInfoAdicionalEstudiante',
