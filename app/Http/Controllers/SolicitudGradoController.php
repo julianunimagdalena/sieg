@@ -74,9 +74,11 @@ class SolicitudGradoController extends Controller
             $tipos = Variables::tiposEstudiante();
             $estudiante = $persona->estudiantes()->where('idPrograma', $dm->id)->first();
 
-            if ($estudiante->idTipo === $tipos['graduado']->id) return response('Estudiante ya graduado', 400);
-            if (!$estudiante->procesoGrado->no_aprobado)
-                return response('Ya se encuentra registrado en el sistema con este programa', 400);
+            if ($estudiante) {
+                if ($estudiante->idTipo === $tipos['graduado']->id) return response('Estudiante ya graduado', 400);
+                if (!$estudiante->procesoGrado->no_aprobado)
+                    return response('Ya se encuentra registrado en el sistema con este programa', 400);
+            }
         }
 
         $solicitud = new SolicitudGrado();

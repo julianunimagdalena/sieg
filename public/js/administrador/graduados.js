@@ -57,8 +57,25 @@ new Vue({
                     this.form.graduados = {};
                     this.errors.graduados = {};
 
-                    alertTareaRealizada(`Se registraron ${data.registrados} y actualizaron ${data.actualizados} egresados`);
+                    alertTareaRealizada(`Se registraron ${data.ya_graduados}, ${data.registrados} estudiantes en proceso y actualizaron ${data.actualizados} registros`);
 
+
+                    if (data.errors && data.errors.length > 0) {
+                        let csvContent = "data:text/csv;charset=utf-8,";
+                        csvContent += "Posición, Descripción\n";
+                        csvContent += data.map((e) => {
+                            return `${e.pos}, ${e.descripcion}`;
+                        }).join('\n');
+
+                        const encodedUri = encodeURI(csvContent);
+                        const link = document.createElement("a");
+                        link.setAttribute("href", encodedUri);
+                        link.setAttribute("download", "erores.csv");
+                        document.body.appendChild(link);
+
+                        link.click();
+                        link.remove();
+                    }
                 },
                 ({ response }) => {
                     if (response.status === 422)

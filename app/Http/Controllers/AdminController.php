@@ -602,7 +602,7 @@ class AdminController extends Controller
         return view('egresado.ficha', ['isAdmin' => $ur->isRol('administrador')]);
     }
 
-    public function registrarGraduados(Request $request = null)
+    public function registrarGraduados(Request $request)
     {
         $this->validate($request, [
             'fecha_inicial' => 'date',

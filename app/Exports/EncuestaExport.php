@@ -95,8 +95,11 @@ class EncuestaExport implements FromArray, WithHeadings, ShouldAutoSize, WithEve
 
             $respuestas = $pge->respuestas;
             foreach ($this->preguntasEnOrden() as $pregunta) {
-                $respuesta = $respuestas->first(fn ($r) => $r->pregunta_id === $pregunta->id);
-                array_push($rowdata, $respuesta ? $respuesta->texto : '');
+                $respuesta = $respuestas->filter(fn ($r) => $r->pregunta_id === $pregunta->id)
+                    ->map(fn ($r) => $r->texto)
+                    ->join(', ');
+
+                array_push($rowdata, $respuesta);
             }
 
             array_push($data, $rowdata);

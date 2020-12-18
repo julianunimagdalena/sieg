@@ -1,5 +1,5 @@
 import { baseURL } from '../variables.js';
-import { objectToParameter } from '../functions.js';
+import { objectToParameter, fileResponse, initBootstrapSelect } from '../functions.js';
 import http from '../http.js';
 
 const vue = new Vue({
@@ -11,6 +11,13 @@ const vue = new Vue({
         estudiante: {
 
         },
+        form: {
+            encuesta: {}
+        },
+        errors: {
+            encuesta: {}
+        },
+        programas: [],
         estudiante_id: undefined,
         isBackup: false,
         show_sidebar: false,
@@ -51,6 +58,32 @@ const vue = new Vue({
                     alertErrorServidor();
                 }
             ).then(cerrarCargando);
+        },
+        onLoadProgramas(data) {
+            this.programas = data;
+        },
+        onClickDescargarEncuesta() {
+            this.form.encuesta = {};
+            initBootstrapSelect('#s-programas');
+            $('#modalDescargarEncuesta').modal('show');
+        },
+        onSubmitDescargarEncuesta() {
+            cargando();
+            const options = { 'responseType': 'arraybuffer' };
+            http.post('administrador/descargar-encuesta', { ...this.form.encuesta, key: 'momento_0' }, options).then(
+                (response) => {
+                    this.form.encuesta = {};
+                    fileResponse(response);
+                    alertTareaRealizada();
+                    $('#modalDescargarEncuesta').modal('hide');
+                },
+                ({ response }) => {
+                    if (response.status === 422) {
+                        alertErrorServidor('Faltan algunos campos obligatorios por llenar');
+                        //this.errors.encuesta = response.data.errors;
+                    }
+                }
+            ).finally(cerrarCargando);
         },
         initDataTable() {
             if (this.dataTable) {

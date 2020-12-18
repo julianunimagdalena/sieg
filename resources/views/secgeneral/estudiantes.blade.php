@@ -41,7 +41,7 @@
 
 
 <card-action title="ACCIONES">
-    <filter-estudiante v-model="filter" @initdtable="initDataTable()"
+    <filter-estudiante v-model="filter" @initdtable="initDataTable()" @loadprogramas="onLoadProgramas"
         filter_class="col-md-11 offset-md-{{ isset($backup) ? '3' : '2' }}" buttons_class="mt-3" :secretaria="true"
         :isbackup="isBackup" customcolumn>
 
@@ -55,7 +55,15 @@
                 <span class="text">Descargar Backup</span>
             </button>
         </template>
-
+        @elseif(session('ur')->isRol('administrador'))
+        <template v-slot:buttons>
+            <button class="btn btn-sm btn-success btn-icon-split ml-2" @click="onClickDescargarEncuesta()">
+                <span class="icon text-white-50">
+                    <i class="fas fa-cloud-download-alt"></i>
+                </span>
+                <span class="text">Descargar Encuestas</span>
+            </button>
+        </template>
         @else
         <template v-slot:buttons>
             <btn-generar-snies :filter="filter"></btn-generar-snies>
@@ -92,6 +100,26 @@
 <sidebar-documentos :show="show_sidebar" @hide="show_sidebar = false" :estudiante_data="estudiante" :secretaria="true">
 
 </sidebar-documentos>
+
+<modal id="modalDescargarEncuesta" title="Descargar Encuesta" @submit="onSubmitDescargarEncuesta()">
+
+    <div class="form-group">
+        <label>Programa</label>
+        <select v-model="form.encuesta.programa_id" class="form-control bselect" id="s-programas">
+            <option :value="undefined" disabled>SELECCIONE UN PROGRAMA</option>
+            <option v-for="(programa, index) in programas" :value="programa.id">
+                @{{ programa.nombre }}</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <app-input label="Fecha Grado Inicial" type="date" v-model="form.encuesta.fecha_inicial" required />
+    </div>
+
+    <div class="form-group">
+        <app-input label="Fecha Grado Inicial" type="date" v-model="form.encuesta.fecha_final" required />
+    </div>
+</modal>
 
 <modal-informacion-estudiante :estudiante_id="estudiante_id" @hide="estudiante_id = undefined">
 </modal-informacion-estudiante>

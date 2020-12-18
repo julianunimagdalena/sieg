@@ -33,10 +33,12 @@ Route::get('/prueba-siare/{codigo}', function ($codigo) {
 
 Route::get('/prueba', function () {
     // return App\Models\RespuestaEncuesta::all();
-    $ctrl = new App\Http\Controllers\AdminController();
-    $request = new \Illuminate\Http\Request();
-    $request->replace(['key' => 'momento_0']);
-    return $ctrl->descargarEncuesta($request);
+    // $ctrl = new App\Http\Controllers\AdminController();
+    // $request = new \Illuminate\Http\Request();
+    // $request->replace(['fecha_inicial' => '2020-12-18', 'fecha_final' => '2020-12-18']);
+    // return $ctrl->registrarGraduados($request);
+    $ws = new App\Tools\WSAdmisiones();
+    return $ws->getListaGraduadoByFechas('2020-12-11', '2020-12-11');
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');
@@ -171,6 +173,7 @@ Route::post('/administrador/registrar-graduados', 'AdminController@registrarGrad
 Route::get('/administrador/consultar-graduado', 'AdminController@consultarGraduado');
 Route::get('/administrador/consultar-graduado-programas', 'AdminController@consultarGraduadoProgramas');
 Route::post('/administrador/update-graduado', 'AdminController@updateGraduado');
+Route::post('/administrador/descargar-encuesta', 'AdminController@descargarEncuesta');
 
 // PETICIONES SEC GENERAL
 Route::post('/secgeneral/estudiantes', 'SecretariaGeneralController@obtenerEstudiantes');

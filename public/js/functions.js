@@ -109,6 +109,18 @@ const toBase64 = file => new Promise((resolve, reject) => {
     reader.onerror = error => reject(error);
 });
 
+function fileResponse(response) {
+    var blob = new Blob([response.data], { type: response.headers['content-type'] });
+    var filename = response.headers['content-disposition'].split('filename=')[1];
+    var a = document.createElement('a');
+
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+
+    return filename;
+}
+
 
 export {
     objectToFormData,
@@ -118,5 +130,6 @@ export {
     getDocumentoRoute,
     objectToParameter,
     openModal,
-    toBase64
+    toBase64,
+    fileResponse
 };
