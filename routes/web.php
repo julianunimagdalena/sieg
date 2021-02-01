@@ -37,8 +37,9 @@ Route::get('/prueba', function () {
     // $request = new \Illuminate\Http\Request();
     // $request->replace(['fecha_inicial' => '2020-12-18', 'fecha_final' => '2020-12-18']);
     // return $ctrl->registrarGraduados($request);
-    $ws = new App\Tools\WSAdmisiones();
-    return $ws->getListaGraduadoByFechas('2020-12-11', '2020-12-11');
+    // $ws = new App\Tools\WSAdmisiones();
+    // return $ws->getListaGraduadoByFechas('2020-12-11', '2020-12-11');
+    return App\Models\UsuarioRol::with('rol')->find(20036);
 });
 
 Route::get('/session-data', 'CustomLoginController@sessionData');

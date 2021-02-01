@@ -85,7 +85,7 @@ new Vue({
                     else
                         alertErrorServidor();
                 }
-            ).then(cerrarCargando);
+            ).finally(cerrarCargando);
         },
         initFilter() {
             this.filter = {};

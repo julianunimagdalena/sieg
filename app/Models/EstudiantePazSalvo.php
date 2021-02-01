@@ -17,4 +17,10 @@ class EstudiantePazSalvo extends Model
     {
         return $this->belongsTo('App\Models\PazSalvo', 'idPazsalvo');
     }
+
+    public function scopePazsalvo($query, $key)
+    {
+        $pss = Variables::defaultPazSalvos();
+        return $query->where('idPazsalvo', $pss[$key]->id);
+    }
 }

@@ -22,7 +22,7 @@
                         <div class="form-group">
                             <label>Sexo</label>
                             <select class="form-control" v-model="input.genero_id" @input="errors.genero_id=undefined">
-                                <option value="" selected hidden>Seleccione una opción</option>
+                                <option :value="undefined" selected hidden>Seleccione una opción</option>
                                 <option v-for="(sexo, key) in datos.sexos" :value="sexo.id">@{{ sexo.nombre }}</option>
                             </select>
                             <small class="text-danger" v-if="errors.genero_id">@{{errors.genero_id[0]}}</small>
@@ -41,7 +41,7 @@
                             <label>País de nacimiento</label>
                             <select class="form-control" v-model="input.pais_nacimiento_id"
                                 @change="onChangePaisNacimiento()" :disabled="!register">
-                                <option value="" selected hidden>Seleccione una opción</option>
+                                <option :value="undefined" selected hidden>Seleccione una opción</option>
                                 <option v-for="(pais) in datos.paises" :value="pais.id">@{{ pais.nombre }}</option>
                             </select>
                         </div>
@@ -51,7 +51,7 @@
                             <label>Departamento de nacimiento</label>
                             <select class="form-control" v-model="input.departamento_nacimiento_id"
                                 @change="onChangeDepartamentoNacimiento()" :disabled="!register">
-                                <option value="" selected hidden>Seleccione una opción</option>
+                                <option :value="undefined" selected hidden>Seleccione una opción</option>
 
                                 <option v-for="(departamento) in datos.departamentos" :value="departamento.id">
                                     @{{ departamento.nombre }}</option>
@@ -62,7 +62,7 @@
                         <div class="form-group">
                             <label>Municipio de nacimiento</label>
                             <select class="form-control" v-model="input.municipio_nacimiento_id" :disabled="!register">
-                                <option value="" disabled>Seleccione una opción</option>
+                                <option :value="undefined" selected hidden>Seleccione una opción</option>
                                 <option v-for="(municipio) in datos.municipios" :value="municipio.id">
                                     @{{ municipio.nombre }}</option>
                             </select>
@@ -74,7 +74,7 @@
                         <div class="form-group">
                             <label>Fecha de nacimiento</label>
                             <input type="date" class="form-control" :disabled="!register"
-                                v-model="input.fecha_nacimiento">
+                                @change="onChangeFechaNacimiento()" v-model="input.fecha_nacimiento">
                         </div>
                     </div>
                     <div class="col-md-3">
@@ -88,7 +88,7 @@
                             <label>Estado civil</label> <small class="text-danger ml-1">*</small>
                             <select class="form-control" v-model="input.estado_civil_id"
                                 @input="errors.estado_civil_id = undefined">
-                                <option value="" selected hidden>Seleccione una opción</option>
+                                <option :value="undefined" selected hidden>Seleccione una opción</option>
                                 <option v-for="(estado) in datos.estados_civiles" :value="estado.id">
                                     @{{ estado.nombre }}</option>
                             </select>
@@ -129,7 +129,7 @@
                     <div class="form-group">
                         <label>Tipo</label>
                         <select class="form-control" v-model="input.tipo_documento_id" :disabled="!register">
-                            <option value="" selected hidden>Seleccione una opción</option>
+                            <option :value="undefined" selected hidden>Seleccione una opción</option>
                             <option v-for=" (t_documento) in datos.tipos_documento" :value="t_documento.id">
                                 @{{ t_documento.abrv || t_documento.nombre }}</option>
                         </select>
@@ -167,7 +167,7 @@
                         <label>País de residencia</label>
                         <select class="form-control" v-model="input.pais_residencia_id"
                             @change="onChangePaisResidencia()">
-                            <option value="" selected hidden>Seleccione una opción</option>
+                            <option :value="undefined" selected hidden>Seleccione una opción</option>
                             <option v-for="(pais) in datos.paises" :value="pais.id">@{{ pais.nombre }}</option>
                         </select>
                     </div>
@@ -177,7 +177,7 @@
                         <label>Departamento de residencia</label>
                         <select class="form-control" v-model="input.departamento_residencia_id"
                             @change="onChangeDepartamentoResidencia()">
-                            <option value="" selected hidden>Seleccione una opción</option>
+                            <option :value="undefined" selected hidden>Seleccione una opción</option>
                             <option v-for="(departamento) in datos.departamentos_residencia" :value="departamento.id">
                                 @{{ departamento.nombre }}</option>
                         </select>
@@ -188,7 +188,7 @@
                         <label>Municipio de residencia</label><small class="text-danger ml-1">*</small>
                         <select class="form-control" v-model="input.municipio_residencia_id"
                             @input="errors.municipio_residencia_id = undefined">
-                            <option value="" selected hidden>Seleccione una opción</option>
+                            <option :value="undefined" selected hidden>Seleccione una opción</option>
                             <option v-for="(municipio) in datos.municipios_residencia" :value="municipio.id">
                                 @{{ municipio.nombre }}</option>
                         </select>
@@ -245,9 +245,9 @@
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <app-input v-model="input.correo" type="email" label="Correo Personal"
+                        <app-input v-model="input.correo2" type="email" label="Correo Personal"
                             @input="errors.correo2 = undefined" placeholder="Correo Electronico"
-                            v-bind:errors="errors.correo" />
+                            v-bind:errors="errors.correo2" />
                     </div>
                 </div>
             </div>

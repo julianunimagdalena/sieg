@@ -767,7 +767,7 @@ class AdminController extends Controller
 
     public function registrarGraduado()
     {
-        return view('egresado.ficha', ['register' => true]);
+        return view('egresado.ficha', ['register' => true, 'isAdmin' => true]);
     }
 
     public function consultarGraduado(Request $request)

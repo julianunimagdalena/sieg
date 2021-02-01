@@ -157,5 +157,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.25.3/locale/es.min.js"></script>
 <script src="https://unpkg.com/driver.js/dist/driver.min.js"></script>
 <script type="module" src="{{ asset('js/ficha/main.js')}}"></script>
+@if(!session('ur')->isRol('administrador'))
 <script type="module" src="{{ asset('js/ficha/tutorial.js')}}"></script>
+@endif
 @endpush

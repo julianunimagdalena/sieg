@@ -124,10 +124,10 @@ class DirProgramaController extends Controller
         $witherrors = [];
         $dpss = Variables::defaultPazSalvos();
         $pss = [
-            'recursosEducativos' => false,
-            'biblioteca' => false,
-            'bienestar' => false,
-            'pago' => false
+            'recursosEducativos' => $estudiante->estudiantePazSalvo()->pazsalvo('recursosEducativos')->first()->paz_salvo,
+            'biblioteca' => $estudiante->estudiantePazSalvo()->pazsalvo('biblioteca')->first()->paz_salvo,
+            'bienestar' => $estudiante->estudiantePazSalvo()->pazsalvo('bienestar')->first()->paz_salvo,
+            // 'pago' => false
         ];
 
         try {

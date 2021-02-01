@@ -34,8 +34,10 @@ new Vue({
             }
         },
         updateRegister(data) {
-            this.egresado_data.data = data;
-            console.log(data);
+            this.egresado_data = {
+                ...this.egresado_data,
+                ...data
+            };
         },
         runAlertBusqueda() {
             swal({
@@ -75,7 +77,7 @@ new Vue({
             );
         }
     },
-    mounted: function () {
+    mounted() {
         let tabActive = sessionStorage.getItem('active');
 
         this.register = Boolean(Number($('#is-register').val()));

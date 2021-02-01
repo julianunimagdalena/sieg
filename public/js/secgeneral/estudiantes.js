@@ -32,8 +32,9 @@ const vue = new Vue({
 
             if (sidebar === 'est')
                 this.show_est = true;
-            else
-                this.show_dir = true;
+            else {
+                this.show_sidebar = true;
+            }
 
         },
         showEstudiante(id) {

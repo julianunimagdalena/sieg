@@ -11,7 +11,7 @@ class UsuarioRol extends Model
     public $timestamps = false;
     protected $table = 'usuario_rol';
 
-    protected $visible = ['id', 'usuario_id', 'rol_id', 'activo'];
+    // protected $visible = ['id', 'usuario_id', 'rol_id', 'activo'];
     protected $casts = [
         'activo' => 'boolean',
         'usuario_id' => 'integer',

@@ -33,7 +33,7 @@ Vue.component('datos-basicos', {
             this.input = new_v.datos;
             if (new_v.id) {
                 this.input.id = new_v.id;
-                this.input.edad = moment().diff(this.input.fecha_nacimiento, 'years', false);
+                this.onChangeFechaNacimiento();
 
                 this.onChangePaisNacimiento();
                 this.onChangeDepartamentoNacimiento();
@@ -44,6 +44,9 @@ Vue.component('datos-basicos', {
         }
     },
     methods: {
+        onChangeFechaNacimiento() {
+            this.input.edad = moment().diff(this.input.fecha_nacimiento, 'years', false);
+        },
         handleSubmit() {
             cargando('Enviando datos');
             http.post('egresado/datos', this.input).then(
@@ -51,7 +54,7 @@ Vue.component('datos-basicos', {
                     swal('Info', 'Se han guardado satisfactoriamente los datos', 'success');
 
                     if (this.register && this.updateregister) {
-                        this.input.id = data.id;
+                        this.input = { ...this.input, id: data.id };
                         this.updateregister(this.input);
                     }
                 },
@@ -92,7 +95,8 @@ Vue.component('datos-basicos', {
             this.getMunicipios(this.input.departamento_residencia_id).then((data) => this.datos.municipios_residencia = data);
         }
     },
-    mounted: function () {
+    mounted() {
+
         http.get('recursos/generos').then(
             ({ data }) => {
                 this.datos.sexos = data;
@@ -140,11 +144,9 @@ Vue.component('datos-basicos', {
                 ({ data, ...datos }) => {
                     this.input = data;
 
-                    this.input.edad = moment().diff(data.fecha_nacimiento, 'years', false);
+                    this.onChangeFechaNacimiento();
 
                     this.datos = { ...this.datos, ...datos };
-
-
                 }
             );
         }

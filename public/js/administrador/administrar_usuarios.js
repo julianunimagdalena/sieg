@@ -27,6 +27,28 @@ new Vue({
         },
         eliminar(usuario) {
 
+            swal({
+                title: "¿Está seguro de eliminar?",
+                text: "Se eliminará para siempre",
+                icon: "warning",
+                buttons: [
+                    'No, cancelar',
+                    'Si, estoy de acuerdo'
+                ],
+            }).then(
+                (isConfirm) => {
+                    if (isConfirm) {
+                        cargando();
+                        http.post('administrador/eliminar-usuario', { id: usuario.id }).then(
+                            () => {
+                                alertTareaRealizada();
+                                this.fetchUsuarios();
+                            },
+                            ({ response }) => alertErrorServidor()
+                        ).finally(cerrarCargando);
+                    }
+                }
+            );
         }
     }
 });

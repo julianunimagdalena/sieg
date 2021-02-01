@@ -100,8 +100,8 @@
                         <div class="row">
 
                             <div class="col-md-12 col-sm-12 form-group">
-                                <app-select label="Mejor Ecaes" v-model="form.estudiante.extra.mejor_ecaes" required
-                                    :errors="errors.estudiante.extra.mejor_ecaes"
+                                <app-select label="Mejor Ecaes" v-model="form.estudiante.extra.mejor_ecaes"
+                                    :s_disabled="secretaria" required :errors="errors.estudiante.extra.mejor_ecaes"
                                     @input="errors.estudiante.extra.mejor_ecaes = undefined">
                                     <option :value="true">SI</option>
                                     <option :value="false">NO</option>
@@ -110,7 +110,7 @@
 
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-select label="¿Aplica mención de honor por resultados ECAES?"
-                                    v-model="form.estudiante.extra.mencion_honor" required
+                                    :s_disabled="secretaria" v-model="form.estudiante.extra.mencion_honor" required
                                     :errors="errors.estudiante.extra.mencion_honor"
                                     @input="errors.estudiante.extra.mencion_honor = undefined">
                                     <option :value="true">SI</option>
@@ -120,7 +120,7 @@
 
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-select label="Incentivos por mejor resultado ECAES a nivel nacional"
-                                    v-model="form.estudiante.extra.incentivo_nacional" required
+                                    :s_disabled="secretaria" v-model="form.estudiante.extra.incentivo_nacional" required
                                     :errors="errors.estudiante.extra.incentivo_nacional"
                                     @input="errors.estudiante.extra.incentivo_nacional = undefined">
                                     <option :value="true">SI APLICA</option>
@@ -130,8 +130,8 @@
 
                             <div class="col-md-12 col-sm-12 form-group">
                                 <app-select label="Incentivos por mejor resultado ECAES institucional"
-                                    v-model="form.estudiante.extra.incentivo_institucional" required
-                                    :errors="errors.estudiante.extra.incentivo_institucional"
+                                    :s_disabled="secretaria" v-model="form.estudiante.extra.incentivo_institucional"
+                                    required :errors="errors.estudiante.extra.incentivo_institucional"
                                     @input="errors.estudiante.extra.incentivo_institucional = undefined">
                                     <option :value="true">SI APLICA</option>
                                     <option :value="false">NO APLICA</option>
@@ -139,14 +139,14 @@
                             </div>
 
                             <div class="col-md-12 col-sm-12 form-group">
-                                <app-input label="Nombre del Tutor de Grado" placeholder="Nombre"
+                                <app-input label="Nombre del Tutor de Grado" placeholder="Nombre" :disabled="secretaria"
                                     v-model="form.estudiante.extra.tutor_grado"
                                     :errors="errors.estudiante.extra.tutor_grado"
                                     @input="errors.estudiante.extra.tutor_grado" />
                             </div>
 
                             <div class="col-md-12 col-sm-12 form-group">
-                                <app-select label="Tipo Vinculación del Tutor de Grado"
+                                <app-select label="Tipo Vinculación del Tutor de Grado" :s_disabled="secretaria"
                                     v-model="form.estudiante.extra.tipo_vinculacion_tutor_id"
                                     :errors="errors.estudiante.extra.tipo_vinculacion_tutor_id"
                                     @input="errors.estudiante.extra.tipo_vinculacion_tutor_id  = undefined">
@@ -165,6 +165,7 @@
             </div>
         </div>
         <template v-slot:footer class="p-3">
+            @if(!session('ur')->isRol('administrador'))
             <button type="button" class="btn btn-success btn-circle" title="Aprobar Estudiante"
                 @click="aprobarEstudiante()" :disabled="!datos.can_aprobar">
                 <i class="fas fa-check"></i>
@@ -173,6 +174,7 @@
                 data-target="#modalNoAprobarEstudiante" title="Rechazar Estudiante">
                 <i class="fas fa-times"></i>
             </button>
+            @endif
         </template>
     </sidebar>
     <modal id="modalRechazarDocumento" title="Rechazar Documento Estudiante"

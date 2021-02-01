@@ -42,7 +42,8 @@
             <td style="font-size: .8rem">@{{usr.dirige || '-'}}</td>
             <td>
                 <i class="fas fa-pen text-primary" title="Editar" v-on:click="usuarioModal(usr)"></i>
-                <i class="fas fa-trash text-danger" title="Eliminar" v-on:click="eliminar(usr)"></i>
+                <i class="fas fa-trash text-danger" title="Eliminar" v-on:click="eliminar(usr)"
+                    v-if="usr.id != {{ session('ur')->id }}"></i>
             </td>
         </tr>
     </tbody>

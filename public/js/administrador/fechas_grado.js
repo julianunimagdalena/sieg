@@ -38,24 +38,20 @@ new Vue({
             this.selectedFechaId = fecha ? fecha.id : null;
             $('#fechaGradoModal').modal('show');
         },
-        eliminarFecha(fecha)
-        {
+        eliminarFecha(fecha) {
             alertConfirmar('¿Está seguro de eliminar la fecha de grado?').then(
-                (ok) =>
-                {
-                    if(!ok)
+                (ok) => {
+                    if (!ok)
                         return;
 
                     cargando();
-                    http.post('administrador/eliminar-fecha-grado', { fecha_id: fecha.id } ).then(
-                        () =>
-                        {
+                    http.post('administrador/eliminar-fecha-grado', { fecha_id: fecha.id }).then(
+                        () => {
                             this.buscar({}, true);
                             alertTareaRealizada();
                         },
-                        err =>
-                        {
-                            alertErrorServidor();
+                        ({ response }) => {
+                            alertErrorServidor(response.data);
                         }
                     ).then(cerrarCargando);
                 }

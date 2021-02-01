@@ -86,6 +86,7 @@ Vue.component('user-avatar', {
     },
 
     mounted: function () {
+
         this.initFoto();
     }
 });

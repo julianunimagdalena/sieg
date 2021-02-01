@@ -73,6 +73,13 @@ Vue.component('filter-estudiante', {
             }
         );
 
+        /*http.get('recursos/fechas-grado?activa=1').then(
+            ({ data }) => {
+                this.datos.fechas_grado = data;
+                console.log(data);
+            }
+        );*/
+
         http.get(urlProgramas).then(
             ({ data }) => {
                 this.datos.programas = data;

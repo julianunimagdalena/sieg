@@ -2,7 +2,7 @@
 <span>
     <label>@{{ label }} </label><small class="text-danger ml-1" v-if="required">*</small>
     <select :id="id" class="form-control" :class="input_class" :placeholder="placeholder" v-model="c_value"
-        v-on:change="$emit('input', c_value)">
+        :disabled="s_disabled" v-on:change="$emit('input', c_value)">
         <option :value="c_value === null ? null : undefined" selected :disabled="disabled">
             @{{ default_text || "Seleccione una opción"}}</option>
         <slot />
@@ -19,6 +19,10 @@
             id: {
                 type: String,
                 default: undefined
+            },
+            s_disabled: {
+                type: Boolean,
+                default: false
             },
             disabled: {
                 type: Boolean,
